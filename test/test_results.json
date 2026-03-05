@@ -1,0 +1,110 @@
+{
+  "test_time": "2026-03-05T21:51:02.904110",
+  "summary": {
+    "total_pages": 12,
+    "passed": 4,
+    "failed": 8,
+    "success_rate": "33.3%"
+  },
+  "accessibility": [
+    {
+      "page": "index.html",
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 20490
+    },
+    {
+      "page": "playable.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "register-v2.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "login-v2.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "shop.html",
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 18165
+    },
+    {
+      "page": "recharge.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "tournament.html",
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 17694
+    },
+    {
+      "page": "streak.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "ranked.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "honor.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "profile.html",
+      "status_code": 404,
+      "status": "❌ HTTP 404",
+      "size": 9379
+    },
+    {
+      "page": "admin/index.html",
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 11436
+    }
+  ],
+  "performance": [
+    {
+      "page": "index.html",
+      "load_time": 0.56,
+      "size_kb": 20.01
+    },
+    {
+      "page": "playable.html",
+      "load_time": 0.52,
+      "size_kb": 9.16
+    },
+    {
+      "page": "shop.html",
+      "load_time": 0.52,
+      "size_kb": 17.74
+    }
+  ],
+  "failed_pages": [
+    "playable.html",
+    "register-v2.html",
+    "login-v2.html",
+    "recharge.html",
+    "streak.html",
+    "ranked.html",
+    "honor.html",
+    "profile.html"
+  ]
+}
