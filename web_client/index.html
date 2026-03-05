@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>命运塔·首登者 V1.0</title>
+    <link rel="stylesheet" href="style-v1.0.css">
+    <link rel="stylesheet" href="device-adaptive-v1.0.css">
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="home-screen" class="screen active">
+        <div class="home-container">
+            <!-- 顶部栏 -->
+            <header class="home-header">
+                <div class="logo">
+                    <span class="logo-icon">🏰</span>
+                    <span class="logo-text">命运塔</span>
+                </div>
+                <div class="user-info" onclick="showUserCenter()">
+                    <div class="avatar">👤</div>
+                    <div class="currency">
+                        <span class="coin">💰 <span id="user-coins">10000</span></span>
+                        <span class="diamond">💎 <span id="user-diamonds">100</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 连胜挑战横幅 (重点推荐) -->
+            <div class="streak-banner" onclick="startGame('streak')">
+                <div class="banner-bg"></div>
+                <div class="streak-content">
+                    <span class="hot-badge">🔥 热门</span>
+                    <h2 class="streak-title">连胜挑战</h2>
+                    <p class="streak-desc">连续13次成功登顶！赢取丰厚奖励</p>
+                    <button class="play-btn">立即挑战</button>
+                </div>
+                <div class="streak-icon">⚡</div>
+            </div>
+
+            <!-- 游戏模式选择 -->
+            <div class="mode-grid">
+                <div class="mode-card" onclick="startGame('solo')">
+                    <div class="mode-icon">👤</div>
+                    <h3>个人赛</h3>
+                    <p>4人竞技 智取巅峰</p>
+                    <span class="mode-tag">匹配中: <span id="solo-waiting">128</span>人</span>
+                </div>
+                <div class="mode-card" onclick="startGame('team')">
+                    <div class="mode-icon">👥</div>
+                    <h3>团队赛</h3>
+                    <p>2v2/3v3 协作登顶</p>
+                    <span class="mode-tag">在线: <span id="team-online">64</span>队</span>
+                </div>
+            </div>
+
+            <!-- 功能菜单 -->
+            <nav class="feature-nav">
+                <div class="nav-item" onclick="showShop()">
+                    <span class="nav-icon">🛒</span>
+                    <span>商城</span>
+                </div>
+                <div class="nav-item" onclick="showTournament()">
+                    <span class="nav-icon">🏆</span>
+                    <span>锦标赛</span>
+                </div>
+                <div class="nav-item" onclick="showTasks()">
+                    <span class="nav-icon">📋</span>
+                    <span>任务</span>
+                </div>
+                <div class="nav-item" onclick="showRank()">
+                    <span class="nav-icon">📊</span>
+                    <span>排行</span>
+                </div>
+            </nav>
+
+            <!-- 底部菜单 -->
+            <footer class="bottom-nav">
+                <div class="nav-btn active" data-screen="home">
+                    <span class="btn-icon">🏠</span>
+                    <span>首页</span>
+                </div>
+                <div class="nav-btn" data-screen="friends">
+                    <span class="btn-icon">👥</span>
+                    <span>好友</span>
+                </div>
+                <div class="nav-btn play" onclick="quickMatch()">
+                    <span class="btn-icon">▶️</span>
+                    <span>开始</span>
+                </div>
+                <div class="nav-btn" data-screen="mail">
+                    <span class="btn-icon">📧</span>
+                    <span>邮件</span>
+                </div>
+                <div class="nav-btn" data-screen="settings">
+                    <span class="btn-icon">⚙️</span>
+                    <span>设置</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <!-- 游戏头部 -->
+            <header class="game-header">
+                <button class="back-btn" onclick="backToHome()">←</button>
+                <div class="game-info">
+                    <span class="round">第 <span id="current-round">1</span> 轮</span>
+                    <span class="timer" id="game-timer">15</span>
+                </div>
+                <button class="menu-btn" onclick="showGameMenu()">☰</button>
+            </header>
+
+            <!-- 塔区域 -->
+            <div class="tower-section">
+                <!-- 塔主体 -->
+                <div class="tower-container">
+                    <div class="tower-layers" id="tower-layers">
+                        <!-- 层由JS动态生成 -->
+                    </div>
+                    
+                    <!-- 玩家位置标记 -->
+                    <div class="player-markers" id="player-markers">
+                        <!-- 由JS动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 守卫信息 -->
+                <div class="guard-info" id="guard-info">
+                    <div class="guard-avatar">🛡️</div>
+                    <div class="guard-cards">
+                        <span>守卫牌: <span id="guard-remaining">13</span></span>
+                        <span>激怒牌: <span id="provocation-remaining">3</span></span>
+                    </div>
+                </div>
+
+                <!-- 激怒牌展示区 -->
+                <div class="provocation-area" id="provocation-area">
+                    <h4>激怒牌 (明牌)</h4>
+                    <div class="provocation-cards" id="provocation-cards">
+                        <!-- 由JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他玩家 -->
+            <div class="other-players" id="other-players">
+                <!-- 由JS动态生成 -->
+            </div>
+
+            <!-- 当前守卫牌 -->
+            <div class="current-guard-card-area">
+                <div class="guard-card-slot" id="guard-card-slot">
+                    <span class="guard-label">守卫</span>
+                    <div class="card-back">?</div>
+                    <div class="card-front hidden" id="guard-card-front"></div>
+                </div>
+            </div>
+
+            <!-- 手牌区域 -->
+            <div class="hand-section">
+                <div class="hand-info">
+                    <span>剩余: <span id="hand-count">52</span>张</span>
+                    <span id="current-level">第 2 层</span>
+                </div>
+                <div class="hand-cards" id="hand-cards">
+                    <!-- 由JS动态生成 -->
+                </div>
+                <button class="confirm-btn" id="confirm-btn" onclick="confirmPlay()" disabled>
+                    确认出牌
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结算界面 -->
+    <div id="result-screen" class="screen">
+        <div class="result-container">
+            <div class="result-header" id="result-header">
+                <h1 id="result-title">胜利!</h1>
+                <div class="result-icon" id="result-icon">🏆</div>
+            </div>
+            
+            <div class="score-board" id="score-board">
+                <!-- 由JS动态生成 -->
+            </div>
+
+            <div class="result-actions">
+                <button class="action-btn primary" onclick="playAgain()">再来一局</button>
+                <button class="action-btn" onclick="backToHome()">返回首页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载中 -->
+    <div id="loading-screen" class="screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>匹配中...</p>
+            <p class="loading-sub">正在寻找对手</p>
+        </div>
+    </div>
+
+    <!-- 引入游戏逻辑 -->
+    <script src="core-game-v1.0.js"></script>
+    <script src="shop-data-v1.0.js"></script>
+    <script src="device-effects-v1.0.js"></script>
+    <script src="game-controller-v1.0.js"></script>
+</body>
+</html>

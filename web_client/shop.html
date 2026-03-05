@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>商城 - 命运塔·首登者</title>
+    <link rel="stylesheet" href="style-v1.0.css">
+    <style>
+        /* 商城专用样式 */
+        .shop-container {
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+        }
+        
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .shop-title {
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .shop-currency {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .currency-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .currency-badge.coins { color: var(--primary-color); }
+        .currency-badge.diamonds { color: #00d4ff; }
+        
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-tab {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 25px;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+        
+        .category-tab.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border-color: var(--primary-color);
+        }
+        
+        /* 商品网格 */
+        .shop-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .shop-item:active {
+            transform: scale(0.98);
+        }
+        
+        .item-preview {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            position: relative;
+        }
+        
+        /* 稀有度背景 */
+        .item-preview.common { background: linear-gradient(135deg, #2a2a4a, #1a1a3e); }
+        .item-preview.rare { background: linear-gradient(135deg, #1a4a6a, #0d2847); }
+        .item-preview.epic { background: linear-gradient(135deg, #4a1a6a, #280d47); }
+        .item-preview.legendary { background: linear-gradient(135deg, #6a4a1a, #47280d); }
+        
+        .rarity-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .rarity-badge.common { background: #888; color: #000; }
+        .rarity-badge.rare { background: #0088ff; color: #fff; }
+        .rarity-badge.epic { background: #8800ff; color: #fff; }
+        .rarity-badge.legendary { background: linear-gradient(135deg, var(--primary-color), #ff8800); color: #000; }
+        
+        .item-info {
+            padding: 12px;
+        }
+        
+        .item-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .item-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-price {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+        }
+        
+        .item-price.coins { color: var(--primary-color); }
+        .item-price.diamonds { color: #00d4ff; }
+        
+        .buy-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            min-height: 36px;
+        }
+        
+        .buy-btn:disabled {
+            background: #444;
+            color: #666;
+        }
+        
+        .buy-btn.owned {
+            background: #4CAF50;
+            color: #fff;
+        }
+        
+        /* 特效预览弹窗 */
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+        }
+        
+        .preview-modal.active {
+            display: flex;
+        }
+        
+        .preview-content {
+            background: linear-gradient(135deg, var(--bg-mid), var(--bg-dark));
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+        }
+        
+        .preview-title {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-stage {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .preview-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            min-height: 52px;
+        }
+        
+        .preview-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        .preview-btn.buy {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="shop-container">
+        <!-- 头部 -->
+        <header class="shop-header">
+            <button class="back-btn" onclick="backToHome()">←</button>
+            <span class="shop-title">商城</span>
+            <div class="shop-currency">
+                <div class="currency-badge coins">
+                    <span>💰</span>
+                    <span id="shop-coins">10000</span>
+                </div>
+                <div class="currency-badge diamonds">
+                    <span>💎</span>
+                    <span id="shop-diamonds">100</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="all">全部</button>
+            <button class="category-tab" data-category="skin">皮肤</button>
+            <button class="category-tab" data-category="effect">特效</button>
+            <button class="category-tab" data-category="card_back">卡背</button>
+            <button class="category-tab" data-category="avatar">头像框</button>
+            <button class="category-tab" data-category="emote">表情</button>
+        </div>
+
+        <!-- 商品网格 -->
+        <div class="shop-grid" id="shop-grid">
+            <!-- 由JS动态生成 -->
+        </div>
+    </div>
+
+    <!-- 特效预览弹窗 -->
+    <div class="preview-modal" id="preview-modal">
+        <div class="preview-content">
+            <h3 class="preview-title" id="preview-name">商品名称</h3>
+            <div class="preview-stage" id="preview-stage">
+                <span id="preview-icon" style="font-size: 64px;">🔥</span>
+            </div>
+            <p id="preview-desc" style="text-align: center; margin-bottom: 20px; color: var(--text-muted);">商品描述</p>
+            <div class="preview-actions">
+                <button class="preview-btn cancel" onclick="closePreview()">取消</button>
+                <button class="preview-btn buy" id="preview-buy-btn" onclick="confirmPurchase()">购买</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="shop-data-v1.0.js"></script>
+    <script>
+        // 商城状态
+        const ShopState = {
+            currentCategory: 'all',
+            selectedItem: null,
+            userCoins: 10000,
+            userDiamonds: 100,
+            inventory: []
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            renderShop();
+            bindEvents();
+        });
+
+        // 加载用户数据
+        function loadUserData() {
+            const saved = localStorage.getItem('tof_user');
+            if (saved) {
+                const user = JSON.parse(saved);
+                ShopState.userCoins = user.coins || 10000;
+                ShopState.userDiamonds = user.diamonds || 100;
+            }
+            
+            const inventory = localStorage.getItem('tof_inventory');
+            if (inventory) {
+                ShopState.inventory = JSON.parse(inventory);
+            }
+            
+            updateCurrencyDisplay();
+        }
+
+        // 更新货币显示
+        function updateCurrencyDisplay() {
+            document.getElementById('shop-coins').textContent = ShopState.userCoins;
+            document.getElementById('shop-diamonds').textContent = ShopState.userDiamonds;
+        }
+
+        // 渲染商城
+        function renderShop() {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+            
+            const items = ShopState.currentCategory === 'all' 
+                ? SHOP_ITEMS 
+                : SHOP_ITEMS.filter(item => item.type === ShopState.currentCategory);
+            
+            items.forEach(item => {
+                const isOwned = ShopState.inventory.includes(item.id);
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+                el.innerHTML = `
+                    <div class="item-preview ${item.rarity}" onclick="showPreview('${item.id}')">
+                        <span>${item.icon}</span>
+                        <span class="rarity-badge ${item.rarity}">${item.rarity}</span>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-desc">${item.description}</div>
+                        <div class="item-footer">
+                            <div class="item-price ${item.currency}">
+                                <span>${item.currency === 'coins' ? '💰' : '💎'}</span>
+                                <span>${item.price}</span>
+                            </div>
+                            <button class="buy-btn ${isOwned ? 'owned' : ''}" 
+                                    onclick="${isOwned ? '' : `showPreview('${item.id}')`}"
+                                    ${isOwned ? 'disabled' : ''}>
+                                ${isOwned ? '已拥有' : '购买'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        // 显示预览
+        function showPreview(itemId) {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            if (!item) return;
+            
+            ShopState.selectedItem = item;
+            
+            document.getElementById('preview-name').textContent = item.name;
+            document.getElementById('preview-icon').textContent = item.icon;
+            document.getElementById('preview-desc').textContent = item.description;
+            
+            const buyBtn = document.getElementById('preview-buy-btn');
+            const canAfford = item.currency === 'coins' 
+                ? ShopState.userCoins >= item.price 
+                : ShopState.userDiamonds >= item.price;
+            
+            buyBtn.textContent = canAfford 
+                ? `${item.currency === 'coins' ? '💰' : '💎'} ${item.price} 购买` 
+                : '余额不足';
+            buyBtn.disabled = !canAfford;
+            
+            // 播放特效预览
+            playEffectPreview(item.type, item.id);
+            
+            document.getElementById('preview-modal').classList.add('active');
+        }
+
+        // 关闭预览
+        function closePreview() {
+            document.getElementById('preview-modal').classList.remove('active');
+            ShopState.selectedItem = null;
+        }
+
+        // 播放特效预览
+        function playEffectPreview(type, itemId) {
+            const stage = document.getElementById('preview-stage');
+            
+            // 清除旧特效
+            stage.querySelectorAll('.effect-overlay').forEach(el => el.remove());
+            
+            if (type === 'effect') {
+                const effect = document.createElement('div');
+                effect.className = 'effect-overlay';
+                effect.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    pointer-events: none;
+                `;
+                
+                // 根据特效类型添加动画
+                if (itemId.includes('fire')) {
+                    effect.style.background = 'radial-gradient(circle, rgba(255,100,0,0.8) 0%, transparent 70%)';
+                    effect.style.animation = 'pulse 0.5s ease-in-out 3';
+                } else if (itemId.includes('ice')) {
+                    effect.style.background = 'radial-gradient(circle, rgba(0,200,255,0.8) 0%, transparent 70%)';
+                    effect.style.animation = 'pulse 0.5s ease-in-out 3';
+                } else if (itemId.includes('lightning')) {
+                    effect.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, transparent 70%)';
+                    effect.style.animation = 'pulse 0.3s ease-in-out 5';
+                }
+                
+                stage.appendChild(effect);
+            }
+        }
+
+        // 确认购买
+        function confirmPurchase() {
+            const item = ShopState.selectedItem;
+            if (!item) return;
+            
+            // 扣除货币
+            if (item.currency === 'coins') {
+                ShopState.userCoins -= item.price;
+            } else {
+                ShopState.userDiamonds -= item.price;
+            }
+            
+            // 添加到库存
+            ShopState.inventory.push(item.id);
+            
+            // 保存
+            localStorage.setItem('tof_user', JSON.stringify({
+                coins: ShopState.userCoins,
+                diamonds: ShopState.userDiamonds
+            }));
+            localStorage.setItem('tof_inventory', JSON.stringify(ShopState.inventory));
+            
+            // 更新显示
+            updateCurrencyDisplay();
+            renderShop();
+            closePreview();
+            
+            // 提示
+            showToast(`成功购买 ${item.name}！`);
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.9);
+                color: var(--primary-color);
+                padding: 16px 32px;
+                border-radius: 12px;
+                z-index: 2000;
+                font-weight: bold;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // 绑定事件
+        function bindEvents() {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    ShopState.currentCategory = tab.dataset.category;
+                    renderShop();
+                });
+            });
+        }
+
+        // 返回首页
+        function backToHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

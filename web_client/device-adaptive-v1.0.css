@@ -1,0 +1,511 @@
+/* ============================================
+ * 命运塔·首登者 V1.0 - 设备精确适配样式
+ * Device Adaptive Styles
+ * 
+ * 重点适配机型：
+ * - iPhone SE/8: 375px (0.85x)
+ * - iPhone 14/15/16: 390-402px (0.90x)
+ * - iPhone Pro Max: 430px (1.00x 基准)
+ * - 华为 Mate X6 折叠屏: 700-800px+ (1.20x)
+ * - Samsung Galaxy/Pixel: 360-390px (0.88x)
+ * ============================================ */
+
+/* 基础CSS变量 */
+:root {
+    --device-scale: 1;
+    --card-width: 48px;
+    --card-height: 68px;
+    --card-font-size: 16px;
+    --btn-height: 44px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    
+    /* 颜色 */
+    --primary-color: #FFD700;
+    --primary-dark: #FFA500;
+    --secondary-color: #FF4757;
+    --bg-dark: #0a0a1a;
+    --bg-mid: #1a1a3e;
+    --text-light: #ffffff;
+    --text-muted: #8888aa;
+}
+
+/* ============================================
+ * iPhone SE/8 小屏适配 (375px, 0.85x)
+ * ============================================ */
+.device-small {
+    --card-width: 40px;
+    --card-height: 56px;
+    --card-font-size: 13px;
+    --btn-height: 37px;
+    --space-sm: 6px;
+    --space-md: 13px;
+    --space-lg: 20px;
+}
+
+.device-small .tower-layer {
+    height: 26px;
+    font-size: 11px;
+}
+
+.device-small .logo-text {
+    font-size: 16px;
+}
+
+.device-small .streak-title {
+    font-size: 18px;
+}
+
+.device-small .mode-card h3 {
+    font-size: 14px;
+}
+
+.device-small .hand-cards {
+    gap: 4px;
+}
+
+.device-small .player-marker {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+}
+
+/* ============================================
+ * iPhone 14/15/16 标准版 (390-402px, 0.90x)
+ * ============================================ */
+.device-standard {
+    --card-width: 43px;
+    --card-height: 61px;
+    --card-font-size: 14px;
+    --btn-height: 40px;
+    --space-sm: 7px;
+    --space-md: 14px;
+    --space-lg: 22px;
+}
+
+.device-standard .tower-layer {
+    height: 28px;
+    font-size: 12px;
+}
+
+/* ============================================
+ * Android标准屏 (360-390px, 0.88x)
+ * ============================================ */
+.device-android {
+    --card-width: 42px;
+    --card-height: 60px;
+    --card-font-size: 14px;
+    --btn-height: 39px;
+    --space-sm: 7px;
+    --space-md: 14px;
+    --space-lg: 21px;
+}
+
+.device-android .tower-layer {
+    height: 27px;
+    font-size: 12px;
+}
+
+/* ============================================
+ * iPhone Pro Max 基准 (430px, 1.00x)
+ * ============================================ */
+.device-large {
+    /* 使用默认变量 */
+}
+
+/* ============================================
+ * Android大屏 (412px, 0.95x)
+ * ============================================ */
+.device-xlarge {
+    --card-width: 46px;
+    --card-height: 65px;
+    --card-font-size: 15px;
+    --btn-height: 42px;
+}
+
+/* ============================================
+ * 折叠屏展开态 (华为Mate X6, Galaxy Z Fold)
+ * 700-900px, 1.20x
+ * ============================================ */
+.device-fold {
+    --card-width: 58px;
+    --card-height: 82px;
+    --card-font-size: 19px;
+    --btn-height: 53px;
+    --space-sm: 10px;
+    --space-md: 19px;
+    --space-lg: 29px;
+}
+
+.device-fold .home-container,
+.device-fold .game-container,
+.device-fold .shop-container,
+.device-fold .tournament-container {
+    max-width: 600px;
+}
+
+.device-fold .tower-container {
+    max-width: 400px;
+}
+
+.device-fold .tower-layer {
+    height: 38px;
+    font-size: 16px;
+}
+
+.device-fold .mode-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.device-fold .shop-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.device-fold .hand-cards {
+    gap: 12px;
+}
+
+/* 华为Mate X6特殊优化 */
+.huawei-mate-fold .card {
+    border-radius: 12px;
+}
+
+.huawei-mate-fold .tower-layer {
+    border-radius: 12px;
+}
+
+/* ============================================
+ * 平板设备 (500px+, 1.30x)
+ * ============================================ */
+.device-tablet {
+    --card-width: 62px;
+    --card-height: 88px;
+    --card-font-size: 20px;
+    --btn-height: 57px;
+    --space-sm: 10px;
+    --space-md: 21px;
+    --space-lg: 31px;
+}
+
+.device-tablet .home-container,
+.device-tablet .game-container,
+.device-tablet .shop-container,
+.device-tablet .tournament-container {
+    max-width: 680px;
+}
+
+.device-tablet .mode-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.device-tablet .shop-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ============================================
+ * iOS安全区适配 (刘海屏/灵动岛)
+ * ============================================ */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .platform-ios .home-header,
+    .platform-ios .game-header,
+    .platform-ios .shop-header,
+    .platform-ios .tournament-header {
+        padding-top: max(12px, env(safe-area-inset-top));
+    }
+    
+    .platform-ios .bottom-nav {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+/* ============================================
+ * 卡牌皮肤效果样式
+ * ============================================ */
+.card.skin-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.3) !important;
+    border: 2px solid #FFD700 !important;
+}
+
+.card.skin-gold .suit,
+.card.skin-gold .rank {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.card.skin-crystal {
+    background: linear-gradient(135deg, #E0F7FA, #B2EBF2, #4DD0E1) !important;
+    color: #006064 !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.5) !important;
+    border: 2px solid #00BCD4 !important;
+}
+
+.card.skin-wood {
+    background: linear-gradient(135deg, #8B4513, #D2691E, #CD853F) !important;
+    color: #FFF8DC !important;
+    border: 2px solid #8B4513 !important;
+}
+
+.card.skin-wood::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.1) 2px,
+        rgba(0,0,0,0.1) 4px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.card.skin-forest {
+    background: linear-gradient(135deg, #228B22, #32CD32, #90EE90) !important;
+    color: #FFF !important;
+    box-shadow: 0 0 15px rgba(34, 139, 34, 0.4) !important;
+    border: 2px solid #228B22 !important;
+}
+
+.card.skin-magma {
+    background: linear-gradient(135deg, #FF4500, #FF6347, #FFA07A) !important;
+    color: #FFF !important;
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.5), inset 0 0 20px rgba(255, 200, 0, 0.3) !important;
+    border: 2px solid #FF4500 !important;
+    animation: magmaPulse 2s infinite;
+}
+
+@keyframes magmaPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.5), inset 0 0 20px rgba(255, 200, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 69, 0, 0.8), inset 0 0 30px rgba(255, 200, 0, 0.5); }
+}
+
+.card.skin-neon {
+    background: linear-gradient(135deg, #FF00FF, #BF00FF, #00FFFF) !important;
+    color: #FFF !important;
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3) !important;
+    border: 2px solid #FF00FF !important;
+    animation: neonFlicker 1.5s infinite alternate;
+}
+
+@keyframes neonFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.9; }
+}
+
+/* ============================================
+ * 卡背样式
+ * ============================================ */
+.card-back.dragon {
+    background: linear-gradient(135deg, #1a1a4e, #4a1a6a) !important;
+    border-color: #FFD700 !important;
+}
+
+.card-back.dragon::after {
+    content: '🐉';
+    font-size: 24px;
+    filter: drop-shadow(0 0 10px #FFD700);
+}
+
+.card-back.phoenix {
+    background: linear-gradient(135deg, #4a1a1a, #8a2a2a) !important;
+    border-color: #FF6347 !important;
+}
+
+.card-back.phoenix::after {
+    content: '🦅';
+    font-size: 24px;
+    filter: drop-shadow(0 0 10px #FF6347);
+}
+
+/* ============================================
+ * 头像框效果
+ * ============================================ */
+.avatar-frame-king {
+    border: 3px solid #FFD700 !important;
+    box-shadow: 0 0 20px #FFD700, inset 0 0 10px rgba(255, 215, 0, 0.3) !important;
+}
+
+.avatar-frame-star {
+    border: 3px solid #4169E1 !important;
+    box-shadow: 0 0 15px #4169E1 !important;
+}
+
+.avatar-frame-fire {
+    border: 3px solid #FF4500 !important;
+    box-shadow: 0 0 15px #FF4500 !important;
+    animation: frameFire 2s infinite;
+}
+
+@keyframes frameFire {
+    0%, 100% { box-shadow: 0 0 15px #FF4500; }
+    50% { box-shadow: 0 0 25px #FF6347, 0 0 35px #FF4500; }
+}
+
+.avatar-frame-ice {
+    border: 3px solid #00CED1 !important;
+    box-shadow: 0 0 15px #00CED1 !important;
+}
+
+.avatar-frame-angel {
+    border: 3px solid #FFF !important;
+    box-shadow: 0 0 20px #FFF, 0 0 40px #FFD700 !important;
+}
+
+.avatar-frame-devil {
+    border: 3px solid #8B0000 !important;
+    box-shadow: 0 0 20px #8B0000, 0 0 40px #FF0000 !important;
+}
+
+/* ============================================
+ * 特效粒子基础样式
+ * ============================================ */
+.effect-particle {
+    will-change: transform, opacity;
+}
+
+/* 火焰粒子 */
+.fire-particle {
+    filter: blur(1px);
+}
+
+/* 冰霜粒子 */
+.ice-crystal {
+    backdrop-filter: blur(2px);
+}
+
+/* 闪电 */
+.lightning-bolt {
+    filter: blur(2px) brightness(2);
+}
+
+/* ============================================
+ * 触摸优化 (移动端)
+ * ============================================ */
+@media (pointer: coarse) {
+    .card,
+    .mode-card,
+    .nav-item,
+    .nav-btn,
+    .buy-btn,
+    .tournament-btn,
+    .play-btn,
+    .confirm-btn {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .card:active,
+    .mode-card:active,
+    .nav-item:active {
+        transform: scale(0.98);
+    }
+    
+    /* 增大触摸区域 */
+    .buy-btn,
+    .tournament-btn.register,
+    .play-btn,
+    .confirm-btn {
+        min-height: 48px;
+    }
+}
+
+/* ============================================
+ * 横屏提示 (手机横屏时)
+ * ============================================ */
+@media (orientation: landscape) and (max-height: 480px) and (max-width: 900px) {
+    body::before {
+        content: '请竖屏游玩以获得最佳体验 🔄';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, #0a0a1a, #1a1a3e);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-size: 20px;
+        text-align: center;
+        padding: 40px;
+        color: var(--primary-color);
+    }
+    
+    body::after {
+        content: '命运塔·首登者 建议竖屏游玩';
+        position: fixed;
+        top: 60%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-muted);
+        z-index: 100000;
+    }
+    
+    .screen {
+        display: none !important;
+    }
+}
+
+/* 折叠屏横屏不提示 */
+@media (orientation: landscape) and (min-width: 700px) {
+    body::before,
+    body::after {
+        display: none !important;
+    }
+    
+    .screen {
+        display: flex !important;
+    }
+}
+
+/* ============================================
+ * 高刷屏幕优化 (120Hz/144Hz)
+ * ============================================ */
+@media (prefers-reduced-motion: no-preference) {
+    .card,
+    .mode-card,
+    .shop-item,
+    .tournament-card,
+    .effect-particle {
+        will-change: transform;
+    }
+}
+
+/* 减少动画 (用户设置) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+ * 暗黑模式适配 (系统级)
+ * ============================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-dark: #0a0a1a;
+        --bg-mid: #1a1a3e;
+    }
+}
+
+/* ============================================
+ * 打印样式 (禁用)
+ * ============================================ */
+@media print {
+    body {
+        display: none;
+    }
+}
