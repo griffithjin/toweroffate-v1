@@ -1,10 +1,10 @@
 {
-  "test_time": "2026-03-05T21:51:02.904110",
+  "test_time": "2026-03-05T21:53:41.769497",
   "summary": {
     "total_pages": 12,
-    "passed": 4,
-    "failed": 8,
-    "success_rate": "33.3%"
+    "passed": 12,
+    "failed": 0,
+    "success_rate": "100.0%"
   },
   "accessibility": [
     {
@@ -15,63 +15,63 @@
     },
     {
       "page": "playable.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 30192
     },
     {
       "page": "register-v2.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 13707
     },
     {
       "page": "login-v2.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 11636
     },
     {
       "page": "shop.html",
       "status_code": 200,
       "status": "✅ 正常",
-      "size": 18165
+      "size": 14822
     },
     {
       "page": "recharge.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 14193
     },
     {
       "page": "tournament.html",
       "status_code": 200,
       "status": "✅ 正常",
-      "size": 17694
+      "size": 17812
     },
     {
       "page": "streak.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 10679
     },
     {
       "page": "ranked.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 10083
     },
     {
       "page": "honor.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 8977
     },
     {
       "page": "profile.html",
-      "status_code": 404,
-      "status": "❌ HTTP 404",
-      "size": 9379
+      "status_code": 200,
+      "status": "✅ 正常",
+      "size": 11676
     },
     {
       "page": "admin/index.html",
@@ -83,28 +83,19 @@
   "performance": [
     {
       "page": "index.html",
-      "load_time": 0.56,
+      "load_time": 0.57,
       "size_kb": 20.01
     },
     {
       "page": "playable.html",
-      "load_time": 0.52,
-      "size_kb": 9.16
+      "load_time": 0.54,
+      "size_kb": 29.48
     },
     {
       "page": "shop.html",
       "load_time": 0.52,
-      "size_kb": 17.74
+      "size_kb": 14.47
     }
   ],
-  "failed_pages": [
-    "playable.html",
-    "register-v2.html",
-    "login-v2.html",
-    "recharge.html",
-    "streak.html",
-    "ranked.html",
-    "honor.html",
-    "profile.html"
-  ]
+  "failed_pages": []
 }

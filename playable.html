@@ -97,9 +97,32 @@
         .hand-section { display: flex; gap: 8px; margin-bottom: 6px; }
         .hand-label { width: 50px; display: flex; flex-direction: column; justify-content: center; color: #888; font-size: 10px; }
         .hand-cards { flex: 1; display: flex; gap: 4px; overflow-x: auto; padding: 4px; background: rgba(255,255,255,0.05); border-radius: 6px; }
-        .hand-card { min-width: 34px; height: 48px; background: #fff; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .hand-card.red { color: #d00; }
-        .hand-card.black { color: #000; }
+        .hand-card.skin-gold { background: linear-gradient(135deg, #FFD700, #FFA500); border: 2px solid #FFD700; }
+        .hand-card.skin-crystal { background: linear-gradient(135deg, #00d9ff, #00a8ff); border: 2px solid #00d9ff; }
+        .hand-card.skin-wood { background: linear-gradient(135deg, #8B4513, #A0522D); border: 2px solid #8B4513; }
+        .hand-card.skin-forest { background: linear-gradient(135deg, #2ed573, #26c281); border: 2px solid #2ed573; }
+        
+        /* 特效动画 */
+        @keyframes fireEffect {
+            0%, 100% { box-shadow: 0 0 10px #ff4757, 0 0 20px #ff6b6b; }
+            50% { box-shadow: 0 0 20px #ff4757, 0 0 40px #ff6b6b; }
+        }
+        @keyframes iceEffect {
+            0%, 100% { box-shadow: 0 0 10px #00d9ff, 0 0 20px #00a8ff; }
+            50% { box-shadow: 0 0 20px #00d9ff, 0 0 40px #00a8ff; }
+        }
+        .effect-fire { animation: fireEffect 0.5s ease; }
+        .effect-ice { animation: iceEffect 0.5s ease; }
+        
+        /* 卡背样式 */
+        .guard-icon.back-dragon { background: linear-gradient(135deg, #8B4513, #A0522D); }
+        .guard-icon.back-phoenix { background: linear-gradient(135deg, #ff4757, #c0392b); }
+        .guard-icon.back-moon { background: linear-gradient(135deg, #4a69bd, #1e3799); }
+        
+        /* 头像框 */
+        .player-avatar.frame-king { border: 3px solid #FFD700; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .player-avatar.frame-star { border: 3px solid #00d9ff; box-shadow: 0 0 10px rgba(0,217,255,0.5); }
+        .player-avatar.frame-fire { border: 3px solid #ff4757; box-shadow: 0 0 10px rgba(255,71,87,0.5); }
         .hand-card.selected { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(255,215,0,0.6); border: 2px solid #FFD700; }
         .hand-card .suit { font-size: 16px; }
         .hand-card .rank { font-size: 10px; font-weight: bold; }
@@ -568,10 +591,75 @@
             }, 1000);
         }
         
-        // 其他功能
-        function showPromo() {
-            alert('🎁 VIP限时特惠活动！');
+        // 读取装备的道具
+        function loadEquippedItems() {
+            const equipped = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+            return {
+                skin: equipped.skin || 'default',
+                effect: equipped.effect || 'default',
+                cardback: equipped.cardback || 'default',
+                frame: equipped.frame || 'default'
+            };
         }
+        
+        // 应用皮肤到手牌
+        function applySkinToCard(cardElement) {
+            const equipped = loadEquippedItems();
+            if(equipped.skin && equipped.skin !== 'default') {
+                cardElement.classList.add(`skin-${equipped.skin.replace('skin_', '')}`);
+            }
+        }
+        
+        // 应用特效
+        function applyEffect() {
+            const equipped = loadEquippedItems();
+            const playBtn = document.getElementById('playBtn');
+            
+            if(equipped.effect === 'effect_fire') {
+                playBtn.classList.add('effect-fire');
+                setTimeout(() => playBtn.classList.remove('effect-fire'), 500);
+            } else if(equipped.effect === 'effect_ice') {
+                playBtn.classList.add('effect-ice');
+                setTimeout(() => playBtn.classList.remove('effect-ice'), 500);
+            }
+        }
+        
+        // 应用卡背到守卫牌
+        function applyCardback() {
+            const equipped = loadEquippedItems();
+            const guardIcons = document.querySelectorAll('.guard-icon');
+            
+            guardIcons.forEach(icon => {
+                if(equipped.cardback && equipped.cardback !== 'default') {
+                    icon.classList.add(`back-${equipped.cardback.replace('back_', '')}`);
+                }
+            });
+        }
+        
+        // 应用头像框
+        function applyFrame(avatarElement) {
+            const equipped = loadEquippedItems();
+            if(equipped.frame && equipped.frame !== 'default') {
+                avatarElement.classList.add(`frame-${equipped.frame.replace('frame_', '')}`);
+            }
+        }
+        
+        // 修改渲染手牌函数，添加皮肤应用
+        const originalRenderHand = renderHand;
+        renderHand = function() {
+            originalRenderHand();
+            // 应用皮肤
+            document.querySelectorAll('.hand-card').forEach(card => {
+                applySkinToCard(card);
+            });
+        };
+        
+        // 修改出牌函数，添加特效
+        const originalPlayBtnClick = document.getElementById('playBtn').onclick;
+        document.getElementById('playBtn').onclick = function() {
+            applyEffect(); // 应用特效
+            originalPlayBtnClick.call(this);
+        };
         
         function switchTower() {
             alert('🏗️ 切换世界名塔功能开发中...');
