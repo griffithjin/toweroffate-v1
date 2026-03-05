@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>命运塔·首登者</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; }
+        .page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+        .page.active { display: block; }
+        
+        /* 首页 */
+        #home { background: linear-gradient(180deg, #0d1b2a, #1a1a3e, #0a0a1a); text-align: center; padding-top: 20vh; }
+        #home h1 { font-size: 60px; margin: 20px 0; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+        #home h2 { background: linear-gradient(45deg, #FFD700, #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn { display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; margin: 10px; cursor: pointer; }
+        
+        /* 游戏 */
+        #game { background: #0d1b2a; }
+        .header { display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); }
+        .tower { display: flex; flex-direction: column-reverse; align-items: center; gap: 2px; padding: 10px; height: 40vh; overflow-y: auto; }
+        .floor { width: 200px; height: 25px; background: linear-gradient(90deg, #4dd0e1, #00838f); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .floor.current { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; box-shadow: 0 0 10px #FFD700; }
+        .hand { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); padding: 15px; }
+        .cards { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+        .card { min-width: 50px; height: 70px; background: #fff; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #000; cursor: pointer; }
+        .card.red { color: #d00; }
+        .card.selected { transform: translateY(-10px); box-shadow: 0 5px 20px rgba(255,215,0,0.5); }
+        .btn-play { width: 100%; padding: 15px; margin-top: 10px; background: #444; color: #888; border: none; border-radius: 10px; font-size: 16px; }
+        .btn-play.ready { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+    </style>
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="home" class="page active">
+        <h1>🏰</h1>
+        <h2>命运塔·首登者</h2>
+        <p style="color:#888">点击按钮开始游戏</p>
+        <br><br>
+        <button class="btn" onclick="startGame()">开始游戏</button>
+    </div>
+
+    <!-- 游戏 -->
+    <div id="game" class="page">
+        <div class="header">
+            <button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:8px 15px;border-radius:8px">← 返回</button>
+            <span>第 <span id="level">1</span> 层</span>
+            <span id="timer">15s</span>
+        </div>
+        
+        <div class="tower" id="tower"></div>
+        
+        <div class="hand">
+            <div style="text-align:center;margin-bottom:10px">选择一张牌出牌</div>
+            <div class="cards" id="cards"></div>
+            <button class="btn-play" id="playBtn" onclick="play()">选择一张牌</button>
+        </div>
+    </div>
+
+    <script>
+        let level = 0, selected = null, hand = [], timer = 15;
+        const suits = ['♥','♦','♣','♠'], ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+        
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function startGame() {
+            level = 0;
+            selected = null;
+            // 生成手牌
+            hand = [];
+            for(let s of suits) for(let r of ranks) hand.push({suit:s, rank:r, red:s=='♥'||s=='♦'});
+            hand.sort(()=>Math.random()-0.5);
+            showPage('game');
+            drawTower();
+            drawHand();
+            startTimer();
+        }
+        
+        function goHome() {
+            showPage('home');
+            clearInterval(window.timerInterval);
+        }
+        
+        function drawTower() {
+            const t = document.getElementById('tower');
+            t.innerHTML = '';
+            for(let i=12; i>=0; i--) {
+                const d = document.createElement('div');
+                d.className = 'floor' + (i==level?' current':'');
+                d.textContent = ranks[i];
+                d.style.width = (180 + i*5) + 'px';
+                t.appendChild(d);
+            }
+            document.getElementById('level').textContent = level + 1;
+        }
+        
+        function drawHand() {
+            const c = document.getElementById('cards');
+            c.innerHTML = '';
+            hand.slice(0,6).forEach((card,i) => {
+                const d = document.createElement('div');
+                d.className = 'card ' + (card.red?'red':'') + (i==selected?' selected':'');
+                d.innerHTML = `<b>${card.suit}</b>${card.rank}`;
+                d.onclick = ()=>{selected=i; drawHand(); updateBtn();};
+                c.appendChild(d);
+            });
+        }
+        
+        function updateBtn() {
+            const b = document.getElementById('playBtn');
+            if(selected!==null) { b.className='btn-play ready'; b.textContent='确认出牌'; }
+            else { b.className='btn-play'; b.textContent='选择一张牌'; }
+        }
+        
+        function play() {
+            if(selected===null) return;
+            // 简单逻辑: 50%概率前进
+            if(Math.random()>0.5) {
+                level++;
+                if(level>=13) { alert('🎉 恭喜登顶!'); level=12; }
+            }
+            hand.splice(selected,1);
+            selected=null;
+            drawTower();
+            drawHand();
+            updateBtn();
+            resetTimer();
+        }
+        
+        function startTimer() {
+            timer=15;
+            document.getElementById('timer').textContent=timer+'s';
+            window.timerInterval = setInterval(()=>{
+                timer--;
+                document.getElementById('timer').textContent=timer+'s';
+                if(timer<=0) { selected=0; play(); }
+            },1000);
+        }
+        
+        function resetTimer() {
+            clearInterval(window.timerInterval);
+            startTimer();
+        }
+    </script>
+</body>
+</html>
