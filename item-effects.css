@@ -1,0 +1,192 @@
+/* 道具特效应用到卡牌的CSS */
+
+/* 卡牌特效容器 */
+.card-effect-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* 火焰特效 - 应用到卡牌 */
+.card-fire-effect {
+    animation: cardFireEffect 0.8s ease;
+}
+
+@keyframes cardFireEffect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px 10px rgba(255, 71, 87, 0.5);
+        transform: scale(1.05);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+        transform: scale(1);
+    }
+}
+
+/* 冰霜特效 - 应用到卡牌 */
+.card-ice-effect {
+    animation: cardIceEffect 0.8s ease;
+}
+
+@keyframes cardIceEffect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(0, 217, 255, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px 10px rgba(0, 217, 255, 0.5);
+        transform: scale(1.05);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(0, 217, 255, 0);
+        transform: scale(1);
+    }
+}
+
+/* 闪电特效 */
+.card-lightning-effect {
+    animation: cardLightningEffect 0.6s ease;
+}
+
+@keyframes cardLightningEffect {
+    0%, 100% { 
+        filter: brightness(1);
+        box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
+    }
+    25%, 75% { 
+        filter: brightness(1.5);
+        box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.8);
+    }
+    50% { 
+        filter: brightness(2);
+        box-shadow: 0 0 40px 10px rgba(255, 255, 0, 1);
+    }
+}
+
+/* 爱心特效 */
+.card-heart-effect {
+    animation: cardHeartEffect 0.8s ease;
+}
+
+@keyframes cardHeartEffect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7);
+        transform: scale(1) rotate(0deg);
+    }
+    50% { 
+        box-shadow: 0 0 30px 10px rgba(255, 105, 180, 0.5);
+        transform: scale(1.1) rotate(5deg);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* 星星特效 */
+.card-star-effect {
+    animation: cardStarEffect 0.8s ease;
+}
+
+@keyframes cardStarEffect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px 15px rgba(255, 215, 0, 0.6);
+        transform: scale(1.1);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+        transform: scale(1);
+    }
+}
+
+/* 金币特效 */
+.card-money-effect {
+    animation: cardMoneyEffect 0.8s ease;
+}
+
+@keyframes cardMoneyEffect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px 10px rgba(255, 193, 7, 0.5);
+        transform: scale(1.08);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+        transform: scale(1);
+    }
+}
+
+/* 增强卡背样式 */
+.guard-icon.back-dragon {
+    background: linear-gradient(135deg, #8B4513, #A0522D) !important;
+    border: 2px solid #D2691E;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.guard-icon.back-phoenix {
+    background: linear-gradient(135deg, #ff4757, #c0392b) !important;
+    border: 2px solid #ff6b6b;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.guard-icon.back-moon {
+    background: linear-gradient(135deg, #4a69bd, #1e3799) !important;
+    border: 2px solid #6c5ce7;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.guard-icon.back-stars {
+    background: linear-gradient(135deg, #2d3436, #000000) !important;
+    border: 2px solid #FFD700;
+    box-shadow: 0 0 10px rgba(255,215,0,0.3), inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.guard-icon.back-flower {
+    background: linear-gradient(135deg, #e84393, #fd79a8) !important;
+    border: 2px solid #fab1a0;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+.guard-icon.back-skull {
+    background: linear-gradient(135deg, #2d3436, #636e72) !important;
+    border: 2px solid #b2bec3;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* 卡背图案覆盖 */
+.guard-icon.back-dragon::before { content: '🐉'; font-size: 20px; }
+.guard-icon.back-phoenix::before { content: '🐦'; font-size: 20px; }
+.guard-icon.back-moon::before { content: '🌙'; font-size: 20px; }
+.guard-icon.back-stars::before { content: '⭐'; font-size: 20px; }
+.guard-icon.back-flower::before { content: '🌸'; font-size: 20px; }
+.guard-icon.back-skull::before { content: '💀'; font-size: 20px; }
+
+/* 道具效果开关 */
+.effect-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #FFD700;
+    border-radius: 20px;
+    color: #FFD700;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+.effect-toggle.disabled {
+    border-color: #666;
+    color: #666;
+}
