@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>命运塔·首登者 - 团队对战</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        body { background: #0a0a1a; color: #fff; height: 100vh; overflow: hidden; font-size: 12px; }
+        
+        /* 顶部标题 */
+        .header { 
+            background: linear-gradient(90deg, #6b2c91, #4a148c); 
+            padding: 8px; 
+            text-align: center; 
+            font-size: 16px; 
+            font-weight: bold;
+            color: #FFD700;
+            border-bottom: 2px solid #FFD700;
+        }
+        
+        /* 主布局 - 三栏 */
+        .main { display: flex; height: calc(100vh - 36px); }
+        
+        /* ========== 左侧广告位/菜单 ========== */
+        .left-ads { 
+            width: 80px; 
+            background: #0f0f1e; 
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .left-menu-item { 
+            padding: 8px 4px; 
+            text-align: center; 
+            border-bottom: 1px solid #333;
+            font-size: 11px;
+        }
+        .menu-red { color: #ff4757; font-weight: bold; }
+        .menu-green { color: #2ed573; }
+        .menu-yellow { color: #ffa502; }
+        .menu-blue { color: #74b9ff; }
+        
+        /* 倒计时区域 */
+        .timer-box {
+            background: rgba(255,215,0,0.1);
+            padding: 10px 4px;
+            text-align: center;
+            border-bottom: 1px solid #444;
+        }
+        .timer-label { font-size: 10px; color: #888; }
+        .timer-value { font-size: 18px; color: #FFD700; font-weight: bold; }
+        
+        /* ========== 中间游戏区 ========== */
+        .game-area { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 队伍标题行 */
+        .teams-header { 
+            display: flex; 
+            background: #1a1a2e;
+            border-bottom: 1px solid #444;
+            text-align: center;
+        }
+        .team-section { 
+            flex: 1; 
+            padding: 6px; 
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .team-dragon { 
+            background: linear-gradient(90deg, #1e3a5f, #2d5a87); 
+            color: #74b9ff; 
+            border-right: 1px solid #444;
+        }
+        .team-panda { 
+            background: linear-gradient(90deg, #8b4513, #a0522d); 
+            color: #fab1a0; 
+        }
+        .vs-divider { 
+            width: 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #2d2d44;
+            font-weight: bold;
+        }
+        
+        /* 玩家标题行 */
+        .players-header {
+            display: flex;
+            background: #0f0f1e;
+            border-bottom: 1px solid #444;
+        }
+        .level-header { 
+            width: 35px; 
+            padding: 6px; 
+            text-align: center; 
+            background: #1a1a2e;
+            border-right: 1px solid #444;
+            font-size: 11px;
+            color: #888;
+        }
+        .player-header-cell {
+            flex: 1;
+            padding: 6px 2px;
+            text-align: center;
+            font-size: 11px;
+            border-right: 1px solid #333;
+        }
+        .player-dragon { background: rgba(30, 58, 95, 0.3); color: #74b9ff; }
+        .player-panda { background: rgba(139, 69, 19, 0.3); color: #fab1a0; }
+        
+        /* 战场表格 */
+        .battlefield { 
+            flex: 1; 
+            overflow-y: auto;
+            background: #161625;
+        }
+        .battlefield::-webkit-scrollbar { width: 6px; }
+        .battlefield::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        
+        .battle-row {
+            display: flex;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            height: 32px;
+        }
+        
+        .level-cell { 
+            width: 35px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: bold;
+            font-size: 13px;
+            border-right: 1px solid #444;
+            background: rgba(0,0,0,0.2);
+        }
+        /* 层颜色 - A在顶部，2在底部 */
+        .level-A { background: linear-gradient(90deg, #FFD700, #FFA500); color: #000; }
+        .level-K { background: linear-gradient(90deg, #ff6b6b, #ee5a24); color: #fff; }
+        .level-Q { background: linear-gradient(90deg, #a29bfe, #6c5ce7); color: #fff; }
+        .level-J { background: linear-gradient(90deg, #74b9ff, #0984e3); color: #fff; }
+        .level-10 { background: linear-gradient(90deg, #81ecec, #00cec9); color: #000; }
+        .level-9 { background: linear-gradient(90deg, #55efc4, #00b894); color: #000; }
+        .level-8 { background: linear-gradient(90deg, #dfe6e9, #b2bec3); color: #000; }
+        .level-7 { background: linear-gradient(90deg, #74b9ff, #0984e3); color: #fff; }
+        .level-6 { background: linear-gradient(90deg, #0984e3, #0769c3); color: #fff; }
+        .level-5 { background: linear-gradient(90deg, #0769c3, #054f93); color: #fff; }
+        .level-4 { background: linear-gradient(90deg, #054f93, #043563); color: #fff; }
+        .level-3 { background: linear-gradient(90deg, #6c5ce7, #5f3dc4); color: #fff; }
+        .level-2 { background: linear-gradient(90deg, #00b894, #00a383); color: #fff; }
+        
+        .player-cell {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .player-cell.has-player { background: rgba(46, 213, 115, 0.15); }
+        .player-cell.current-player { 
+            background: rgba(255, 215, 0, 0.3);
+            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .player-avatar { font-size: 16px; }
+        .player-check { 
+            position: absolute; 
+            bottom: 2px; 
+            right: 2px; 
+            font-size: 10px; 
+            color: #2ed573;
+        }
+        
+        /* 气泡提示 */
+        .tooltip-bubble {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        /* 出发层 */
+        .start-floor {
+            display: flex;
+            background: #0f0f1e;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+            padding: 8px;
+        }
+        .start-label { 
+            width: 60px; 
+            color: #888; 
+            display: flex; 
+            align-items: center;
+            font-size: 11px;
+        }
+        .start-players { 
+            flex: 1; 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap;
+        }
+        .start-avatar { font-size: 18px; opacity: 0.6; }
+        
+        /* 手牌区 */
+        .hand-section {
+            background: #0a0a15;
+            border-bottom: 1px solid #333;
+            padding: 8px;
+        }
+        .section-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+        .hand-cards {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+        .hand-cards::-webkit-scrollbar { display: none; }
+        .card {
+            min-width: 45px;
+            height: 63px;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .card.red { color: #d32f2f; }
+        .card.black { color: #212121; }
+        .card.selected {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+            border: 2px solid #FFD700;
+        }
+        .card-suit { font-size: 18px; }
+        .card-rank { font-size: 11px; font-weight: bold; }
+        
+        /* 道具区 */
+        .items-section {
+            background: #0f0f1e;
+            border-bottom: 1px solid #333;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .items-label { 
+            width: 40px; 
+            font-size: 11px; 
+            color: #888; 
+        }
+        .items-slots {
+            display: flex;
+            gap: 8px;
+        }
+        .item-slot {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .items-desc {
+            flex: 1;
+            text-align: center;
+            color: #666;
+            font-size: 11px;
+        }
+        
+        /* 嘲讽区 */
+        .chat-section {
+            background: #0a0a15;
+            border-bottom: 1px solid #333;
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+        }
+        .chat-btn {
+            padding: 8px 15px;
+            background: #444;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        /* 牌局记录 */
+        .history-section {
+            background: #0f0f1e;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .history-title {
+            text-align: center;
+            padding: 6px;
+            background: #1a1a2e;
+            border-bottom: 1px solid #444;
+            font-size: 12px;
+            color: #888;
+        }
+        .history-row {
+            display: flex;
+            padding: 6px 8px;
+            border-bottom: 1px solid #222;
+            font-size: 11px;
+            align-items: center;
+        }
+        .history-round { 
+            width: 50px; 
+            color: #FFD700; 
+        }
+        .history-players { 
+            flex: 1; 
+            display: flex; 
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .history-result { 
+            width: 60px; 
+            text-align: right;
+            color: #2ed573;
+        }
+        .player-play { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 2px;
+        }
+        .play-check { color: #2ed573; }
+        .play-cross { color: #ff4757; }
+        
+        /* ========== 右侧广告位 ========== */
+        .right-ads { 
+            width: 90px; 
+            background: #0f0f1e; 
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-ad-header {
+            padding: 8px;
+            text-align: center;
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            font-size: 11px;
+            border-bottom: 1px solid #333;
+        }
+        .guard-section, .provoke-section {
+            flex: 1;
+            border-bottom: 1px solid #333;
+        }
+        .section-header {
+            padding: 6px;
+            text-align: center;
+            font-size: 10px;
+            color: #888;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid #333;
+        }
+        .guard-cell, .provoke-cell {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+        }
+        .provoke-cell {
+            color: #ff6b6b;
+            font-size: 10px;
+            flex-wrap: wrap;
+            padding: 2px;
+            line-height: 1.2;
+        }
+        
+        /* 底部广告 */
+        .bottom-ad {
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            text-align: center;
+            color: #555;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">🏰 命运塔·首登者</div>
+    
+    <div class="main">
+        <!-- 左侧菜单 -->
+        <div class="left-ads">
+            <div class="timer-box">
+                <div class="timer-label">倒计时</div>
+                <div class="timer-value" id="timer">30s</div>
+            </div>
+            <div class="left-menu-item">
+                <div style="color:#888">当前牌局</div>
+                <div style="color:#FFD700;font-size:14px">第3局</div>
+            </div>
+            <div class="left-menu-item menu-green">VIP中心</div>
+            <div class="left-menu-item menu-green">商城</div>
+            <div class="left-menu-item menu-yellow">荣誉展示</div>
+            <div class="left-menu-item menu-blue">锦标赛</div>
+            <div class="left-menu-item menu-yellow">连胜模式</div>
+            <div class="left-menu-item menu-yellow">邀请好友</div>
+            <div class="left-menu-item menu-red" onclick="location.href='index.html'">返回</div>
+            <div class="bottom-ad">广告位</div>
+        </div>
+
+        <!-- 中间游戏区 -->
+        <div class="game-area">
+            <!-- 队伍标题 -->
+            <div class="teams-header">
+                <div class="team-section team-dragon">🐲 龙神战队</div>
+                <div class="vs-divider">VS</div>
+                <div class="team-section team-panda">🐼 熊猫战队</div>
+            </div>
+            
+            <!-- 玩家标题 -->
+            <div class="players-header">
+                <div class="level-header">层数</div>
+                <div class="player-header-cell player-dragon">玩家1</div>
+                <div class="player-header-cell player-dragon">玩家2</div>
+                <div class="player-header-cell player-dragon">玩家3</div>
+                <div class="player-header-cell player-dragon">玩家4</div>
+                <div class="player-header-cell player-dragon">玩家5</div>
+                <div class="player-header-cell player-panda">玩家6</div>
+                <div class="player-header-cell player-panda">玩家7</div>
+                <div class="player-header-cell player-panda">玩家8</div>
+                <div class="player-header-cell player-panda">玩家9</div>
+                <div class="player-header-cell player-panda">玩家10</div>
+            </div>
+
+            <!-- 战场 -->
+            <div class="battlefield" id="battlefield"></div>
+
+            <!-- 出发层 -->
+            <div class="start-floor">
+                <div class="start-label">🏁 出发层</div>
+                <div class="start-players" id="start-players">
+                    <span class="start-avatar">👦</span>
+                    <span class="start-avatar">👧</span>
+                    <span class="start-avatar">👨</span>
+                    <span class="start-avatar">👩</span>
+                </div>
+            </div>
+
+            <!-- 手牌区 -->
+            <div class="hand-section">
+                <div class="section-label">🎴 手牌区 - 选择一张牌出牌</div>
+                <div class="hand-cards" id="hand-cards"></div>
+            </div>
+
+            <!-- 道具区 -->
+            <div class="items-section">
+                <div class="items-label">道具</div>
+                <div class="items-slots">
+                    <div class="item-slot">⚡</div>
+                    <div class="item-slot">🛡️</div>
+                    <div class="item-slot">🔮</div>
+                    <div class="item-slot">💊</div>
+                </div>
+                <div class="items-desc">vip道具 + 队友共用道具 + 系统免费道具</div>
+            </div>
+
+            <!-- 嘲讽区 -->
+            <div class="chat-section">
+                <input type="text" class="chat-input" placeholder="玩家文本输入区 - 输入嘲讽或鼓励队友...">
+                <button class="chat-btn">😀</button>
+                <button class="chat-btn" style="background:#FFD700;color:#000">发送</button>
+            </div>
+
+            <!-- 牌局记录 -->
+            <div class="history-section">
+                <div class="history-title">📜 牌局滚动记录</div>
+                <div id="history-list">
+                    <div class="history-row">
+                        <div class="history-round">第3局</div>
+                        <div class="history-players">
+                            <span class="player-play">👦♠<span class="play-cross">✗</span></span>
+                            <span class="player-play">⚙️♦<span class="play-cross">✗</span></span>
+                            <span class="player-play">🤖♥<span class="play-cross">✗</span></span>
+                            <span class="player-play">🎲♦<span class="play-cross">✗</span></span>
+                            <span class="player-play">🐶♦<span class="play-cross">✗</span></span>
+                            <span class="player-play">🐍♠<span class="play-cross">✗</span></span>
+                            <span class="player-play">🐱♥<span class="play-cross">✗</span></span>
+                            <span class="player-play">🎩♠<span class="play-check">✓</span></span>
+                            <span class="player-play">🦕♠<span class="play-cross">✗</span></span>
+                            <span class="player-play">🌹♣<span class="play-check">✓</span></span>
+                        </div>
+                        <div class="history-result">未激怒</div>
+                    </div>
+                    <div class="history-row">
+                        <div class="history-round">第2局</div>
+                        <div class="history-players">
+                            <span class="player-play">👦♠<span class="play-cross">✗</span></span>
+                            <span class="player-play">⚙️♦<span class="play-check">✓</span></span>
+                        </div>
+                        <div class="history-result">未激怒</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧广告位 -->
+        <div class="right-ads">
+            <div class="right-ad-header">📢 滚动广告位</div>
+            
+            <div class="guard-section">
+                <div class="section-header">守卫牌区</div>
+                <div id="guard-list"></div>
+            </div>
+            
+            <div class="provoke-section">
+                <div class="section-header">激怒牌</div>
+                <div id="provoke-list"></div>
+            </div>
+            
+            <div class="bottom-ad">广告位</div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据
+        const Game = {
+            currentLevel: 1, // 当前在第2层
+            myPosition: 1, // 玩家1位置
+            players: [],
+            hand: [],
+            guards: [],
+            
+            init() {
+                this.generatePlayers();
+                this.generateHand();
+                this.generateGuards();
+                this.renderBattlefield();
+                this.renderHand();
+                this.renderRightPanel();
+            },
+            
+            generatePlayers() {
+                const avatars = ['👦','⚙️','🤖','🎲','🐶','🐍','🐱','🎩','🦕','🌹'];
+                this.players = [];
+                for(let i=0; i<10; i++) {
+                    this.players.push({
+                        id: i,
+                        avatar: avatars[i],
+                        level: i < 5 ? Math.floor(Math.random() * 3) : Math.floor(Math.random() * 4),
+                        team: i < 5 ? 'dragon' : 'panda'
+                    });
+                }
+                // 设置我在第2层
+                this.players[0].level = 1;
+            },
+            
+            generateHand() {
+                const suits = ['♥','♦','♣','♠'];
+                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+                this.hand = [];
+                for(let i=0; i<52; i++) {
+                    this.hand.push({
+                        suit: suits[Math.floor(Math.random()*4)],
+                        rank: ranks[Math.floor(Math.random()*13)],
+                        isRed: Math.random() > 0.5
+                    });
+                }
+            },
+            
+            generateGuards() {
+                const suits = ['♥','♦','♣','♠'];
+                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+                this.guards = [];
+                
+                for(let i=0; i<13; i++) {
+                    const guardCards = [];
+                    for(let j=0; j<13; j++) {
+                        guardCards.push({suit: suits[Math.floor(Math.random()*4)], rank: ranks[Math.floor(Math.random()*13)]});
+                    }
+                    const provocationCards = [];
+                    for(let j=0; j<3; j++) {
+                        provocationCards.push({suit: suits[Math.floor(Math.random()*4)], rank: ranks[Math.floor(Math.random()*13)]});
+                    }
+                    this.guards.push({level: i, guardCards, provocationCards, isDefeated: false});
+                }
+            },
+            
+            renderBattlefield() {
+                const bf = document.getElementById('battlefield');
+                bf.innerHTML = '';
+                
+                const levels = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+                const levelClasses = ['level-A','level-K','level-Q','level-J','level-10','level-9','level-8','level-7','level-6','level-5','level-4','level-3','level-2'];
+                
+                levels.forEach((l, i) => {
+                    const actualLevel = 12 - i;
+                    const isCurrent = actualLevel === this.currentLevel;
+                    
+                    const row = document.createElement('div');
+                    row.className = 'battle-row';
+                    
+                    let html = `<div class="level-cell ${levelClasses[i]} ${isCurrent?'current':''}">${l}</div>`;
+                    
+                    // 10个玩家
+                    for(let p=0; p<10; p++) {
+                        const player = this.players[p];
+                        const hasPlayer = player.level === actualLevel;
+                        const isMe = hasPlayer && p === 0;
+                        
+                        html += `<div class="player-cell ${hasPlayer?'has-player':''} ${isMe?'current-player':''}">
+                            ${hasPlayer ? `
+                                <span class="player-avatar">${player.avatar}</span>
+                                ${isMe?'<span class="player-check">✓</span>':''}
+                                ${isMe?'<div class="tooltip-bubble">我是第一名</div>':''}
+                            ` : ''}
+                        </div>`;
+                    }
+                    
+                    row.innerHTML = html;
+                    bf.appendChild(row);
+                });
+            },
+            
+            renderHand() {
+                const container = document.getElementById('hand-cards');
+                container.innerHTML = '';
+                
+                this.hand.slice(0,8).forEach((card, i) => {
+                    const div = document.createElement('div');
+                    div.className = `card ${card.isRed?'red':'black'}`;
+                    div.innerHTML = `<div class="card-suit">${card.suit}</div><div class="card-rank">${card.rank}</div>`;
+                    container.appendChild(div);
+                });
+            },
+            
+            renderRightPanel() {
+                // 守卫牌
+                const guardList = document.getElementById('guard-list');
+                guardList.innerHTML = '';
+                for(let i=0; i<13; i++) {
+                    const guard = this.guards[i];
+                    const isCurrent = i === this.currentLevel;
+                    const div = document.createElement('div');
+                    div.className = 'guard-cell';
+                    div.style.background = isCurrent ? 'rgba(255,215,0,0.2)' : '';
+                    div.innerHTML = isCurrent ? '🎴' : (guard.isDefeated ? '✓' : '·');
+                    guardList.appendChild(div);
+                }
+                
+                // 激怒牌
+                const provokeList = document.getElementById('provoke-list');
+                provokeList.innerHTML = '';
+                const provokes = ['♥9♣6♠3','♥Q♠8♦2','♥K♠5♦4','♥10♠9♦2','♥8♣5♦7','♥A♣5♦A','♥8♣5♦4','♥8♣5♥4','♥8♣3♦K','♥8♣4♦9','♥8♣9♦8','♥10♣3♦4','♥8♣5♦4'];
+                provokes.forEach((p, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'provoke-cell';
+                    div.style.background = i === this.currentLevel ? 'rgba(255,0,0,0.1)' : '';
+                    div.textContent = p;
+                    provokeList.appendChild(div);
+                });
+            }
+        };
+        
+        Game.init();
+    </script>
+</body>
+</html>
