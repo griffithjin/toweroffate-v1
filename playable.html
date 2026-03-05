@@ -171,8 +171,10 @@
             flex: 1;
             display: grid;
             grid-template-columns: 28px repeat(10, 1fr) 35px 50px;
+            grid-template-rows: repeat(13, 1fr); /* 13层平均分配 */
             overflow-y: auto;
             background: linear-gradient(180deg, #FFD700 0%, #1a1a3e 5%, #0d1b2a 100%);
+            max-height: 100%;
         }
         .grid-header {
             background: rgba(45,45,68,0.9);
@@ -197,8 +199,9 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
-            min-height: 36px;
+            font-size: 12px;
+            min-height: 28px;
+            height: 100%;
         }
         .level-A { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-size: 18px; }
         .level-K { background: linear-gradient(135deg, #E0E0E0, #C0C0C0); color: #000; }
@@ -227,7 +230,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 36px;
+            min-height: 28px;
+            height: 100%;
             position: relative;
         }
         .player-avatar {
@@ -377,18 +381,34 @@
             padding: 2px 8px;
             border-radius: 10px;
         }
+        /* 手牌区域 - 确保横向滚动 */
         .hand-cards-container {
             flex: 1;
             overflow-x: auto;
             overflow-y: hidden;
             padding: 10px 4px;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #FFD700 transparent;
+        }
+        .hand-cards-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .hand-cards-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        .hand-cards-container::-webkit-scrollbar-thumb {
+            background: #FFD700;
+            border-radius: 3px;
         }
         .hand-cards {
             display: flex;
             gap: 8px;
             padding: 5px;
             min-width: max-content;
+            height: 100%;
+            align-items: center;
         }
         .hand-card {
             width: 50px;
