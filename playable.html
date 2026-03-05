@@ -392,7 +392,7 @@
                 const provokeCell = document.createElement('div');
                 provokeCell.className = `provoke-cell ${idx===myLevel?'current':''}`;
                 let pcHtml = '<div class="provoke-cards-small">';
-                guard.provocationCards.forEach(c => {
+                guard.provokeCards.forEach(c => {
                     const isRed = c.suit==='♥'||c.suit==='♦';
                     pcHtml += `<div class="provoke-mini ${isRed?'':'black'}" title="${c.suit}${c.rank}">${c.suit}</div>`;
                 });
@@ -491,7 +491,7 @@
             let provocationTriggered = false;
             let provokeCard = null;
             if([2,5,8].includes(me.level)) {
-                for(let pc of guard.provocationCards) {
+                for(let pc of guard.provokeCards) {
                     if(playerCard.suit===pc.suit || playerCard.rank===pc.rank) {
                         provocationTriggered = true;
                         provokeCard = pc;
