@@ -2,226 +2,427 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>命运塔·首登者</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>命运塔·首登者 V1.0</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        :root { --primary: #FFD700; --bg: linear-gradient(180deg, #0d1b2a 0%, #1a1a3e 50%, #0a0a1a 100%); }
-        html, body { height: 100%; font-family: -apple-system, sans-serif; background: var(--bg); color: #fff; overflow: hidden; }
-        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; background: #0a0a1a; color: #fff; height: 100vh; overflow: hidden; }
+        .screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; }
         .screen.active { display: flex; }
+        
         /* 首页 */
-        .home-container { flex: 1; max-width: 480px; margin: 0 auto; width: 100%; padding: 16px; }
-        .home-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
-        .logo { font-size: 20px; font-weight: bold; background: linear-gradient(45deg, #FFD700, #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tower-visual { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .tower-icon { font-size: 100px; filter: drop-shadow(0 0 30px rgba(255,215,0,0.6)); animation: float 3s ease-in-out infinite; }
+        #home-screen { background: linear-gradient(180deg, #0d1b2a 0%, #1a1a3e 50%, #0a0a1a 100%); }
+        .home-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; max-width: 480px; margin: 0 auto; }
+        .tower-main { font-size: 80px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        .btn-quick { width: 100%; padding: 18px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: bold; margin: 20px 0; }
-        .mode-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .mode-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,215,0,0.2); border-radius: 16px; padding: 16px; text-align: center; }
-        .mode-card .icon { font-size: 32px; }
-        .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-        .feature { text-align: center; font-size: 11px; color: #888; }
+        .title { font-size: 28px; font-weight: bold; background: linear-gradient(45deg, #FFD700, #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .subtitle { color: #888; font-size: 14px; margin-bottom: 30px; }
+        .btn-main { width: 100%; max-width: 300px; padding: 18px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; border: none; border-radius: 16px; font-size: 18px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
+        .btn-main:active { transform: scale(0.98); }
+        .modes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .mode-btn { padding: 12px 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; color: #fff; cursor: pointer; font-size: 14px; }
+        .mode-btn:active { background: rgba(255,215,0,0.2); }
+        
         /* 游戏界面 */
-        .game-container { flex: 1; max-width: 480px; margin: 0 auto; width: 100%; padding: 12px; }
-        .game-header { display: flex; justify-content: space-between; padding: 8px 0; }
-        .tower-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .tower-stack { display: flex; flex-direction: column-reverse; gap: 2px; }
-        .tower-level { height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border-radius: 6px; }
-        .tower-level[data-level="13"] { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
-        .tower-level.current { box-shadow: 0 0 0 3px #FFD700; }
-        .hand-area { padding: 12px; background: rgba(0,0,0,0.3); border-radius: 16px; }
-        .hand-cards { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; }
-        .hand-card { width: 48px; height: 67px; background: #fff; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; flex-shrink: 0; }
-        .hand-card.red { color: #d00; }
-        .hand-card.black { color: #000; }
-        .hand-card.selected { transform: translateY(-8px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
+        #game-screen { background: #0d1b2a; }
+        .game-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: none; border-radius: 10px; color: #fff; font-size: 18px; cursor: pointer; }
+        .game-info { text-align: center; }
+        .game-info .label { font-size: 11px; color: #888; }
+        .game-info .value { font-size: 16px; color: #FFD700; font-weight: bold; }
+        
+        /* 塔区域 */
+        .tower-section { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; overflow-y: auto; }
+        .tower { display: flex; flex-direction: column-reverse; gap: 2px; width: 100%; max-width: 280px; }
+        .level { height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border-radius: 4px; transition: all 0.3s; }
+        .level.current { box-shadow: 0 0 0 2px #FFD700, 0 0 10px rgba(255,215,0,0.5); transform: scale(1.05); z-index: 10; }
+        /* 塔层颜色 - 从下到上渐变 */
+        .l1 { width: 95%; background: linear-gradient(90deg, #e0f7fa, #b2ebf2); color: #000; }
+        .l2 { width: 92%; background: linear-gradient(90deg, #b2ebf2, #80deea); color: #000; }
+        .l3 { width: 89%; background: linear-gradient(90deg, #80deea, #4dd0e1); color: #000; }
+        .l4 { width: 86%; background: linear-gradient(90deg, #4dd0e1, #26c6da); color: #000; }
+        .l5 { width: 83%; background: linear-gradient(90deg, #26c6da, #00bcd4); color: #000; }
+        .l6 { width: 80%; background: linear-gradient(90deg, #00bcd4, #00acc1); color: #fff; }
+        .l7 { width: 77%; background: linear-gradient(90deg, #00acc1, #0097a7); color: #fff; }
+        .l8 { width: 74%; background: linear-gradient(90deg, #0097a7, #00838f); color: #fff; }
+        .l9 { width: 71%; background: linear-gradient(90deg, #00838f, #006064); color: #fff; }
+        .l10 { width: 68%; background: linear-gradient(90deg, #006064, #01579b); color: #fff; }
+        .l11 { width: 65%; background: linear-gradient(90deg, #01579b, #0d47a1); color: #fff; }
+        .l12 { width: 62%; background: linear-gradient(90deg, #0d47a1, #1a237e); color: #fff; }
+        .l13 { width: 59%; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        
+        /* 守卫区域 */
+        .guard-section { padding: 15px; background: rgba(0,0,0,0.3); margin: 0 15px 10px; border-radius: 12px; }
+        .guard-title { text-align: center; font-size: 12px; color: #888; margin-bottom: 10px; }
+        .guard-card { width: 60px; height: 84px; background: linear-gradient(135deg, #1a5490, #0d2847); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .guard-card.revealed { background: #fff; color: #000; }
+        .provocation { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .provocation-card { width: 40px; height: 56px; background: linear-gradient(135deg, rgba(255,71,87,0.8), rgba(255,99,71,0.6)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid rgba(255,71,87,0.5); }
+        
+        /* 手牌区域 */
+        .hand-section { padding: 15px; background: rgba(0,0,0,0.5); }
+        .hand-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; color: #888; }
+        .hand-cards { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; }
+        .hand-cards::-webkit-scrollbar { display: none; }
+        .card { width: 50px; height: 70px; background: #fff; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
+        .card.red { color: #d00; }
+        .card.black { color: #000; }
+        .card.selected { transform: translateY(-10px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
+        .card .suit { font-size: 20px; }
+        .card .rank { font-size: 12px; }
+        .btn-play { width: 100%; padding: 15px; margin-top: 10px; background: #444; color: #666; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; }
+        .btn-play.active { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+        
         /* 加载 */
-        .loading { align-items: center; justify-content: center; gap: 20px; }
-        .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,215,0,0.2); border-top-color: #FFD700; border-radius: 50%; animation: spin 1s linear infinite; }
+        #loading-screen { align-items: center; justify-content: center; background: #0a0a1a; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,215,0,0.2); border-top-color: #FFD700; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <!-- 首页 -->
     <div id="home-screen" class="screen active">
-        <div class="home-container">
-            <header class="home-header">
-                <div class="logo">🏰 命运塔</div>
-                <div>💰 10000</div>
-            </header>
-            <div class="tower-visual">
-                <div class="tower-icon">🏰</div>
-                <h2 style="margin-top:16px">首登者</h2>
-                <p style="color:#888;font-size:14px">登顶巅峰，成为传奇</p>
-            </div>
-            <button class="btn-quick" onclick="startGame('solo')">⚡ 快速开始</button>
-            <div class="mode-grid">
-                <div class="mode-card" onclick="startGame('solo')"><div class="icon">👤</div><div>个人赛</div></div>
-                <div class="mode-card" onclick="startGame('team')"><div class="icon">👥</div><div>团队赛</div></div>
-                <div class="mode-card" onclick="startGame('streak')"><div class="icon">⚡</div><div>连胜</div></div>
-                <div class="mode-card" onclick="location.href='tournament.html'"><div class="icon">🏆</div><div>锦标赛</div></div>
-            </div>
-            <div class="features">
-                <div class="feature" onclick="location.href='shop.html'">🛒<br>商城</div>
-                <div class="feature">🎒<br>背包</div>
-                <div class="feature">📊<br>排行</div>
-                <div class="feature">⚙️<br>设置</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 游戏 -->
-    <div id="game-screen" class="screen">
-        <div class="game-container">
-            <div class="game-header">
-                <button onclick="showScreen('home')" style="width:40px;height:40px;background:rgba(255,255,255,0.1);border:none;border-radius:10px;color:#fff">←</button>
-                <div>第 <span id="round">1</span> 轮 | <span id="timer" style="color:#FFD700">15</span>s</div>
-                <button style="width:40px;height:40px;background:rgba(255,255,255,0.1);border:none;border-radius:10px;color:#fff">☰</button>
-            </div>
-            <div class="tower-area">
-                <div class="tower-stack" id="tower"></div>
-            </div>
-            <div class="hand-area">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#888">
-                    <span>手牌 <span id="hand-count">52</span> 张</span>
-                    <span>第 <span id="current-level">2</span> 层</span>
-                </div>
-                <div class="hand-cards" id="hand-cards"></div>
-                <button id="play-btn" onclick="playCard()" disabled style="width:100%;padding:16px;margin-top:12px;background:#444;color:#666;border:none;border-radius:12px;font-size:16px;font-weight:bold">选择一张牌</button>
+        <div class="home-content">
+            <div class="tower-main">🏰</div>
+            <div class="title">命运塔·首登者</div>
+            <div class="subtitle">登顶第13层，成为首登者</div>
+            <button class="btn-main" onclick="startGame('solo')">⚡ 快速开始</button>
+            <div class="modes">
+                <button class="mode-btn" onclick="startGame('solo')">👤 单人</button>
+                <button class="mode-btn" onclick="startGame('team')">👥 团队</button>
+                <button class="mode-btn" onclick="startGame('streak')">⚡ 连胜</button>
             </div>
         </div>
     </div>
 
     <!-- 加载 -->
-    <div id="loading-screen" class="screen loading">
+    <div id="loading-screen" class="screen">
         <div class="spinner"></div>
-        <div>匹配中...</div>
-        <div style="color:#888;font-size:14px">正在寻找对手</div>
+        <div>正在进入游戏...</div>
+    </div>
+
+    <!-- 游戏 -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-info">
+                <div class="label">第 <span id="round-num">1</span> 轮</div>
+                <div class="value" id="timer">15s</div>
+            </div>
+            <div class="game-info">
+                <div class="label">当前层</div>
+                <div class="value" id="current-level">2</div>
+            </div>
+        </div>
+
+        <div class="tower-section">
+            <div class="tower" id="tower"></div>
+        </div>
+
+        <div class="guard-section">
+            <div class="guard-title">守卫牌 (点击出牌后揭示)</div>
+            <div class="guard-card" id="guard-card">?</div>
+            <div class="guard-title" style="margin-top:10px">激怒牌 (明牌)</div>
+            <div class="provocation" id="provocation"></div>
+        </div>
+
+        <div class="hand-section">
+            <div class="hand-header">
+                <span>剩余手牌: <span id="hand-count">52</span> 张</span>
+                <span id="message">选择一张牌出牌</span>
+            </div>
+            <div class="hand-cards" id="hand-cards"></div>
+            <button class="btn-play" id="play-btn" onclick="confirmPlay()">选择一张牌</button>
+        </div>
     </div>
 
     <script>
-        let state = { screen: 'home', level: 1, round: 1, timer: 15, hand: [], selected: null };
+        // ==================== 游戏核心逻辑 ====================
+        // 基于今天讨论的主逻辑:
+        // - 4副牌208张
+        // - 13守卫, 每名守卫13张守卫牌 + 3张激怒牌
+        // - 首登者机制
         
+        const Game = {
+            state: 'home', // home, loading, playing
+            mode: 'solo',
+            playerLevel: 1, // 当前在第几层 (0-12对应2-A)
+            round: 1,
+            timer: 15,
+            hand: [], // 玩家手牌
+            selectedCard: null,
+            guards: [], // 13个守卫
+            firstAscender: null, // 首登者
+            
+            // 初始化游戏
+            init() {
+                this.playerLevel = 0;
+                this.round = 1;
+                this.firstAscender = null;
+                this.generateGuards();
+                this.generateHand();
+                this.renderTower();
+                this.renderGuard();
+                this.renderHand();
+                this.startTimer();
+            },
+            
+            // 生成13个守卫
+            generateGuards() {
+                const suits = ['♥','♦','♣','♠'];
+                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+                this.guards = [];
+                
+                for(let i=0; i<13; i++) {
+                    // 每名守卫13张守卫牌
+                    const guardCards = [];
+                    for(let j=0; j<13; j++) {
+                        guardCards.push({
+                            suit: suits[Math.floor(Math.random()*4)],
+                            rank: ranks[Math.floor(Math.random()*13)]
+                        });
+                    }
+                    // 3张激怒牌
+                    const provocationCards = [];
+                    for(let j=0; j<3; j++) {
+                        provocationCards.push({
+                            suit: suits[Math.floor(Math.random()*4)],
+                            rank: ranks[Math.floor(Math.random()*13)]
+                        });
+                    }
+                    
+                    this.guards.push({
+                        level: i, // 0-12
+                        guardCards: guardCards,
+                        usedGuardCards: [],
+                        provocationCards: provocationCards,
+                        usedProvocationCards: [],
+                        isDefeated: false
+                    });
+                }
+            },
+            
+            // 生成玩家手牌 (完整52张)
+            generateHand() {
+                const suits = ['♥','♦','♣','♠'];
+                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+                this.hand = [];
+                
+                for(let s of suits) {
+                    for(let r of ranks) {
+                        this.hand.push({
+                            suit: s,
+                            rank: r,
+                            isRed: (s === '♥' || s === '♦')
+                        });
+                    }
+                }
+                // 洗牌
+                this.hand.sort(() => Math.random() - 0.5);
+            },
+            
+            // 渲染塔
+            renderTower() {
+                const tower = document.getElementById('tower');
+                tower.innerHTML = '';
+                const levels = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+                
+                for(let i=0; i<13; i++) {
+                    const div = document.createElement('div');
+                    div.className = `level l${i+1} ${i === this.playerLevel ? 'current' : ''}`;
+                    div.textContent = levels[i];
+                    tower.appendChild(div);
+                }
+                
+                document.getElementById('current-level').textContent = levels[this.playerLevel];
+            },
+            
+            // 渲染守卫
+            renderGuard() {
+                const guard = this.guards[this.playerLevel];
+                const provDiv = document.getElementById('provocation');
+                provDiv.innerHTML = '';
+                
+                // 显示激怒牌 (明牌)
+                for(let card of guard.provocationCards) {
+                    const div = document.createElement('div');
+                    div.className = 'provocation-card';
+                    div.innerHTML = `${card.suit}${card.rank}`;
+                    provDiv.appendChild(div);
+                }
+            },
+            
+            // 渲染手牌
+            renderHand() {
+                const container = document.getElementById('hand-cards');
+                container.innerHTML = '';
+                
+                // 显示前7张
+                const displayCards = this.hand.slice(0, 7);
+                
+                displayCards.forEach((card, index) => {
+                    const div = document.createElement('div');
+                    div.className = `card ${card.isRed ? 'red' : 'black'} ${this.selectedCard === index ? 'selected' : ''}`;
+                    div.innerHTML = `<div class="suit">${card.suit}</div><div class="rank">${card.rank}</div>`;
+                    div.onclick = () => this.selectCard(index);
+                    container.appendChild(div);
+                });
+                
+                document.getElementById('hand-count').textContent = this.hand.length;
+                this.updatePlayButton();
+            },
+            
+            // 选择卡牌
+            selectCard(index) {
+                this.selectedCard = (this.selectedCard === index) ? null : index;
+                this.renderHand();
+            },
+            
+            // 更新出牌按钮
+            updatePlayButton() {
+                const btn = document.getElementById('play-btn');
+                if(this.selectedCard !== null) {
+                    btn.classList.add('active');
+                    btn.textContent = '确认出牌';
+                } else {
+                    btn.classList.remove('active');
+                    btn.textContent = '选择一张牌';
+                }
+            },
+            
+            // 确认出牌
+            play() {
+                if(this.selectedCard === null) return;
+                
+                const playerCard = this.hand[this.selectedCard];
+                const guard = this.guards[this.playerLevel];
+                
+                // 守卫出一张牌
+                const guardCard = guard.guardCards.pop();
+                guard.usedGuardCards.push(guardCard);
+                
+                // 揭示守卫牌
+                const guardCardEl = document.getElementById('guard-card');
+                guardCardEl.textContent = guardCard.suit + guardCard.rank;
+                guardCardEl.classList.add('revealed');
+                
+                // 判断是否匹配 (花色或点数相同则前进)
+                const isMatch = (playerCard.suit === guardCard.suit) || (playerCard.rank === guardCard.rank);
+                
+                // 检查激怒牌 (3/6/9层守卫主动使用)
+                let provocationTriggered = false;
+                if([2,5,8].includes(this.playerLevel) && guard.provocationCards.length > 0) {
+                    const provCard = guard.provocationCards[0];
+                    // 如果激怒牌匹配, 回退
+                    if(playerCard.suit === provCard.suit || playerCard.rank === provCard.rank) {
+                        provocationTriggered = true;
+                    }
+                }
+                
+                // 从手牌移除
+                this.hand.splice(this.selectedCard, 1);
+                this.selectedCard = null;
+                
+                // 显示结果
+                setTimeout(() => {
+                    if(provocationTriggered) {
+                        alert('💥 激怒牌触发! 回退一层');
+                        if(this.playerLevel > 0) this.playerLevel--;
+                    } else if(isMatch) {
+                        alert('✅ 匹配成功! 前进一层');
+                        this.playerLevel++;
+                        // 检查是否登顶
+                        if(this.playerLevel >= 12) {
+                            this.becomeFirstAscender();
+                            return;
+                        }
+                    } else {
+                        alert('❌ 不匹配, 留在本层');
+                    }
+                    
+                    this.round++;
+                    this.renderTower();
+                    this.renderGuard();
+                    this.renderHand();
+                    document.getElementById('round-num').textContent = this.round;
+                    
+                    // 重置守卫牌显示
+                    guardCardEl.textContent = '?';
+                    guardCardEl.classList.remove('revealed');
+                    
+                    this.resetTimer();
+                }, 500);
+            },
+            
+            // 成为首登者
+            becomeFirstAscender() {
+                this.firstAscender = 'player';
+                alert('🎉 恭喜! 你成为首登者! 现在你需要防守其他玩家的进攻。');
+                this.playerLevel = 12; // 保持在A层
+                this.renderTower();
+            },
+            
+            // 计时器
+            startTimer() {
+                this.timer = 15;
+                this.updateTimerDisplay();
+                
+                this.timerInterval = setInterval(() => {
+                    this.timer--;
+                    this.updateTimerDisplay();
+                    
+                    if(this.timer <= 0) {
+                        this.autoPlay();
+                    }
+                }, 1000);
+            },
+            
+            resetTimer() {
+                clearInterval(this.timerInterval);
+                this.startTimer();
+            },
+            
+            updateTimerDisplay() {
+                document.getElementById('timer').textContent = this.timer + 's';
+            },
+            
+            // 自动出牌
+            autoPlay() {
+                if(this.hand.length > 0) {
+                    this.selectedCard = 0;
+                    this.play();
+                }
+            }
+        };
+
+        // ==================== UI 控制 ====================
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id + '-screen').classList.add('active');
-            state.screen = id;
+            Game.state = id;
         }
-        
+
         function startGame(mode) {
+            Game.mode = mode;
             showScreen('loading');
+            
             setTimeout(() => {
-                initGame();
+                Game.init();
                 showScreen('game');
-            }, 1500);
-        }
-        
-        function initGame() {
-            state.level = 1;
-            state.round = 1;
-            state.selected = null;
-            generateHand();
-            renderTower();
-            renderHand();
-            startTimer();
-        }
-        
-        function generateHand() {
-            const suits = ['♥','♦','♣','♠'], ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-            state.hand = [];
-            for(let i=0; i<52; i++) {
-                state.hand.push({
-                    suit: suits[Math.floor(Math.random()*4)],
-                    rank: ranks[Math.floor(Math.random()*13)],
-                    color: Math.random() > 0.5 ? 'red' : 'black'
-                });
-            }
-        }
-        
-        function renderTower() {
-            const tower = document.getElementById('tower');
-            tower.innerHTML = '';
-            const levels = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-            for(let i=0; i<13; i++) {
-                const el = document.createElement('div');
-                el.className = 'tower-level' + (i+1 === state.level ? ' current' : '');
-                el.dataset.level = i+1;
-                el.style.width = (85 - i*3) + '%';
-                el.style.background = i === 12 ? 'linear-gradient(135deg,#FFD700,#FFA500)' : `linear-gradient(90deg,hsl(${200+i*10},70%,${50+i*3}%),hsl(${200+i*10},70%,${40+i*3}%))`;
-                el.style.color = i > 9 ? '#fff' : '#000';
-                el.textContent = levels[i];
-                tower.appendChild(el);
-            }
-        }
-        
-        function renderHand() {
-            const container = document.getElementById('hand-cards');
-            container.innerHTML = '';
-            state.hand.slice(0,8).forEach((card,i) => {
-                const el = document.createElement('div');
-                el.className = `hand-card ${card.color}` + (state.selected === i ? ' selected' : '');
-                el.innerHTML = `<span style="font-size:18px">${card.suit}</span><span style="font-size:11px">${card.rank}</span>`;
-                el.onclick = () => selectCard(i);
-                container.appendChild(el);
-            });
-            document.getElementById('hand-count').textContent = state.hand.length;
-            document.getElementById('current-level').textContent = state.level + 1;
-            updatePlayButton();
-        }
-        
-        function selectCard(index) {
-            state.selected = state.selected === index ? null : index;
-            renderHand();
-        }
-        
-        function updatePlayButton() {
-            const btn = document.getElementById('play-btn');
-            if(state.selected !== null) {
-                btn.disabled = false;
-                btn.style.background = 'linear-gradient(135deg,#FFD700,#FFA500)';
-                btn.style.color = '#000';
-                btn.textContent = '确认出牌';
-            } else {
-                btn.disabled = true;
-                btn.style.background = '#444';
-                btn.style.color = '#666';
-                btn.textContent = '选择一张牌';
-            }
-        }
-        
-        function playCard() {
-            if(state.selected === null) return;
-            state.hand.splice(state.selected, 1);
-            state.selected = null;
-            if(state.level < 13) state.level++;
-            state.round++;
-            renderTower();
-            renderHand();
-            document.getElementById('round').textContent = state.round;
-        }
-        
-        function startTimer() {
-            state.timer = 15;
-            const timerEl = document.getElementById('timer');
-            const interval = setInterval(() => {
-                if(state.screen !== 'game') { clearInterval(interval); return; }
-                state.timer--;
-                timerEl.textContent = state.timer;
-                if(state.timer <= 0) {
-                    clearInterval(interval);
-                    if(state.selected === null) autoPlay();
-                }
             }, 1000);
         }
-        
-        function autoPlay() {
-            if(state.hand.length > 0) {
-                state.selected = Math.floor(Math.random() * Math.min(8, state.hand.length));
-                playCard();
-            }
+
+        function goHome() {
+            clearInterval(Game.timerInterval);
+            showScreen('home');
         }
+
+        function confirmPlay() {
+            Game.play();
+        }
+
+        // 初始化
+        showScreen('home');
     </script>
 </body>
 </html>
