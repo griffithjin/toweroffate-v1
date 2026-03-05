@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命运塔·首登者 - 游戏匹配</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a3e 0%, #0d1b2a 100%); color: #fff; overflow: hidden; }
+        
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        
+        /* 模式选择阶段 */
+        .mode-select { flex: 1; display: flex; flex-direction: column; padding: 20px; }
+        .header { display: flex; align-items: center; margin-bottom: 20px; }
+        .back-btn { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.1); 
+            border: none; 
+            color: #fff; 
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .header-title { flex: 1; text-align: center; font-size: 18px; font-weight: bold; margin-right: 36px; }
+        
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .mode-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mode-card:hover { background: rgba(255,255,255,0.1); }
+        .mode-card.selected { border-color: #FFD700; background: rgba(255,215,0,0.1); }
+        .mode-icon { font-size: 40px; margin-bottom: 10px; }
+        .mode-name { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        .mode-desc { font-size: 12px; color: #888; }
+        
+        .match-btn {
+            margin-top: auto;
+            padding: 18px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .match-btn:hover { transform: scale(1.02); }
+        .match-btn:disabled { background: #444; color: #666; cursor: not-allowed; }
+        
+        /* 匹配中阶段 */
+        .matching {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        .matching.active { display: flex; }
+        
+        .matching-animation {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .matching-ring {
+            position: absolute;
+            border: 3px solid rgba(255,215,0,0.3);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .matching-ring:nth-child(1) { width: 100%; height: 100%; animation-duration: 1s; }
+        .matching-ring:nth-child(2) { width: 75%; height: 75%; top: 12.5%; left: 12.5%; animation-duration: 1.5s; animation-direction: reverse; }
+        .matching-ring:nth-child(3) { width: 50%; height: 50%; top: 25%; left: 25%; animation-duration: 2s; }
+        .matching-icon { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 40px; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .matching-text { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .matching-sub { font-size: 14px; color: #888; margin-bottom: 30px; }
+        .matching-timer { font-size: 36px; font-weight: bold; color: #FFD700; margin-bottom: 10px; }
+        .matching-players { font-size: 14px; color: #888; margin-bottom: 40px; }
+        .cancel-btn {
+            padding: 15px 40px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .cancel-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        /* 匹配成功阶段 */
+        .match-success {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .match-success.active { display: flex; }
+        
+        .success-header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(46,213,115,0.2), rgba(46,213,115,0.05));
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        .success-icon { font-size: 48px; margin-bottom: 10px; }
+        .success-text { font-size: 18px; font-weight: bold; color: #2ed573; }
+        
+        .team-section { margin-bottom: 20px; }
+        .team-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .team-name { font-size: 16px; font-weight: bold; }
+        .team-name.blue { color: #4169E1; }
+        .team-name.red { color: #ff4757; }
+        
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .player-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .player-avatar.self { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .player-info { flex: 1; }
+        .player-name { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+        .player-rank { font-size: 11px; color: #888; }
+        .player-status { font-size: 11px; color: #2ed573; }
+        
+        .ready-section {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+        }
+        .ready-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .ready-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+        }
+        .ready-dot.ready { background: #2ed573; box-shadow: 0 0 10px #2ed573; }
+        .ready-text { font-size: 14px; color: #888; margin-bottom: 15px; }
+        .ready-btn {
+            padding: 18px 60px;
+            background: linear-gradient(135deg, #2ed573, #26c281);
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+        }
+        .ready-btn.ready {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+        
+        .countdown {
+            font-size: 48px;
+            font-weight: bold;
+            color: #FFD700;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 模式选择 -->
+        <div class="mode-select" id="modeSelect">
+            <div class="header">
+                <button class="back-btn" onclick="history.back()">←</button>
+                <div class="header-title">选择模式</div>
+            </div>
+
+            <div class="mode-grid">
+                <div class="mode-card selected" onclick="selectMode(this, 'solo')">
+                    <div class="mode-icon">👤</div>
+                    <div class="mode-name">单人练习</div>
+                    <div class="mode-desc">与AI对战练习</div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode(this, '4p')">
+                    <div class="mode-icon">👥</div>
+                    <div class="mode-name">4人乱斗</div>
+                    <div class="mode-desc">4人各自为战</div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode(this, '2v2')">
+                    <div class="mode-icon">⚔️</div>
+                    <div class="mode-name">2v2团战</div>
+                    <div class="mode-desc">2对2团队战</div>
+                </div>
+                
+                <div class="mode-card" onclick="selectMode(this, 'rank')">
+                    <div class="mode-icon">🏆</div>
+                    <div class="mode-name">排位赛</div>
+                    <div class="mode-desc">争夺段位排名</div>
+                </div>
+            </div>
+
+            <button class="match-btn" onclick="startMatching()">开始匹配</button>
+        </div>
+
+        <!-- 匹配中 -->
+        <div class="matching" id="matching">
+            <div class="matching-animation">
+                <div class="matching-ring"></div>
+                <div class="matching-ring"></div>
+                <div class="matching-ring"></div>
+                <div class="matching-icon">🔍</div>
+            </div>
+
+            <div class="matching-text">正在寻找对手...</div>
+            <div class="matching-sub">预计等待时间：<10秒</div>
+            <div class="matching-timer" id="matchTimer">00:00</div>
+            <div class="matching-players">已找到 <span id="foundPlayers">1</span>/4 名玩家</div>
+
+            <button class="cancel-btn" onclick="cancelMatching()">取消匹配</button>
+        </div>
+
+        <!-- 匹配成功 -->
+        <div class="match-success" id="matchSuccess">
+            <div class="success-header">
+                <div class="success-icon">✨</div>
+                <div class="success-text">匹配成功！</div>
+            </div>
+
+            <div class="team-section">
+                <div class="team-header">
+                    <span class="team-name blue">🔵 蓝队</span>
+                    <span style="font-size:12px;color:#888">VS</span>
+                    <span class="team-name red">🔴 红队</span>
+                </div>
+
+                <div class="players-grid">
+                    <div class="player-card">
+                        <div class="player-avatar self">😺</div>
+                        <div class="player-info">
+                            <div class="player-name">我 (你)</div>
+                            <div class="player-rank">黄金段位</div>
+                        </div>
+                        <span class="player-status">准备中...</span>
+                    </div>
+                    
+                    <div class="player-card">
+                        <div class="player-avatar">🐶</div>
+                        <div class="player-info">
+                            <div class="player-name">玩家A</div>
+                            <div class="player-rank">白银段位</div>
+                        </div>
+                        <span class="player-status">已准备 ✓</span>
+                    </div>
+                    
+                    <div class="player-card">
+                        <div class="player-avatar">🐰</div>
+                        <div class="player-info">
+                            <div class="player-name">玩家B</div>
+                            <div class="player-rank">黄金段位</div>
+                        </div>
+                        <span class="player-status">已准备 ✓</span>
+                    </div>
+                    
+                    <div class="player-card">
+                        <div class="player-avatar">🦊</div>
+                        <div class="player-info">
+                            <div class="player-name">玩家C</div>
+                            <div class="player-rank">铂金段位</div>
+                        </div>
+                        <span class="player-status">已准备 ✓</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ready-section">
+                <div class="ready-progress">
+                    <div class="ready-dot ready"></div>
+                    <div class="ready-dot ready"></div>
+                    <div class="ready-dot ready"></div>
+                    <div class="ready-dot"></div>
+                </div>
+                <div class="ready-text">3/4 玩家已准备</div>
+                
+                <div class="countdown" id="countdown">5</div>
+                
+                <button class="ready-btn" id="readyBtn" onclick="toggleReady()">准备</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMode = 'solo';
+        let matchTimer = null;
+        let matchSeconds = 0;
+        let isReady = false;
+
+        function selectMode(card, mode) {
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedMode = mode;
+        }
+
+        function startMatching() {
+            // 单人练习直接开始
+            if (selectedMode === 'solo') {
+                location.href = 'playable.html';
+                return;
+            }
+
+            // 切换到匹配中界面
+            document.getElementById('modeSelect').style.display = 'none';
+            document.getElementById('matching').classList.add('active');
+
+            // 开始计时
+            matchSeconds = 0;
+            matchTimer = setInterval(() => {
+                matchSeconds++;
+                const mins = Math.floor(matchSeconds / 60).toString().padStart(2, '0');
+                const secs = (matchSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('matchTimer').textContent = `${mins}:${secs}`;
+
+                // 模拟找到玩家
+                if (matchSeconds === 3) {
+                    document.getElementById('foundPlayers').textContent = '2';
+                } else if (matchSeconds === 5) {
+                    document.getElementById('foundPlayers').textContent = '3';
+                } else if (matchSeconds === 8) {
+                    document.getElementById('foundPlayers').textContent = '4';
+                    // 匹配成功
+                    setTimeout(() => {
+                        matchSuccess();
+                    }, 1000);
+                }
+            }, 1000);
+        }
+
+        function cancelMatching() {
+            clearInterval(matchTimer);
+            document.getElementById('matching').classList.remove('active');
+            document.getElementById('modeSelect').style.display = 'flex';
+        }
+
+        function matchSuccess() {
+            clearInterval(matchTimer);
+            document.getElementById('matching').classList.remove('active');
+            document.getElementById('matchSuccess').classList.add('active');
+
+            // 开始倒计时
+            let countdown = 5;
+            const countdownEl = document.getElementById('countdown');
+            const countdownTimer = setInterval(() => {
+                countdown--;
+                countdownEl.textContent = countdown;
+                
+                if (countdown === 0) {
+                    clearInterval(countdownTimer);
+                    // 进入游戏
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function toggleReady() {
+            const btn = document.getElementById('readyBtn');
+            isReady = !isReady;
+            
+            if (isReady) {
+                btn.textContent = '已准备';
+                btn.classList.add('ready');
+                // 更新状态
+                document.querySelector('.player-status').textContent = '已准备 ✓';
+            } else {
+                btn.textContent = '准备';
+                btn.classList.remove('ready');
+                document.querySelector('.player-status').textContent = '准备中...';
+            }
+        }
+
+        function startGame() {
+            // 根据模式进入不同游戏页面
+            const gameUrls = {
+                '4p': 'playable-solo-4p.html',
+                '2v2': 'playable-team-2v2.html',
+                'rank': 'playable.html'
+            };
+            location.href = gameUrls[selectedMode] || 'playable.html';
+        }
+    </script>
+</body>
+</html>

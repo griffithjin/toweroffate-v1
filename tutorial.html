@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命运塔·首登者 - 新手引导</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a3e 0%, #0d1b2a 100%); color: #fff; overflow: hidden; }
+        
+        .tutorial-container { width: 100%; height: 100%; position: relative; }
+        
+        /* 步骤指示器 */
+        .step-indicator {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #FFD700; width: 24px; border-radius: 4px; }
+        .step-dot.completed { background: #2ed573; }
+        
+        /* 跳过按钮 */
+        .skip-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .skip-btn:hover { color: #fff; border-color: #fff; }
+        
+        /* 步骤页面 */
+        .step {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        .step.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 欢迎页 */
+        .welcome-icon { font-size: 80px; margin-bottom: 20px; }
+        .welcome-title { font-size: 24px; font-weight: bold; color: #FFD700; margin-bottom: 10px; }
+        .welcome-text { font-size: 14px; color: #aaa; text-align: center; line-height: 1.6; max-width: 300px; }
+        
+        /* 游戏演示 */
+        .demo-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 350px;
+        }
+        .demo-tower {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .demo-level {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+        }
+        .demo-level.highlight { background: rgba(255,215,0,0.2); border: 1px solid #FFD700; }
+        .level-name { font-weight: bold; }
+        .level-player { font-size: 20px; }
+        
+        /* 卡牌演示 */
+        .card-demo {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .demo-card {
+            width: 60px;
+            height: 80px;
+            background: #fff;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #d00;
+            animation: pulse 2s infinite;
+        }
+        .demo-card.black { color: #000; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .card-arrow { font-size: 30px; color: #FFD700; display: flex; align-items: center; }
+        
+        /* 说明文字 */
+        .step-title { font-size: 20px; font-weight: bold; color: #FFD700; margin-bottom: 15px; text-align: center; }
+        .step-desc { font-size: 14px; color: #aaa; text-align: center; line-height: 1.6; max-width: 320px; margin-bottom: 20px; }
+        .step-tip { 
+            background: rgba(255,215,0,0.1); 
+            border-left: 3px solid #FFD700; 
+            padding: 10px 15px; 
+            font-size: 13px; 
+            color: #ccc;
+            max-width: 320px;
+            margin-top: 15px;
+        }
+        
+        /* 按钮 */
+        .nav-btns {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        .btn {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+        .btn:hover { transform: scale(1.05); }
+        
+        /* 完成页 */
+        .complete-icon { font-size: 60px; margin-bottom: 20px; }
+        .reward-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
+            border: 2px solid #FFD700;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .reward-title { font-size: 14px; color: #FFD700; margin-bottom: 10px; }
+        .reward-items { display: flex; gap: 20px; justify-content: center; }
+        .reward-item { text-align: center; }
+        .reward-icon { font-size: 36px; }
+        .reward-name { font-size: 12px; color: #aaa; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="tutorial-container">
+        <!-- 步骤指示器 -->
+        <div class="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <!-- 跳过按钮 -->
+        <button class="skip-btn" onclick="skipTutorial()">跳过引导</button>
+
+        <!-- 步骤1：欢迎 -->
+        <div class="step active" data-step="1">
+            <div class="welcome-icon">🏰</div>
+            <div class="welcome-title">欢迎来到命运塔</div>
+            <div class="welcome-text">
+                命运塔是一座神秘的13层高塔，只有最强者才能成为"首登者"。<br><br>
+                让我带你了解游戏规则，开始你的攀登之旅！
+            </div>
+        </div>
+
+        <!-- 步骤2：游戏目标 -->
+        <div class="step" data-step="2">
+            <div class="step-title">🎯 游戏目标</div>
+            
+            <div class="demo-area">
+                <div class="demo-tower">
+                    <div class="demo-level"><span class="level-name">A层</span><span>🏆</span></div>
+                    <div class="demo-level"><span class="level-name">K层</span></span></div>
+                    <div class="demo-level"><span class="level-name">Q层</span></span></div>
+                    <div class="demo-level highlight">
+                        <span class="level-name">7层</span>
+                        <span class="level-player">😺</span>
+                    </div>
+                    <div class="demo-level"><span class="level-name">2层</span><span>🎯</span></div>
+                </div>
+            </div>
+
+            <div class="step-desc">
+                从第2层开始攀登，击败守卫，避开激怒牌，<br>
+                首位到达A层的玩家将成为"首登者"！
+            </div>
+        </div>
+
+        <!-- 步骤3：出牌规则 -->
+        <div class="step" data-step="3">
+            <div class="step-title">🎴 出牌规则</div>
+
+            <div class="card-demo">
+                <div class="demo-card">
+                    <div>♥</div>
+                    <div style="font-size:14px">A</div>
+                </div>
+                <div class="card-arrow">→</div>
+                <div class="demo-card black">
+                    <div>♠</div>
+                    <div style="font-size:14px">A</div>
+                </div>
+            </div>
+
+            <div class="step-desc">
+                选择你的手牌，与守卫牌匹配。<br>
+                匹配条件：点数相同 或 花色相同
+            </div>
+
+            <div class="step-tip">
+                💡 提示：♥和♦是红色，♣和♠是黑色
+            </div>
+        </div>
+
+        <!-- 步骤4：激怒机制 -->
+        <div class="step" data-step="4">
+            <div class="step-title">💢 激怒机制</div>
+
+            <div class="demo-area">
+                <div style="text-align:center;margin-bottom:15px;font-size:14px;color:#FFD700">⚠️ 危险层数</div>
+                <div style="display:flex;justify-content:center;gap:20px">
+                    <div style="text-align:center">
+                        <div style="font-size:30px">3层</div>
+                        <div style="font-size:12px;color:#ff6b6b">💢 激怒</div>
+                    </div>
+                    <div style="text-align:center">
+                        <div style="font-size:30px">6层</div>
+                        <div style="font-size:12px;color:#ff6b6b">💢 激怒</div>
+                    </div>
+                    <div style="text-align:center">
+                        <div style="font-size:30px">9层</div>
+                        <div style="font-size:12px;color:#ff6b6b">💢 激怒</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-desc">
+                第3、6、9层有激怒牌！<br>
+                如果你的牌与激怒牌匹配，<br>
+                将下降1-2层！
+            </div>
+
+            <div class="step-tip">
+                ⚠️ 策略：激怒层要谨慎出牌，避免匹配激怒牌！
+            </div>
+        </div>
+
+        <!-- 步骤5：完成 -->
+        <div class="step" data-step="5">
+            <div class="complete-icon">🎉</div>
+            <div class="step-title">准备就绪！</div>
+
+            <div class="step-desc">
+                你已经了解了基本规则，<br>
+                快去实战中体验吧！
+            </div>
+
+            <div class="reward-box">
+                <div class="reward-title">🎁 新手奖励</div>
+                <div class="reward-items">
+                    <div class="reward-item">
+                        <div class="reward-icon">💎</div>
+                        <div class="reward-name">100钻石</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-icon">🎴</div>
+                        <div class="reward-name">新手卡背</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-icon">🎁</div>
+                        <div class="reward-name">经验卡</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航按钮 -->
+        <div class="nav-btns">
+            <button class="btn btn-secondary" id="prevBtn" onclick="prevStep()" style="display:none">上一步</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">下一步</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function updateStep() {
+            // 更新步骤显示
+            document.querySelectorAll('.step').forEach((step, idx) => {
+                step.classList.toggle('active', idx + 1 === currentStep);
+            });
+
+            // 更新指示器
+            document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+                dot.classList.remove('active', 'completed');
+                if (idx + 1 < currentStep) {
+                    dot.classList.add('completed');
+                } else if (idx + 1 === currentStep) {
+                    dot.classList.add('active');
+                }
+            });
+
+            // 更新按钮
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
+            document.getElementById('nextBtn').textContent = currentStep === totalSteps ? '开始游戏' : '下一步';
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            } else {
+                // 完成引导，发放奖励
+                completeTutorial();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        }
+
+        function skipTutorial() {
+            if (confirm('确定要跳过新手引导吗？你将错过新手奖励！')) {
+                location.href = 'index.html';
+            }
+        }
+
+        function completeTutorial() {
+            // 标记已完成引导
+            localStorage.setItem('tutorialCompleted', 'true');
+            
+            // 发放奖励
+            let diamond = parseInt(localStorage.getItem('userDiamond') || '0');
+            localStorage.setItem('userDiamond', diamond + 100);
+            
+            // 添加新手卡背到背包
+            let inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            inventory.push({ id: 'back_newbie', type: 'cardback', name: '新手卡背', equipped: false });
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            
+            alert('🎉 恭喜完成新手引导！\n💎 获得100钻石\n🎴 获得新手卡背');
+            location.href = 'index.html';
+        }
+
+        // 初始化
+        updateStep();
+    </script>
+</body>
+</html>

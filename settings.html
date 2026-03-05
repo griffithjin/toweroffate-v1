@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命运塔·首登者 - 设置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; min-height: 100%; font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a3e 0%, #0d1b2a 100%); color: #fff; }
+        
+        .container { max-width: 430px; margin: 0 auto; padding: 20px; }
+        
+        /* 头部 */
+        .header { display: flex; align-items: center; margin-bottom: 25px; }
+        .back-btn { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.1); 
+            border: none; 
+            color: #fff; 
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .header-title { flex: 1; text-align: center; font-size: 18px; font-weight: bold; margin-right: 36px; }
+        
+        /* 设置分组 */
+        .settings-group {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .group-title { font-size: 14px; color: #888; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* 设置项 */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .setting-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .setting-info { display: flex; align-items: center; gap: 12px; }
+        .setting-icon { font-size: 22px; }
+        .setting-name { font-size: 15px; }
+        .setting-value { font-size: 13px; color: #888; }
+        
+        /* 开关 */
+        .switch {
+            width: 50px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .switch.on { background: #2ed573; }
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        .switch.on::after { left: 24px; }
+        
+        /* 滑块 */
+        .slider-container { width: 120px; }
+        .slider {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #FFD700;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* 选择器 */
+        .selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #FFD700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* 按钮 */
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.15); }
+        .action-btn.danger { background: rgba(255,71,87,0.2); color: #ff6b6b; }
+        .action-btn.danger:hover { background: rgba(255,71,87,0.3); }
+        .action-btn.primary { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; }
+        
+        /* 版本信息 */
+        .version-info {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        .version-logo { font-size: 40px; margin-bottom: 10px; }
+        .version-name { font-size: 14px; color: #888; margin-bottom: 5px; }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a3e, #0d1b2a);
+            border: 2px solid #FFD700;
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .modal-title { font-size: 18px; font-weight: bold; color: #FFD700; text-align: center; margin-bottom: 15px; }
+        .modal-text { font-size: 14px; color: #aaa; text-align: center; line-height: 1.6; margin-bottom: 20px; }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .modal-btn.cancel { background: rgba(255,255,255,0.1); color: #fff; }
+        .modal-btn.confirm { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <div class="header-title">设置</div>
+        </div>
+
+        <!-- 游戏设置 -->
+        <div class="settings-group">
+            <div class="group-title">🎮 游戏设置</div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🔊</span>
+                    <span class="setting-name">游戏音效</span>
+                </div>
+                <div class="switch on" onclick="toggleSwitch(this, 'sound')"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🎵</span>
+                    <span class="setting-name">背景音乐</span>
+                </div>
+                <div class="switch on" onclick="toggleSwitch(this, 'music')"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🔔</span>
+                    <span class="setting-name">震动反馈</span>
+                </div>
+                <div class="switch on" onclick="toggleSwitch(this, 'vibration')"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">📳</span>
+                    <span class="setting-name">音效音量</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- 画面设置 -->
+        <div class="settings-group">
+            <div class="group-title">🎨 画面设置</div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🖼️</span>
+                    <span class="setting-name">画质</span>
+                </div>
+                <div class="selector" onclick="showQualityOptions()">
+                    <span>高清</span>
+                    <span>›</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">✨</span>
+                    <span class="setting-name">特效质量</span>
+                </div>
+                <div class="selector" onclick="showEffectOptions()">
+                    <span>高</span>
+                    <span>›</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🌙</span>
+                    <span class="setting-name">夜间模式</span>
+                </div>
+                <div class="switch" onclick="toggleSwitch(this, 'darkMode')"></div>
+            </div>
+        </div>
+
+        <!-- 账号设置 -->
+        <div class="settings-group">
+            <div class="group-title">👤 账号设置</div>
+            
+            <div class="setting-item" onclick="location.href='profile.html'">
+                <div class="setting-info">
+                    <span class="setting-icon">✏️</span>
+                    <span class="setting-name">编辑资料</span>
+                </div>
+                <span style="color:#888">›</span>
+            </div>
+            
+            <div class="setting-item" onclick="location.href='change-password.html'">
+                <div class="setting-info">
+                    <span class="setting-icon">🔒</span>
+                    <span class="setting-name">修改密码</span>
+                </div>
+                <span style="color:#888">›</span>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">📱</span>
+                    <span class="setting-name">绑定手机</span>
+                </div>
+                <span class="setting-value">已绑定</span>
+            </div>
+        </div>
+
+        <!-- 通知设置 -->
+        <div class="settings-group">
+            <div class="group-title">🔔 通知设置</div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">📨</span>
+                    <span class="setting-name">系统通知</span>
+                </div>
+                <div class="switch on" onclick="toggleSwitch(this, 'notification')"></div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-icon">🎁</span>
+                    <span class="setting-name">活动提醒</span>
+                </div>
+                <div class="switch on" onclick="toggleSwitch(this, 'eventAlert')"></div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <button class="action-btn" onclick="clearCache()">
+            <span>🗑️</span>
+            <span>清除缓存</span>
+        </button>
+
+        <button class="action-btn" onclick="showHelp()">
+            <span>❓</span>
+            <span>帮助与反馈</span>
+        </button>
+
+        <button class="action-btn danger" onclick="showLogoutModal()">
+            <span>🚪</span>
+            <span>退出登录</span>
+        </button>
+
+        <!-- 版本信息 -->
+        <div class="version-info">
+            <div class="version-logo">🏰</div>
+            <div class="version-name">命运塔·首登者</div>
+            <div>版本 v1.0.0</div>
+            <div style="margin-top:10px">© 2025 Tower of Fate</div>
+        </div>
+    </div>
+
+    <!-- 退出确认弹窗 -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-title">🚪 退出登录</div>
+            <div class="modal-text">确定要退出当前账号吗？</div>
+            <div class="modal-btns">
+                <button class="modal-btn cancel" onclick="hideLogoutModal()">取消</button>
+                <button class="modal-btn confirm" onclick="doLogout()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换开关
+        function toggleSwitch(el, setting) {
+            el.classList.toggle('on');
+            const isOn = el.classList.contains('on');
+            localStorage.setItem(`setting_${setting}`, isOn);
+            console.log(`${setting}: ${isOn}`);
+        }
+
+        // 设置音量
+        function setVolume(value) {
+            localStorage.setItem('setting_volume', value);
+        }
+
+        // 清除缓存
+        function clearCache() {
+            if (confirm('确定要清除缓存吗？这将清除本地保存的游戏数据。')) {
+                // 保留登录信息，清除其他数据
+                const token = localStorage.getItem('userToken');
+                const phone = localStorage.getItem('userPhone');
+                
+                localStorage.clear();
+                
+                if (token) localStorage.setItem('userToken', token);
+                if (phone) localStorage.setItem('userPhone', phone);
+                
+                alert('✅ 缓存已清除');
+                location.reload();
+            }
+        }
+
+        // 显示帮助
+        function showHelp() {
+            alert('📧 联系客服：support@toweroffate.com\n\n常见问题：\n1. 如何获得更多钻石？\n   完成每日任务、参与活动、充值购买\n\n2. 游戏卡顿怎么办？\n   尝试降低画质设置，关闭特效\n\n3. 如何提升段位？\n   参与排位赛，获得胜利提升积分');
+        }
+
+        // 退出登录
+        function showLogoutModal() {
+            document.getElementById('logoutModal').classList.add('active');
+        }
+
+        function hideLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('active');
+        }
+
+        function doLogout() {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userInfo');
+            alert('✅ 已退出登录');
+            location.href = 'login-v2.html';
+        }
+
+        // 加载设置
+        function loadSettings() {
+            const settings = ['sound', 'music', 'vibration', 'darkMode', 'notification', 'eventAlert'];
+            settings.forEach(s => {
+                const value = localStorage.getItem(`setting_${s}`);
+                if (value !== null) {
+                    // 根据存储的值设置开关状态
+                }
+            });
+        }
+
+        // 初始化
+        loadSettings();
+    </script>
+</body>
+</html>
