@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命运塔·首登者 - 每日签到</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; min-height: 100%; font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #1a1a3e 0%, #0d1b2a 100%); color: #fff; }
+        
+        .container { max-width: 430px; margin: 0 auto; padding: 20px; }
+        
+        /* 头部 */
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .back-btn { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.1); 
+            border: none; 
+            color: #fff; 
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .header-title { font-size: 18px; font-weight: bold; }
+        .header-right { width: 36px; }
+        
+        /* 签到卡片 */
+        .checkin-card {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05));
+            border: 2px solid #FFD700;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        .checkin-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .checkin-title { font-size: 16px; color: #FFD700; margin-bottom: 10px; position: relative; }
+        .streak-days { 
+            font-size: 48px; 
+            font-weight: bold; 
+            color: #FFD700; 
+            margin: 15px 0;
+            position: relative;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+        .streak-text { font-size: 14px; color: #aaa; position: relative; }
+        .checkin-btn {
+            margin-top: 25px;
+            padding: 15px 50px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .checkin-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,215,0,0.4); }
+        .checkin-btn:disabled { 
+            background: linear-gradient(135deg, #666, #444); 
+            color: #888;
+            cursor: not-allowed;
+        }
+        .checkin-btn.checked::after {
+            content: '✓';
+            margin-left: 8px;
+        }
+        
+        /* 7天签到表 */
+        .weekly-calendar {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .calendar-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            position: relative;
+        }
+        .calendar-day.checked { background: rgba(46,213,115,0.2); border: 1px solid #2ed573; }
+        .calendar-day.today { background: rgba(255,215,0,0.2); border: 2px solid #FFD700; }
+        .calendar-day.future { opacity: 0.5; }
+        .day-number { font-size: 11px; color: #888; margin-bottom: 4px; }
+        .day-reward { font-size: 20px; }
+        .day-check { 
+            position: absolute; 
+            top: 2px; 
+            right: 2px; 
+            width: 14px; 
+            height: 14px; 
+            background: #2ed573; 
+            border-radius: 50%; 
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 本月累计 */
+        .monthly-stats {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .stats-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #FFD700; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+        
+        /* 连续奖励说明 */
+        .streak-rewards {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .rewards-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .reward-list { display: flex; flex-direction: column; gap: 10px; }
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .reward-day { 
+            width: 40px; 
+            height: 40px; 
+            background: linear-gradient(135deg, #FFD700, #FFA500); 
+            border-radius: 50%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 12px;
+        }
+        .reward-day.completed { background: linear-gradient(135deg, #2ed573, #26c281); }
+        .reward-info { flex: 1; }
+        .reward-name { font-size: 14px; font-weight: bold; }
+        .reward-desc { font-size: 12px; color: #888; }
+        .reward-icon { font-size: 28px; }
+        
+        /* 任务列表 */
+        .task-section { margin-top: 25px; }
+        .task-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .task-list { display: flex; flex-direction: column; gap: 10px; }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+        .task-icon { font-size: 28px; }
+        .task-info { flex: 1; }
+        .task-name { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .task-progress { font-size: 12px; color: #888; }
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .task-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+        }
+        .task-btn:disabled { background: #444; color: #666; cursor: not-allowed; }
+        .task-btn.claimed { background: #2ed573; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <div class="header-title">每日签到</div>
+            <div class="header-right"></div>
+        </div>
+
+        <!-- 签到卡片 -->
+        <div class="checkin-card">
+            <div class="checkin-title">🏆 连续签到</div>
+            <div class="streak-days" id="streakDays">7</div>
+            <div class="streak-text">天</div>
+            <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">立即签到</button>
+        </div>
+
+        <!-- 7天签到表 -->
+        <div class="weekly-calendar">
+            <div class="calendar-title">📅 本周签到</div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 本月累计 -->
+        <div class="monthly-stats">
+            <div class="stats-title">📊 本月统计</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="monthDays">12</div>
+                    <div class="stat-label">签到天数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalReward">580</div>
+                    <div class="stat-label">获得钻石</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="maxStreak">7</div>
+                    <div class="stat-label">最高连续</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 连续奖励 -->
+        <div class="streak-rewards">
+            <div class="rewards-title">🎁 连续签到奖励</div>
+            <div class="reward-list">
+                <div class="reward-item">
+                    <div class="reward-day completed">3天</div>
+                    <div class="reward-info">
+                        <div class="reward-name">三日礼包</div>
+                        <div class="reward-desc">50钻石 + 经验卡</div>
+                    </div>
+                    <div class="reward-icon">✓</div>
+                </div>
+                <div class="reward-item">
+                    <div class="reward-day completed">7天</div>
+                    <div class="reward-info">
+                        <div class="reward-name">周签到礼包</div>
+                        <div class="reward-desc">188钻石 + 限定头像框</div>
+                    </div>
+                    <div class="reward-icon">✓</div>
+                </div>
+                <div class="reward-item">
+                    <div class="reward-day">15天</div>
+                    <div class="reward-info">
+                        <div class="reward-name">半月大礼包</div>
+                        <div class="reward-desc">388钻石 + 稀有卡背</div>
+                    </div>
+                    <div class="reward-icon">🔒</div>
+                </div>
+                <div class="reward-item">
+                    <div class="reward-day">30天</div>
+                    <div class="reward-info">
+                        <div class="reward-name">满月超级礼包</div>
+                        <div class="reward-desc">888钻石 + 限定皮肤</div>
+                    </div>
+                    <div class="reward-icon">🔒</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 每日任务 -->
+        <div class="task-section">
+            <div class="task-title">📋 每日任务</div>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-icon">🎮</div>
+                    <div class="task-info">
+                        <div class="task-name">完成3局游戏</div>
+                        <div class="task-progress">2/3</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:66%"></div>
+                        </div>
+                    </div>
+                    <button class="task-btn">进行中</button>
+                </div>
+                
+                <div class="task-item">
+                    <div class="task-icon">🏆</div>
+                    <div class="task-info">
+                        <div class="task-name">获得1次胜利</div>
+                        <div class="task-progress">已完成</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:100%"></div>
+                        </div>
+                    </div>
+                    <button class="task-btn claimed">已领取</button>
+                </div>
+                
+                <div class="task-item">
+                    <div class="task-icon">👤</div>
+                    <div class="task-info">
+                        <div class="task-name">登录游戏</div>
+                        <div class="task-progress">已完成</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:100%"></div>
+                        </div>
+                    </div>
+                    <button class="task-btn" onclick="claimTask(this, 20)">领取</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        const today = new Date().getDay();
+        const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        const rewards = ['💎10', '💎15', '💎20', '🎁', '💎25', '💎30', '💎50'];
+        
+        // 渲染日历
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            weekDays.forEach((day, idx) => {
+                const div = document.createElement('div');
+                const isToday = idx === today - 1;
+                const isPast = idx < today - 1;
+                const isFuture = idx > today - 1;
+                
+                div.className = `calendar-day ${isToday ? 'today' : ''} ${isPast ? 'checked' : ''} ${isFuture ? 'future' : ''}`;
+                div.innerHTML = `
+                    <div class="day-number">${day}</div>
+                    <div class="day-reward">${rewards[idx]}</div>
+                    ${isPast ? '<div class="day-check">✓</div>' : ''}
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // 签到
+        function doCheckin() {
+            const btn = document.getElementById('checkinBtn');
+            
+            // 标记已签到
+            localStorage.setItem('lastCheckin', new Date().toDateString());
+            
+            // 更新连续天数
+            let streak = parseInt(localStorage.getItem('checkinStreak') || '0');
+            streak++;
+            localStorage.setItem('checkinStreak', streak.toString());
+            document.getElementById('streakDays').textContent = streak;
+            
+            // 更新按钮
+            btn.textContent = '今日已签到';
+            btn.disabled = true;
+            btn.classList.add('checked');
+            
+            // 发放奖励
+            let diamond = parseInt(localStorage.getItem('userDiamond') || '0');
+            const reward = today === 0 ? 50 : (10 + (today - 1) * 5); // 周日50，其他递增
+            localStorage.setItem('userDiamond', (diamond + reward).toString());
+            
+            alert(`🎉 签到成功！\n💎 获得${reward}钻石\n🔥 连续${streak}天`);
+            
+            // 重新渲染日历
+            renderCalendar();
+        }
+
+        // 领取任务奖励
+        function claimTask(btn, reward) {
+            btn.textContent = '已领取';
+            btn.classList.add('claimed');
+            btn.disabled = true;
+            
+            let diamond = parseInt(localStorage.getItem('userDiamond') || '0');
+            localStorage.setItem('userDiamond', (diamond + reward).toString());
+            
+            alert(`🎉 领取成功！\n💎 获得${reward}钻石`);
+        }
+
+        // 检查今日是否已签到
+        function checkToday() {
+            const lastCheckin = localStorage.getItem('lastCheckin');
+            const today = new Date().toDateString();
+            
+            if (lastCheckin === today) {
+                const btn = document.getElementById('checkinBtn');
+                btn.textContent = '今日已签到';
+                btn.disabled = true;
+                btn.classList.add('checked');
+            }
+            
+            // 加载连续天数
+            const streak = localStorage.getItem('checkinStreak') || '0';
+            document.getElementById('streakDays').textContent = streak;
+        }
+
+        // 初始化
+        renderCalendar();
+        checkToday();
+    </script>
+</body>
+</html>
