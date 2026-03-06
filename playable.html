@@ -798,5 +798,16 @@
         // 启动游戏
         initGame();
     </script>
+    
+    <!-- 塔背景切换系统 -->
+    <script src="tower-background.js"></script>
+    <script>
+        // 页面加载后初始化背景系统
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initTowerBackground === 'function') {
+                initTowerBackground();
+            }
+        });
+    </script>
 </body>
 </html>
