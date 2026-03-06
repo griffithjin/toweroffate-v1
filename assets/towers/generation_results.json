@@ -1,0 +1,30 @@
+[
+  {
+    "tower": "Sagrada Familia",
+    "status": "failed"
+  },
+  {
+    "tower": "Dutch Windmill",
+    "status": "failed"
+  },
+  {
+    "tower": "Matterhorn",
+    "status": "failed"
+  },
+  {
+    "tower": "Red Square",
+    "status": "failed"
+  },
+  {
+    "tower": "N Seoul Tower",
+    "status": "failed"
+  },
+  {
+    "tower": "Marina Bay Sands",
+    "status": "failed"
+  },
+  {
+    "tower": "Blue Mosque",
+    "status": "failed"
+  }
+]

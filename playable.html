@@ -81,12 +81,25 @@
             font-weight: bold;
         }
         
-        /* 战场区域 */
+        /* 战场区域 - 卡通化背景 */
         .battlefield {
             flex: 0 0 55%;
             display: flex;
             overflow: hidden;
-            background: linear-gradient(180deg, #FFD700 0%, #1a1a3e 8%, #0d1b2a 100%);
+            background: linear-gradient(180deg, rgba(135,206,235,0.3) 0%, rgba(135,206,235,0.1) 100%),
+                        url('assets/towers/eiffel-tower.png?v=2') center center / cover no-repeat;
+            position: relative;
+        }
+        
+        .battlefield::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
         }
         
         /* 左侧菜单 */
@@ -455,7 +468,8 @@
 
     <script>
         // ============ 游戏配置 ============
-        const LEVELS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+        // 修复：层数顺序 2(底层) → A(顶层)
+        const LEVELS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
         const SUITS = ['♥','♦','♣','♠'];
         const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
         
@@ -536,8 +550,8 @@
             grid.appendChild(createCell('守卫', 'grid-header'));
             grid.appendChild(createCell('激怒牌⚠️', 'grid-header', 'color:#ff4757'));
             
-            // 13层 - 从A(13层)到2(1层)
-            for(let i=0; i<13; i++) {
+            // 13层 - 从A(13层)到2(1层)，反向渲染让A显示在顶部
+            for(let i=12; i>=0; i--) {
                 const lv = LEVELS[i];
                 const isMyLevel = gameState.myPlayer.level === i;
                 
@@ -545,32 +559,31 @@
                 const levelCell = createCell(lv, `level-cell level-${lv} ${isMyLevel?'level-current':''}`);
                 grid.appendChild(levelCell);
                 
-                // 玩家区域 - 只显示当前层玩家
+                // 玩家区域 - 只显示在当前层的玩家
                 const playersCell = document.createElement('div');
                 playersCell.className = 'players-cell';
                 
-                // 检查当前层是否有玩家
-                let playerAtLevel = null;
+                // 修复：只显示当前层的玩家头像
+                const playersAtThisLevel = [];
                 
-                // 检查是否是自己
-                if (isMyLevel) {
-                    playerAtLevel = gameState.myPlayer;
-                } else {
-                    // 简化：其他玩家根据层数分配不同头像
-                    const botAvatars = ['🐶','🐰','🦊','🐼','🐨','🐯','🦁','🐸','🐙'];
-                    const botIndex = (i * 3) % botAvatars.length;
-                    playerAtLevel = { 
-                        avatar: botAvatars[botIndex], 
-                        isBot: true,
-                        level: i 
-                    };
+                // 检查"我"是否在当前层
+                if (gameState.myPlayer.level === i) {
+                    const myAvatar = document.createElement('div');
+                    myAvatar.className = 'player-avatar self';
+                    myAvatar.textContent = gameState.myPlayer.avatar;
+                    playersCell.appendChild(myAvatar);
                 }
                 
-                if (playerAtLevel) {
-                    const avatarClass = playerAtLevel.isAscender ? 'player-avatar ascender' : 
-                                       playerAtLevel === gameState.myPlayer ? 'player-avatar self' : 'player-avatar';
-                    playersCell.innerHTML = `<div class="${avatarClass}">${playerAtLevel.avatar}</div>`;
-                }
+                // 检查AI玩家是否在当前层
+                gameState.players.forEach(player => {
+                    if (player.level === i) {
+                        const avatar = document.createElement('div');
+                        avatar.className = `player-avatar ${player.isAscender ? 'ascender' : ''}`;
+                        avatar.textContent = player.avatar;
+                        playersCell.appendChild(avatar);
+                    }
+                });
+                
                 grid.appendChild(playersCell);
                 
                 // 守卫区域 - 显示剩余牌数（不显示具体牌）
@@ -785,6 +798,42 @@
         
         // 启动游戏
         initGame();
+    </script>
+    
+    <!-- 塔背景切换系统 -->
+    <script src="tower-background.js?v=2"></script>
+    <script>
+        // 页面加载后初始化背景系统 - 使用多重保障确保加载
+        function initBackgroundWithRetry(attempts = 0) {
+            if (typeof initTowerBackground === 'function') {
+                console.log('初始化塔背景系统...');
+                initTowerBackground();
+            } else if (attempts < 10) {
+                // 如果脚本还未加载，延迟重试
+                setTimeout(() => initBackgroundWithRetry(attempts + 1), 200);
+            } else {
+                console.error('塔背景系统加载失败');
+            }
+        }
+        
+        // DOMContentLoaded事件
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initBackgroundWithRetry);
+        } else {
+            // DOM已经加载完成
+            initBackgroundWithRetry();
+        }
+        
+        // 备用：window.onload
+        window.addEventListener('load', () => {
+            const bf = document.querySelector('.battlefield');
+            if (bf && (!bf.style.backgroundImage || bf.style.backgroundImage.includes('linear-gradient'))) {
+                console.log('备用加载：手动设置背景');
+                bf.style.backgroundImage = "linear-gradient(180deg, rgba(135,206,235,0.3) 0%, rgba(135,206,235,0.1) 100%), url('https://raw.githubusercontent.com/griffithjin/toweroffate-v1/main/assets/towers/eiffel-tower.png')";
+                bf.style.backgroundSize = 'cover';
+                bf.style.backgroundPosition = 'center center';
+            }
+        });
     </script>
 </body>
 </html>

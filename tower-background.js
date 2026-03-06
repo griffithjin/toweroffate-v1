@@ -1,0 +1,190 @@
+/**
+ * 命运塔 - 卡通背景切换系统 V2.0
+ * 根据层数或随机切换不同的世界名塔背景
+ * 包含20个国家和100+省份/州塔图
+ */
+
+// 可用的塔背景列表 - 70个国家
+const TOWER_BACKGROUNDS = [
+    // 欧洲26个
+    { id: 'eiffel', name: '埃菲尔铁塔', country: '法国', file: 'eiffel-tower.png', continent: 'europe' },
+    { id: 'pisa', name: '比萨斜塔', country: '意大利', file: 'pisa-tower.png', continent: 'europe' },
+    { id: 'bigben', name: '大本钟', country: '英国', file: 'big-ben.png', continent: 'europe' },
+    { id: 'brandenburg', name: '勃兰登堡门', country: '德国', file: 'brandenburg-gate.png', continent: 'europe' },
+    { id: 'sagrada', name: '圣家堂', country: '西班牙', file: 'sagrada-familia.png', continent: 'europe' },
+    { id: 'windmill', name: '风车', country: '荷兰', file: 'windmill.png', continent: 'europe' },
+    { id: 'matterhorn', name: '马特洪峰', country: '瑞士', file: 'matterhorn.png', continent: 'europe' },
+    { id: 'stbasil', name: '圣瓦西里大教堂', country: '俄罗斯', file: 'st-basil.png', continent: 'europe' },
+    { id: 'parthenon', name: '帕特农神庙', country: '希腊', file: 'parthenon.png', continent: 'europe' },
+    { id: 'fjord', name: '峡湾', country: '挪威', file: 'fjord.png', continent: 'europe' },
+    { id: 'aurora', name: '极光', country: '冰岛', file: 'aurora.png', continent: 'europe' },
+    { id: 'vienna', name: '维也纳歌剧院', country: '奥地利', file: 'vienna-opera.png', continent: 'europe' },
+    { id: 'prague', name: '布拉格', country: '捷克', file: 'prague.png', continent: 'europe' },
+    { id: 'budapest', name: '布达佩斯', country: '匈牙利', file: 'budapest.png', continent: 'europe' },
+    { id: 'warsaw', name: '华沙', country: '波兰', file: 'warsaw.png', continent: 'europe' },
+    { id: 'kyiv', name: '基辅', country: '乌克兰', file: 'kyiv.png', continent: 'europe' },
+    { id: 'stockholm', name: '斯德哥尔摩', country: '瑞典', file: 'stockholm.png', continent: 'europe' },
+    { id: 'copenhagen', name: '哥本哈根', country: '丹麦', file: 'copenhagen.png', continent: 'europe' },
+    { id: 'rovaniemi', name: '圣诞老人村', country: '芬兰', file: 'rovaniemi.png', continent: 'europe' },
+    { id: 'cliffsofmoher', name: '莫赫悬崖', country: '爱尔兰', file: 'cliffs-of-moher.png', continent: 'europe' },
+    { id: 'dubrovnik', name: '杜布罗夫尼克', country: '克罗地亚', file: 'dubrovnik.png', continent: 'europe' },
+    { id: 'bratislava', name: '布拉迪斯拉发', country: '斯洛伐克', file: 'bratislava.png', continent: 'europe' },
+    { id: 'brancastle', name: '布兰城堡', country: '罗马尼亚', file: 'bran-castle.png', continent: 'europe' },
+    { id: 'rila', name: '里拉修道院', country: '保加利亚', file: 'rila.png', continent: 'europe' },
+    { id: 'savatemple', name: '圣萨瓦教堂', country: '塞尔维亚', file: 'sava-temple.png', continent: 'europe' },
+    { id: 'sagradafamilia', name: '圣家堂', country: '西班牙', file: 'sagrada-familia.png', continent: 'europe' },
+    
+    // 亚洲20个
+    { id: 'tokyo', name: '东京塔', country: '日本', file: 'tokyo-tower.png', continent: 'asia' },
+    { id: 'orientalpearl', name: '东方明珠', country: '中国', file: 'oriental-pearl.png', continent: 'asia' },
+    { id: 'tajmahal', name: '泰姬陵', country: '印度', file: 'taj-mahal.png', continent: 'asia' },
+    { id: 'grandpalace', name: '大皇宫', country: '泰国', file: 'grand-palace.png', continent: 'asia' },
+    { id: 'burjkhalifa', name: '哈利法塔', country: '阿联酋', file: 'burj-khalifa.png', continent: 'asia' },
+    { id: 'ntower', name: 'N塔', country: '韩国', file: 'n-tower.png', continent: 'asia' },
+    { id: 'marinabay', name: '滨海湾金沙', country: '新加坡', file: 'marina-bay.png', continent: 'asia' },
+    { id: 'bluemosque', name: '蓝色清真寺', country: '土耳其', file: 'blue-mosque.png', continent: 'asia' },
+    { id: 'jerusalem', name: '耶路撒冷', country: '以色列', file: 'jerusalem.png', continent: 'asia' },
+    { id: 'petra', name: '佩特拉', country: '约旦', file: 'petra.png', continent: 'asia' },
+    { id: 'imamsquare', name: '伊玛目广场', country: '伊朗', file: 'imam-square.png', continent: 'asia' },
+    { id: 'steppe', name: '草原', country: '哈萨克斯坦', file: 'steppe.png', continent: 'asia' },
+    { id: 'halongbay', name: '下龙湾', country: '越南', file: 'ha-long-bay.png', continent: 'asia' },
+    { id: 'angkorwat', name: '吴哥窟', country: '柬埔寨', file: 'angkor-wat.png', continent: 'asia' },
+    { id: 'shwedagon', name: '仰光大金塔', country: '缅甸', file: 'shwedagon.png', continent: 'asia' },
+    { id: 'patuxai', name: '凯旋门', country: '老挝', file: 'patuxai.png', continent: 'asia' },
+    { id: 'chocolatehills', name: '巧克力山', country: '菲律宾', file: 'chocolate-hills.png', continent: 'asia' },
+    { id: 'petronas', name: '双子塔', country: '马来西亚', file: 'petronas.png', continent: 'asia' },
+    { id: 'borobudur', name: '婆罗浮屠', country: '印尼', file: 'borobudur.png', continent: 'asia' },
+    { id: 'dohamuseum', name: '伊斯兰艺术博物馆', country: '卡塔尔', file: 'doha-museum.png', continent: 'asia' },
+    
+    // 美洲12个
+    { id: 'liberty', name: '自由女神像', country: '美国', file: 'statue-of-liberty.png', continent: 'america' },
+    { id: 'empire', name: '帝国大厦', country: '美国', file: 'empire-state.png', continent: 'america' },
+    { id: 'cntower', name: 'CN塔', country: '加拿大', file: 'cn-tower.png', continent: 'america' },
+    { id: 'christ', name: '基督像', country: '巴西', file: 'christ-redeemer.png', continent: 'america' },
+    { id: 'machupicchu', name: '马丘比丘', country: '秘鲁', file: 'machu-picchu.png', continent: 'america' },
+    { id: 'obelisk', name: '方尖碑', country: '阿根廷', file: 'obelisk.png', continent: 'america' },
+    { id: 'easterisland', name: '复活节岛', country: '智利', file: 'easter-island.png', continent: 'america' },
+    { id: 'havana', name: '哈瓦那', country: '古巴', file: 'havana.png', continent: 'america' },
+    { id: 'dunnriver', name: '邓恩河瀑布', country: '牙买加', file: 'dunn-river.png', continent: 'america' },
+    { id: 'panamacanal', name: '巴拿马运河', country: '巴拿马', file: 'panama-canal.png', continent: 'america' },
+    { id: 'arenal', name: '阿雷纳尔火山', country: '哥斯达黎加', file: 'arenal.png', continent: 'america' },
+    { id: 'sydneysydney', name: '悉尼', country: '澳大利亚', file: 'sydney-opera.png', continent: 'oceania' }
+];
+
+// 当前背景索引
+let currentBackgroundIndex = 0;
+
+// 根据层数获取背景
+function getBackgroundByLevel(level) {
+    // 每2层切换一个背景
+    const index = Math.floor(level / 2) % TOWER_BACKGROUNDS.length;
+    return TOWER_BACKGROUNDS[index];
+}
+
+// 根据国家获取背景（用于锦标赛）
+function getBackgroundByCountry(countryCode) {
+    return TOWER_BACKGROUNDS.find(t => t.country === countryCode || t.id === countryCode);
+}
+
+// 随机切换背景
+function randomBackground() {
+    const randomIndex = Math.floor(Math.random() * TOWER_BACKGROUNDS.length);
+    return TOWER_BACKGROUNDS[randomIndex];
+}
+
+// 应用背景到战场
+function applyTowerBackground(towerId) {
+    const battlefield = document.querySelector('.battlefield');
+    if (!battlefield) return;
+    
+    const tower = TOWER_BACKGROUNDS.find(t => t.id === towerId);
+    if (tower) {
+        // 使用raw.githubusercontent.com作为图片源（GitHub Pages缓存问题）
+        const imageUrl = `https://raw.githubusercontent.com/griffithjin/toweroffate-v1/main/assets/towers/${tower.file}`;
+        
+        // 添加过渡效果
+        battlefield.style.transition = 'background-image 0.5s ease-in-out';
+        battlefield.style.backgroundImage = `linear-gradient(180deg, rgba(135,206,235,0.3) 0%, rgba(135,206,235,0.1) 100%), url('${imageUrl}')`;
+        battlefield.style.backgroundSize = 'cover';
+        battlefield.style.backgroundPosition = 'center center';
+        battlefield.style.backgroundRepeat = 'no-repeat';
+        
+        // 显示当前塔信息
+        showTowerInfo(tower);
+    }
+}
+
+// 显示塔信息提示
+function showTowerInfo(tower) {
+    // 检查是否已存在信息提示
+    let infoDiv = document.querySelector('.tower-info-float');
+    if (!infoDiv) {
+        infoDiv = document.createElement('div');
+        infoDiv.className = 'tower-info-float';
+        
+        // 添加样式
+        infoDiv.style.cssText = `
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            transition: opacity 0.3s;
+        `;
+        
+        document.querySelector('.battlefield').appendChild(infoDiv);
+    }
+    
+    infoDiv.innerHTML = `
+        <div style="color: #FFD700; font-weight: bold; font-size: 14px;">${tower.name}</div>
+        <div style="color: #aaa; font-size: 12px;">${tower.country}</div>
+    `;
+    infoDiv.style.opacity = '1';
+    
+    // 3秒后淡出
+    setTimeout(() => {
+        infoDiv.style.opacity = '0';
+    }, 3000);
+}
+
+// 初始化背景系统
+function initTowerBackground() {
+    // 初始显示埃菲尔铁塔
+    applyTowerBackground('eiffel');
+    
+    // 监听层数变化，自动切换背景
+    const checkLevelChange = setInterval(() => {
+        if (typeof gameState !== 'undefined' && gameState.myPlayer) {
+            const myLevel = gameState.myPlayer.level;
+            const newBg = getBackgroundByLevel(myLevel);
+            
+            // 检查是否需要切换背景
+            const currentBgId = document.querySelector('.battlefield')?.dataset?.currentBg;
+            if (currentBgId !== newBg.id) {
+                applyTowerBackground(newBg.id);
+                if (document.querySelector('.battlefield')) {
+                    document.querySelector('.battlefield').dataset.currentBg = newBg.id;
+                }
+            }
+        }
+    }, 2000);
+}
+
+// 锦标赛背景切换
+function setTournamentBackground(country, province) {
+    // 优先使用省份/州图片，如果没有则使用国家图片
+    const bgId = province ? `${country}-${province}` : country;
+    applyTowerBackground(bgId);
+}
+
+// 导出
+window.TOWER_BACKGROUNDS = TOWER_BACKGROUNDS;
+window.applyTowerBackground = applyTowerBackground;
+window.initTowerBackground = initTowerBackground;
+window.randomBackground = randomBackground;
+window.getBackgroundByCountry = getBackgroundByCountry;
+window.setTournamentBackground = setTournamentBackground;
