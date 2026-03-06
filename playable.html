@@ -455,7 +455,8 @@
 
     <script>
         // ============ 游戏配置 ============
-        const LEVELS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+        // 修复：层数顺序 2(底层) → A(顶层)
+        const LEVELS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
         const SUITS = ['♥','♦','♣','♠'];
         const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
         
@@ -545,32 +546,31 @@
                 const levelCell = createCell(lv, `level-cell level-${lv} ${isMyLevel?'level-current':''}`);
                 grid.appendChild(levelCell);
                 
-                // 玩家区域 - 只显示当前层玩家
+                // 玩家区域 - 只显示在当前层的玩家
                 const playersCell = document.createElement('div');
                 playersCell.className = 'players-cell';
                 
-                // 检查当前层是否有玩家
-                let playerAtLevel = null;
+                // 修复：只显示当前层的玩家头像
+                const playersAtThisLevel = [];
                 
-                // 检查是否是自己
-                if (isMyLevel) {
-                    playerAtLevel = gameState.myPlayer;
-                } else {
-                    // 简化：其他玩家根据层数分配不同头像
-                    const botAvatars = ['🐶','🐰','🦊','🐼','🐨','🐯','🦁','🐸','🐙'];
-                    const botIndex = (i * 3) % botAvatars.length;
-                    playerAtLevel = { 
-                        avatar: botAvatars[botIndex], 
-                        isBot: true,
-                        level: i 
-                    };
+                // 检查"我"是否在当前层
+                if (gameState.myPlayer.level === i) {
+                    const myAvatar = document.createElement('div');
+                    myAvatar.className = 'player-avatar self';
+                    myAvatar.textContent = gameState.myPlayer.avatar;
+                    playersCell.appendChild(myAvatar);
                 }
                 
-                if (playerAtLevel) {
-                    const avatarClass = playerAtLevel.isAscender ? 'player-avatar ascender' : 
-                                       playerAtLevel === gameState.myPlayer ? 'player-avatar self' : 'player-avatar';
-                    playersCell.innerHTML = `<div class="${avatarClass}">${playerAtLevel.avatar}</div>`;
-                }
+                // 检查AI玩家是否在当前层
+                gameState.players.forEach(player => {
+                    if (player.level === i) {
+                        const avatar = document.createElement('div');
+                        avatar.className = `player-avatar ${player.isAscender ? 'ascender' : ''}`;
+                        avatar.textContent = player.avatar;
+                        playersCell.appendChild(avatar);
+                    }
+                });
+                
                 grid.appendChild(playersCell);
                 
                 // 守卫区域 - 显示剩余牌数（不显示具体牌）
