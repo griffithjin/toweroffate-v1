@@ -1,359 +1,559 @@
 #!/usr/bin/env python3
 """
-生成卡通世界名塔图片
-愤怒的小鸟风格 - 可爱大眼睛表情
+生成卡通风格东南亚+南亚名塔图片
+风格：愤怒的小鸟风格 - 可爱、鲜艳、夸张表情
 """
 
-from PIL import Image, ImageDraw, ImageFont
-import os
+from PIL import Image, ImageDraw, ImageFilter
 import math
+import os
 
-def create_gradient_background(width, height, color1, color2):
-    """创建渐变背景"""
-    img = Image.new('RGB', (width, height))
+OUTPUT_DIR = "/Users/moutai/Desktop/toweroffate_v1.0/assets/towers/"
+WIDTH, HEIGHT = 800, 1200
+
+def create_gradient_background(draw, width, height):
+    """创建天蓝色渐变背景"""
+    for y in range(height):
+        # 从浅天蓝到深一点的蓝色渐变
+        r = int(135 - (y / height) * 40)
+        g = int(206 - (y / height) * 30)
+        b = int(235 - (y / height) * 20)
+        draw.line([(0, y), (width, y)], fill=(r, g, b))
+
+def draw_circle_eyes(draw, cx, cy, size=20):
+    """画愤怒的小鸟风格的大眼睛"""
+    # 白色眼球
+    draw.ellipse([cx-size, cy-size, cx+size, cy+size], fill=(255, 255, 255), outline=(0, 0, 0), width=3)
+    # 黑色瞳孔
+    draw.ellipse([cx-size//3, cy-size//3, cx+size//3, cy+size//3], fill=(0, 0, 0))
+    # 高光
+    draw.ellipse([cx-size//4-2, cy-size//4-2, cx-size//4+2, cy-size//4+2], fill=(255, 255, 255))
+
+def draw_cute_mouth(draw, cx, cy, size=15):
+    """画可爱的微笑嘴巴"""
+    draw.arc([cx-size, cy-size//2, cx+size, cy+size], start=0, end=180, fill=(0, 0, 0), width=3)
+
+def draw_blush(draw, cx, cy, size=12):
+    """画腮红"""
+    draw.ellipse([cx-size, cy-size//2, cx+size, cy+size//2], fill=(255, 182, 193))
+
+def draw_cloud(draw, cx, cy, size=60):
+    """画卡通云朵"""
+    color = (255, 255, 255)
+    draw.ellipse([cx-size, cy-size//2, cx+size, cy+size//2], fill=color)
+    draw.ellipse([cx-size*1.5, cy, cx-size*0.5, cy+size], fill=color)
+    draw.ellipse([cx+size*0.5, cy, cx+size*1.5, cy+size], fill=color)
+
+def draw_ha_long_bay():
+    """1. 越南 - 下龙湾 - 海上桂林"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    r1, g1, b1 = int(color1[1:3], 16), int(color1[3:5], 16), int(color1[5:7], 16)
-    r2, g2, b2 = int(color2[1:3], 16), int(color2[3:5], 16), int(color2[5:7], 16)
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    for y in range(height):
-        ratio = y / height
-        r = int(r1 + (r2 - r1) * ratio)
-        g = int(g1 + (g2 - g1) * ratio)
-        b = int(b1 + (b2 - b1) * ratio)
-        draw.line([(0, y), (width, y)], fill=(r, g, b))
+    # 画几朵云
+    draw_cloud(draw, 150, 150, 50)
+    draw_cloud(draw, 650, 200, 40)
     
-    return img
-
-def draw_eyes_and_face(draw, center_x, center_y, eye_size=35):
-    """绘制愤怒的小鸟风格的大眼睛表情"""
-    # 左眼白
-    left_eye_x = center_x - eye_size
-    draw.ellipse([left_eye_x - eye_size, center_y - eye_size, 
-                  left_eye_x + eye_size, center_y + eye_size], 
-                 fill='white', outline='black', width=3)
-    # 右眼白
-    right_eye_x = center_x + eye_size
-    draw.ellipse([right_eye_x - eye_size, center_y - eye_size, 
-                  right_eye_x + eye_size, center_y + eye_size], 
-                 fill='white', outline='black', width=3)
+    # 海水
+    draw.rectangle([0, 800, WIDTH, HEIGHT], fill=(64, 164, 223))
     
-    # 左眼珠（愤怒的小鸟风格 - 大眼珠）
-    pupil_size = eye_size * 0.6
-    draw.ellipse([left_eye_x - pupil_size, center_y - pupil_size + 5, 
-                  left_eye_x + pupil_size, center_y + pupil_size + 5], 
-                 fill='black')
-    # 高光
-    draw.ellipse([left_eye_x - 8, center_y - 8, left_eye_x + 2, center_y + 2], fill='white')
+    # 画石灰岩山峰（卡通风格）
+    colors = [(100, 150, 100), (80, 130, 80), (120, 170, 120), (90, 140, 90)]
+    positions = [(200, 500), (500, 450), (350, 550), (600, 520)]
     
-    # 右眼珠
-    draw.ellipse([right_eye_x - pupil_size, center_y - pupil_size + 5, 
-                  right_eye_x + pupil_size, center_y + pupil_size + 5], 
-                 fill='black')
-    # 高光
-    draw.ellipse([right_eye_x - 8, center_y - 8, right_eye_x + 2, center_y + 2], fill='white')
+    for i, (x, y) in enumerate(positions):
+        color = colors[i]
+        # 山峰主体 - 圆胖的卡通形状
+        points = [
+            (x, y - 250),  # 顶点
+            (x - 100, y),  # 左下
+            (x + 100, y),  # 右下
+        ]
+        draw.polygon(points, fill=color, outline=(50, 80, 50), width=4)
+        
+        # 添加植被点缀
+        for j in range(5):
+            tx = x - 60 + j * 30
+            ty = y - 30 - j * 10
+            draw.ellipse([tx-15, ty-15, tx+15, ty+15], fill=(50, 100, 50))
     
-    # 微笑
-    smile_y = center_y + eye_size + 15
-    draw.arc([center_x - 25, smile_y - 15, center_x + 25, smile_y + 15], 
-             start=0, end=180, fill='black', width=4)
+    # 主山峰（带脸的）
+    main_x, main_y = 400, 600
+    points = [
+        (main_x, main_y - 300),
+        (main_x - 120, main_y),
+        (main_x + 120, main_y),
+    ]
+    draw.polygon(points, fill=(110, 160, 110), outline=(50, 80, 50), width=4)
+    
+    # 眼睛
+    draw_circle_eyes(draw, main_x - 35, main_y - 180, 25)
+    draw_circle_eyes(draw, main_x + 35, main_y - 180, 25)
     
     # 腮红
-    blush_color = (255, 182, 193)
-    draw.ellipse([left_eye_x - 45, center_y + 10, left_eye_x - 15, center_y + 40], 
-                 fill=blush_color)
-    draw.ellipse([right_eye_x + 15, center_y + 10, right_eye_x + 45, center_y + 40], 
-                 fill=blush_color)
-
-def draw_text(draw, text, y_pos, width):
-    """绘制底部文字"""
-    # 尝试使用系统字体
-    try:
-        font = ImageFont.truetype("/System/Library/Fonts/PingFang.ttc", 60)
-    except:
-        try:
-            font = ImageFont.truetype("/System/Library/Fonts/STHeiti Light.ttc", 60)
-        except:
-            font = ImageFont.load_default()
+    draw_blush(draw, main_x - 60, main_y - 160, 15)
+    draw_blush(draw, main_x + 60, main_y - 160, 15)
     
-    # 获取文字尺寸
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = bbox[2] - bbox[0]
-    x_pos = (width - text_width) // 2
+    # 嘴巴
+    draw_cute_mouth(draw, main_x, main_y - 140, 20)
     
-    # 绘制白色文字带阴影
-    draw.text((x_pos+3, y_pos+3), text, fill=(0,0,0,128), font=font)
-    draw.text((x_pos, y_pos), text, fill='white', font=font)
-
-def draw_sagrada_familia():
-    """绘制圣家堂 - 彩色尖顶教堂"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
-    draw = ImageDraw.Draw(img)
+    # 山顶植被
+    draw.ellipse([main_x-30, main_y-320, main_x+30, main_y-280], fill=(60, 120, 60))
     
-    # 主体建筑
-    base_y = 750
-    # 主塔
-    draw.polygon([(400, 200), (350, base_y), (450, base_y)], fill=(255, 220, 180), outline='black', width=3)
-    # 两侧塔
-    draw.polygon([(280, 300), (250, base_y), (320, base_y)], fill=(255, 200, 150), outline='black', width=3)
-    draw.polygon([(520, 300), (480, base_y), (550, base_y)], fill=(255, 200, 150), outline='black', width=3)
-    
-    # 彩色尖顶
-    colors = [(255,100,100), (100,255,100), (100,100,255), (255,255,100), (255,100,255)]
-    for i, x in enumerate([270, 400, 530]):
-        color = colors[i % len(colors)]
-        draw.polygon([(x, 100), (x-30, 200), (x+30, 200)], fill=color, outline='black', width=2)
-    
-    # 装饰性的彩色马赛克细节
-    for y in range(250, 700, 40):
-        draw.rectangle([370, y, 430, y+20], fill=(100,200,255), outline='black', width=1)
-    
-    # 可爱的表情（在正面）
-    draw_eyes_and_face(draw, 400, 500, eye_size=30)
-    
-    # 底部文字
-    draw_text(draw, "圣家堂 Sagrada Família", 1050, 800)
+    # 标题
+    draw.text((WIDTH//2 - 150, 50), "Ha Long Bay", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 100, 90), "Vietnam", fill=(255, 220, 100), font=None)
     
     return img
 
-def draw_windmill():
-    """绘制荷兰风车"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
+def draw_angkor_wat():
+    """2. 柬埔寨 - 吴哥窟 - 寺庙群"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    # 风车主体（圆形塔身）
-    draw.ellipse([250, 450, 550, 850], fill=(139, 90, 43), outline='black', width=4)
-    # 风车顶部圆锥
-    draw.polygon([(250, 480), (400, 200), (550, 480)], fill=(160, 82, 45), outline='black', width=3)
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    # 风车叶片中心
-    center_x, center_y = 400, 350
-    draw.ellipse([center_x-30, center_y-30, center_x+30, center_y+30], fill=(80, 50, 30), outline='black', width=2)
+    # 太阳
+    draw.ellipse([600, 100, 700, 200], fill=(255, 220, 100))
     
-    # 四片风车叶片
-    blade_colors = [(255, 200, 150), (240, 180, 130), (255, 200, 150), (240, 180, 130)]
+    # 吴哥窟主体 - 三个塔
+    base_color = (139, 125, 107)
+    
+    # 中央主塔
+    cx, cy = 400, 500
+    # 塔身
+    draw.polygon([
+        (cx, cy - 350),
+        (cx - 80, cy - 150),
+        (cx - 80, cy),
+        (cx + 80, cy),
+        (cx + 80, cy - 150),
+    ], fill=base_color, outline=(80, 70, 60), width=4)
+    
+    # 塔顶
+    draw.polygon([
+        (cx, cy - 380),
+        (cx - 30, cy - 350),
+        (cx + 30, cy - 350),
+    ], fill=(160, 145, 125), outline=(80, 70, 60), width=3)
+    
+    # 左右小塔
+    for offset in [-200, 200]:
+        tx = cx + offset
+        draw.polygon([
+            (tx, cy - 250),
+            (tx - 50, cy - 100),
+            (tx - 50, cy),
+            (tx + 50, cy),
+            (tx + 50, cy - 100),
+        ], fill=base_color, outline=(80, 70, 60), width=4)
+        draw.polygon([
+            (tx, cy - 270),
+            (tx - 20, cy - 250),
+            (tx + 20, cy - 250),
+        ], fill=(160, 145, 125), outline=(80, 70, 60), width=3)
+    
+    # 基座
+    draw.rectangle([150, cy, 650, cy + 50], fill=(120, 110, 95), outline=(80, 70, 60), width=3)
+    
+    # 给主塔画脸
+    draw_circle_eyes(draw, cx - 30, cy - 220, 22)
+    draw_circle_eyes(draw, cx + 30, cy - 220, 22)
+    draw_cute_mouth(draw, cx, cy - 180, 18)
+    draw_blush(draw, cx - 55, cy - 200, 12)
+    draw_blush(draw, cx + 55, cy - 200, 12)
+    
+    # 丛林背景
+    for i in range(8):
+        x = 80 + i * 90
+        y = 700
+        draw.polygon([
+            (x, y - 100),
+            (x - 30, y),
+            (x + 30, y),
+        ], fill=(60, 120, 60), outline=(40, 80, 40), width=2)
+    
+    # 标题
+    draw.text((WIDTH//2 - 150, 50), "Angkor Wat", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 120, 90), "Cambodia", fill=(255, 220, 100), font=None)
+    
+    return img
+
+def draw_shwedagon():
+    """3. 缅甸 - 仰光大金塔 - 金色佛塔"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
+    draw = ImageDraw.Draw(img)
+    
+    create_gradient_background(draw, WIDTH, HEIGHT)
+    
+    cx, cy = 400, 650
+    
+    # 基座台阶
     for i in range(4):
-        angle = i * 90
-        rad = math.radians(angle)
-        x1 = center_x + math.cos(rad) * 30
-        y1 = center_y + math.sin(rad) * 30
-        x2 = center_x + math.cos(rad) * 200
-        y2 = center_y + math.sin(rad) * 200
-        # 叶片
-        perp = math.radians(angle + 90)
-        wx = math.cos(perp) * 25
-        wy = math.sin(perp) * 25
-        draw.polygon([(x1-wx, y1-wy), (x1+wx, y1+wy), (x2+wx, y2+wy), (x2-wx, y2-wy)], 
-                     fill=blade_colors[i], outline='black', width=2)
+        w = 300 - i * 40
+        h = 30
+        y = cy - i * 35
+        draw.rectangle([cx - w//2, y, cx + w//2, y + h], 
+                      fill=(218, 165, 32), outline=(184, 134, 11), width=3)
     
-    # 可爱的表情（在风车主体上）
-    draw_eyes_and_face(draw, 400, 620, eye_size=35)
+    # 钟形塔身
+    bell_color = (255, 215, 0)  # 金色
     
-    # 底部文字
-    draw_text(draw, "风车 Windmill", 1050, 800)
+    # 主体圆胖形状
+    draw.ellipse([cx - 100, cy - 250, cx + 100, cy - 50], 
+                fill=bell_color, outline=(218, 165, 32), width=4)
+    
+    # 上部锥形
+    draw.polygon([
+        (cx - 80, cy - 200),
+        (cx - 40, cy - 350),
+        (cx + 40, cy - 350),
+        (cx + 80, cy - 200),
+    ], fill=bell_color, outline=(218, 165, 32), width=4)
+    
+    # 塔顶
+    draw.polygon([
+        (cx, cy - 420),
+        (cx - 30, cy - 350),
+        (cx + 30, cy - 350),
+    ], fill=(255, 236, 139), outline=(218, 165, 32), width=3)
+    
+    # 顶部的宝石
+    draw.ellipse([cx - 15, cy - 440, cx + 15, cy - 410], fill=(255, 0, 100))
+    
+    # 给塔画脸
+    draw_circle_eyes(draw, cx - 35, cy - 180, 25)
+    draw_circle_eyes(draw, cx + 35, cy - 180, 25)
+    draw_cute_mouth(draw, cx, cy - 130, 20)
+    draw_blush(draw, cx - 60, cy - 150, 15)
+    draw_blush(draw, cx + 60, cy - 150, 15)
+    
+    # 周围小塔
+    for offset in [-180, 180]:
+        sx = cx + offset
+        draw.ellipse([sx - 40, cy - 100, sx + 40, cy - 20], 
+                    fill=(255, 223, 100), outline=(218, 165, 32), width=3)
+        draw.polygon([
+            (sx, cy - 160),
+            (sx - 15, cy - 100),
+            (sx + 15, cy - 100),
+        ], fill=(255, 223, 100), outline=(218, 165, 32), width=2)
+    
+    # 标题
+    draw.text((WIDTH//2 - 160, 50), "Shwedagon", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 100, 90), "Myanmar", fill=(255, 220, 100), font=None)
     
     return img
 
-def draw_matterhorn():
-    """绘制马特洪峰 - 三角形雪山"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
+def draw_patuxai():
+    """4. 老挝 - 凯旋门 (Patuxai) - 万象地标"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    # 主山峰（三角形）
-    peak_y = 150
-    base_y = 800
-    left_x, right_x = 200, 600
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    # 山峰阴影面
-    draw.polygon([(400, peak_y), (400, base_y), (right_x, base_y)], fill=(220, 220, 240), outline='black', width=3)
-    # 山峰光照面
-    draw.polygon([(400, peak_y), (left_x, base_y), (400, base_y)], fill=(255, 255, 255), outline='black', width=3)
+    cx, cy = 400, 600
     
-    # 山顶积雪细节
+    # 基座
+    draw.rectangle([cx - 200, cy, cx + 200, cy + 150], 
+                  fill=(205, 175, 140), outline=(160, 130, 100), width=4)
+    
+    # 拱门
+    draw.arc([cx - 100, cy - 50, cx + 100, cy + 100], 
+            start=0, end=180, fill=(120, 100, 80), width=20)
+    
+    # 四个塔楼
+    tower_positions = [cx - 160, cx + 160, cx - 120, cx + 120]
+    for i, tx in enumerate(tower_positions[:2]):
+        # 主塔
+        draw.rectangle([tx - 40, cy - 250, tx + 40, cy], 
+                      fill=(200, 170, 135), outline=(150, 120, 90), width=3)
+        # 塔顶
+        draw.polygon([
+            (tx, cy - 300),
+            (tx - 35, cy - 250),
+            (tx + 35, cy - 250),
+        ], fill=(180, 150, 115), outline=(150, 120, 90), width=3)
+        # 小尖顶
+        draw.line([(tx, cy - 330), (tx, cy - 300)], fill=(150, 120, 90), width=4)
+    
+    for i, tx in enumerate(tower_positions[2:]):
+        # 小塔
+        draw.rectangle([tx - 25, cy - 180, tx + 25, cy], 
+                      fill=(210, 180, 145), outline=(150, 120, 90), width=3)
+        draw.polygon([
+            (tx, cy - 220),
+            (tx - 20, cy - 180),
+            (tx + 20, cy - 180),
+        ], fill=(190, 160, 125), outline=(150, 120, 90), width=3)
+    
+    # 中央顶部结构
+    draw.rectangle([cx - 60, cy - 280, cx + 60, cy - 150], 
+                  fill=(195, 165, 130), outline=(150, 120, 90), width=3)
+    draw.polygon([
+        (cx, cy - 350),
+        (cx - 50, cy - 280),
+        (cx + 50, cy - 280),
+    ], fill=(185, 155, 120), outline=(150, 120, 90), width=3)
+    
+    # 给中央结构画脸
+    draw_circle_eyes(draw, cx - 30, cy - 240, 22)
+    draw_circle_eyes(draw, cx + 30, cy - 240, 22)
+    draw_cute_mouth(draw, cx, cy - 200, 18)
+    draw_blush(draw, cx - 50, cy - 220, 12)
+    draw_blush(draw, cx + 50, cy - 220, 12)
+    
+    # 装饰细节
     for i in range(5):
-        y = peak_y + 80 + i * 40
-        width = 60 + i * 30
-        draw.polygon([(400, y-width//2), (380, y), (420, y)], fill='white', outline='black', width=1)
+        x = cx - 160 + i * 80
+        draw.rectangle([x - 10, cy + 20, x + 10, cy + 60], 
+                      fill=(170, 140, 105), outline=(130, 100, 75), width=2)
     
-    # 山腰云朵效果
-    for i in range(3):
-        cx = 300 + i * 100
-        cy = 400 + i * 80
-        draw.ellipse([cx-40, cy-20, cx+40, cy+20], fill=(255,255,255,200), outline='black', width=1)
-    
-    # 可爱的表情（在山峰上）
-    draw_eyes_and_face(draw, 400, 380, eye_size=32)
-    
-    # 底部文字
-    draw_text(draw, "马特洪峰 Matterhorn", 1050, 800)
+    # 标题
+    draw.text((WIDTH//2 - 120, 50), "Patuxai", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 80, 90), "Laos", fill=(255, 220, 100), font=None)
     
     return img
 
-def draw_st_basil():
-    """绘制圣瓦西里大教堂 - 彩色洋葱头圆顶"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
+def draw_chocolate_hills():
+    """5. 菲律宾 - 巧克力山 - 薄荷岛"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    base_y = 800
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    # 中央主塔（最高）
-    main_colors = [(255, 100, 100), (255, 150, 50), (255, 100, 100)]
-    draw.polygon([(400, 650), (350, base_y), (450, base_y)], fill=(200, 50, 50), outline='black', width=3)
-    # 主洋葱头
-    draw.ellipse([320, 150, 480, 350], fill=main_colors[0], outline='black', width=3)
-    draw.ellipse([340, 180, 460, 320], fill=main_colors[1], outline='black', width=2)
+    # 草地背景
+    draw.rectangle([0, 600, WIDTH, HEIGHT], fill=(144, 238, 144))
     
-    # 四个小洋葱头
-    small_colors = [(100, 150, 255), (100, 255, 100), (255, 255, 100), (255, 100, 255)]
-    positions = [(280, 450), (520, 450), (320, 600), (480, 600)]
-    for i, (px, py) in enumerate(positions):
-        # 塔身
-        draw.polygon([(px, py-50), (px-30, base_y), (px+30, base_y)], 
-                     fill=(180, 40, 40), outline='black', width=2)
-        # 洋葱头
-        draw.ellipse([px-45, py-120, px+45, py], fill=small_colors[i], outline='black', width=3)
+    # 巧克力色山丘
+    hill_color = (139, 90, 43)
+    hills = [
+        (200, 650, 80),
+        (350, 600, 100),
+        (500, 630, 90),
+        (650, 580, 110),
+        (100, 680, 70),
+        (280, 700, 85),
+        (450, 680, 95),
+        (600, 710, 75),
+        (750, 650, 80),
+    ]
     
-    # 可爱的表情（在主塔上）
-    draw_eyes_and_face(draw, 400, 480, eye_size=30)
+    for x, y, r in hills:
+        # 山丘主体
+        draw.ellipse([x - r, y - r, x + r, y + r], 
+                    fill=hill_color, outline=(100, 60, 25), width=3)
+        
+        # 顶部草皮
+        draw.arc([x - r, y - r, x + r, y + r], 
+                start=200, end=340, fill=(100, 200, 100), width=8)
     
-    # 底部文字
-    draw_text(draw, "圣瓦西里大教堂 St. Basil's", 1050, 800)
+    # 主山丘（带脸的）
+    mx, my, mr = 400, 550, 120
+    draw.ellipse([mx - mr, my - mr, mx + mr, my + mr], 
+                fill=(150, 100, 50), outline=(100, 60, 25), width=4)
+    
+    # 眼睛
+    draw_circle_eyes(draw, mx - 40, my - 30, 28)
+    draw_circle_eyes(draw, mx + 40, my - 30, 28)
+    
+    # 腮红
+    draw_blush(draw, mx - 70, my, 18)
+    draw_blush(draw, mx + 70, my, 18)
+    
+    # 嘴巴
+    draw_cute_mouth(draw, mx, my + 10, 25)
+    
+    # 顶部草皮
+    draw.arc([mx - mr, my - mr, mx + mr, my + mr], 
+            start=200, end=340, fill=(120, 220, 120), width=12)
+    
+    # 几朵云
+    draw_cloud(draw, 150, 150, 45)
+    draw_cloud(draw, 600, 120, 40)
+    draw_cloud(draw, 700, 200, 35)
+    
+    # 标题
+    draw.text((WIDTH//2 - 180, 50), "Chocolate Hills", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 100, 90), "Philippines", fill=(255, 220, 100), font=None)
     
     return img
 
-def draw_n_tower():
-    """绘制N塔 - 首尔塔+爱心锁"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
+def draw_petronas():
+    """6. 马来西亚 - 双子塔 - 吉隆坡"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    base_y = 850
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    # 塔身（红色锥形）
-    draw.polygon([(400, 200), (320, base_y), (480, base_y)], fill=(200, 50, 50), outline='black', width=4)
+    # 双子塔
+    tower_color = (180, 190, 210)
+    highlight = (220, 230, 250)
     
-    # 塔顶平台
-    draw.rectangle([350, 180, 450, 220], fill=(100, 100, 100), outline='black', width=2)
-    # 天线
-    draw.line([(400, 100), (400, 180)], fill=(80, 80, 80), width=8)
-    draw.ellipse([385, 85, 415, 115], fill=(255, 100, 100), outline='black', width=2)
+    for offset in [-120, 120]:
+        cx = 400 + offset
+        base_y = 750
+        
+        # 塔身主体 - 分段设计
+        sections = [
+            (base_y - 100, 70, 100),   # 底部
+            (base_y - 200, 60, 100),   # 中段
+            (base_y - 300, 50, 80),    # 上段
+            (base_y - 400, 40, 60),    # 顶部
+        ]
+        
+        for y, w, h in sections:
+            draw.rectangle([cx - w, y, cx + w, y + h], 
+                          fill=tower_color, outline=(140, 150, 170), width=3)
+            # 窗户线条
+            for i in range(4):
+                ly = y + 15 + i * 20
+                draw.line([(cx - w + 5, ly), (cx + w - 5, ly)], 
+                         fill=(100, 110, 130), width=2)
+        
+        # 塔顶尖
+        draw.polygon([
+            (cx, base_y - 480),
+            (cx - 20, base_y - 400),
+            (cx + 20, base_y - 400),
+        ], fill=(200, 210, 230), outline=(140, 150, 170), width=3)
+        draw.line([(cx, base_y - 510), (cx, base_y - 480)], 
+                 fill=(160, 170, 190), width=4)
+        
+        # 给塔画脸（在中段）
+        draw_circle_eyes(draw, cx - 25, base_y - 250, 20)
+        draw_circle_eyes(draw, cx + 25, base_y - 250, 20)
+        draw_cute_mouth(draw, cx, base_y - 210, 15)
+        draw_blush(draw, cx - 45, base_y - 230, 12)
+        draw_blush(draw, cx + 45, base_y - 230, 12)
     
-    # 塔身上的横线装饰
-    for y in range(280, 800, 80):
-        draw.line([(340 + (y-200)//8, y), (460 - (y-200)//8, y)], fill=(150, 40, 40), width=3)
+    # 天桥
+    bridge_y = 350
+    draw.rectangle([280, bridge_y, 520, bridge_y + 25], 
+                  fill=(160, 170, 190), outline=(120, 130, 150), width=3)
     
-    # 爱心锁装饰
-    heart_positions = [(280, 700), (520, 650), (300, 550), (500, 500)]
-    for hx, hy in heart_positions:
-        # 绘制爱心
-        heart_color = (255, 100, 150)
-        draw.ellipse([hx-15, hy-10, hx, hy+10], fill=heart_color, outline='black', width=1)
-        draw.ellipse([hx, hy-10, hx+15, hy+10], fill=heart_color, outline='black', width=1)
-        draw.polygon([(hx-15, hy), (hx+15, hy), (hx, hy+20)], fill=heart_color, outline='black', width=1)
+    # 基座
+    draw.rectangle([220, 750, 580, 800], 
+                  fill=(140, 150, 170), outline=(100, 110, 130), width=4)
     
-    # 可爱的表情（在塔身上）
-    draw_eyes_and_face(draw, 400, 450, eye_size=35)
+    # 云朵
+    draw_cloud(draw, 150, 180, 50)
+    draw_cloud(draw, 650, 150, 45)
     
-    # 底部文字
-    draw_text(draw, "N塔 N Tower", 1050, 800)
+    # 标题
+    draw.text((WIDTH//2 - 150, 50), "Petronas Towers", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 140, 90), "Malaysia", fill=(255, 220, 100), font=None)
     
     return img
 
-def draw_marina_bay():
-    """绘制滨海湾金沙 - 三塔顶船型建筑"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
+def draw_borobudur():
+    """7. 印尼 - 婆罗浮屠 - 佛塔"""
+    img = Image.new('RGB', (WIDTH, HEIGHT))
     draw = ImageDraw.Draw(img)
     
-    base_y = 850
+    create_gradient_background(draw, WIDTH, HEIGHT)
     
-    # 三座塔
-    tower_x = [250, 400, 550]
-    for tx in tower_x:
-        # 塔身（带有弧度）
-        draw.polygon([(tx-40, 350), (tx+40, 350), (tx+50, base_y), (tx-50, base_y)], 
-                     fill=(200, 220, 240), outline='black', width=3)
-        # 窗户线条
-        for y in range(400, 800, 50):
-            draw.line([(tx-35, y), (tx+35, y)], fill=(100, 150, 200), width=2)
+    cx, cy = 400, 700
     
-    # 顶部船型结构
-    deck_y = 300
-    draw.polygon([(180, deck_y+80), (220, deck_y), (580, deck_y), (620, deck_y+80)], 
-                 fill=(150, 200, 255), outline='black', width=4)
-    draw.rectangle([220, deck_y-30, 580, deck_y], fill=(120, 180, 240), outline='black', width=3)
+    # 基座平台
+    draw.polygon([
+        (cx - 250, cy),
+        (cx + 250, cy),
+        (cx + 300, cy + 80),
+        (cx - 300, cy + 80),
+    ], fill=(160, 140, 120), outline=(120, 100, 80), width=4)
     
-    # 顶部花园细节
-    for i in range(5):
-        x = 250 + i * 70
-        draw.ellipse([x-15, deck_y-50, x+15, deck_y-20], fill=(100, 200, 100), outline='black', width=1)
+    # 阶梯式平台
+    levels = [
+        (cy - 80, 200, 60),
+        (cy - 160, 170, 50),
+        (cy - 230, 140, 40),
+    ]
     
-    # 可爱的表情（在中间塔上）
-    draw_eyes_and_face(draw, 400, 520, eye_size=32)
+    for y, w, h in levels:
+        draw.polygon([
+            (cx - w, y),
+            (cx + w, y),
+            (cx + w + 20, y + h),
+            (cx - w - 20, y + h),
+        ], fill=(180, 160, 140), outline=(130, 110, 90), width=3)
+        
+        # 小佛塔
+        for offset in [-w*0.6, -w*0.2, w*0.2, w*0.6]:
+            sx = cx + offset
+            draw.ellipse([sx - 20, y - 40, sx + 20, y], 
+                        fill=(200, 180, 160), outline=(150, 130, 110), width=2)
+            draw.polygon([
+                (sx, y - 55),
+                (sx - 10, y - 40),
+                (sx + 10, y - 40),
+            ], fill=(190, 170, 150), outline=(140, 120, 100), width=2)
     
-    # 底部文字
-    draw_text(draw, "滨海湾金沙 Marina Bay Sands", 1050, 800)
+    # 中央主塔
+    draw.polygon([
+        (cx - 50, cy - 230),
+        (cx + 50, cy - 230),
+        (cx + 60, cy - 100),
+        (cx - 60, cy - 100),
+    ], fill=(190, 170, 150), outline=(140, 120, 100), width=4)
     
-    return img
-
-def draw_blue_mosque():
-    """绘制蓝色清真寺 - 蓝色圆顶+尖塔"""
-    img = create_gradient_background(800, 1200, '#87CEEB', '#98D8E8')
-    draw = ImageDraw.Draw(img)
+    # 主塔顶部圆顶
+    draw.ellipse([cx - 60, cy - 320, cx + 60, cy - 200], 
+                fill=(210, 190, 170), outline=(160, 140, 120), width=4)
     
-    base_y = 850
+    # 塔顶尖
+    draw.polygon([
+        (cx, cy - 420),
+        (cx - 25, cy - 320),
+        (cx + 25, cy - 320),
+    ], fill=(220, 200, 180), outline=(170, 150, 130), width=3)
     
-    # 主体建筑（中央大圆顶）
-    draw.polygon([(400, 550), (280, base_y), (520, base_y)], fill=(100, 150, 200), outline='black', width=3)
-    # 大圆顶
-    draw.ellipse([250, 250, 550, 550], fill=(80, 130, 200), outline='black', width=4)
+    # 给主塔画脸
+    draw_circle_eyes(draw, cx - 30, cy - 260, 22)
+    draw_circle_eyes(draw, cx + 30, cy - 260, 22)
+    draw_cute_mouth(draw, cx, cy - 220, 18)
+    draw_blush(draw, cx - 55, cy - 240, 12)
+    draw_blush(draw, cx + 55, cy - 240, 12)
     
-    # 四个小圆顶
-    small_dome_x = [220, 580, 300, 500]
-    for i, dx in enumerate(small_dome_x):
-        height = 350 if i < 2 else 420
-        draw.ellipse([dx-50, height, dx+50, height+100], fill=(100, 160, 220), outline='black', width=2)
+    # 周围的绿树
+    for i in range(6):
+        x = 80 + i * 130
+        y = 800
+        if 250 < x < 550:  # 跳过中间
+            continue
+        draw.polygon([
+            (x, y - 120),
+            (x - 40, y),
+            (x + 40, y),
+        ], fill=(60, 140, 60), outline=(40, 100, 40), width=2)
     
-    # 尖塔（六座）
-    minaret_x = [150, 250, 650, 550, 320, 480]
-    for i, mx in enumerate(minaret_x):
-        height = 200 if i < 4 else 280
-        # 尖塔主体
-        draw.polygon([(mx-15, height), (mx+15, height), (mx+10, base_y), (mx-10, base_y)], 
-                     fill=(120, 140, 180), outline='black', width=2)
-        # 尖塔顶部
-        draw.polygon([(mx, height-60), (mx-15, height), (mx+15, height)], 
-                     fill=(150, 170, 200), outline='black', width=2)
-        # 月牙装饰
-        draw.arc([mx-10, height-80, mx+10, height-60], start=0, end=180, fill=(255, 215, 0), width=3)
-    
-    # 可爱的表情（在大圆顶上）
-    draw_eyes_and_face(draw, 400, 420, eye_size=35)
-    
-    # 底部文字
-    draw_text(draw, "蓝色清真寺 Blue Mosque", 1050, 800)
+    # 标题
+    draw.text((WIDTH//2 - 140, 50), "Borobudur", fill=(255, 255, 255), font=None)
+    draw.text((WIDTH//2 - 80, 90), "Indonesia", fill=(255, 220, 100), font=None)
     
     return img
 
 def main():
-    output_dir = "/Users/moutai/Desktop/toweroffate_v1.0/assets/towers"
-    
+    """主函数：生成所有图片"""
     towers = [
-        ("sagrada-familia.png", draw_sagrada_familia),
-        ("windmill.png", draw_windmill),
-        ("matterhorn.png", draw_matterhorn),
-        ("st-basil.png", draw_st_basil),
-        ("n-tower.png", draw_n_tower),
-        ("marina-bay.png", draw_marina_bay),
-        ("blue-mosque.png", draw_blue_mosque),
+        (draw_ha_long_bay, "ha-long-bay.png", "越南 - 下龙湾"),
+        (draw_angkor_wat, "angkor-wat.png", "柬埔寨 - 吴哥窟"),
+        (draw_shwedagon, "shwedagon.png", "缅甸 - 仰光大金塔"),
+        (draw_patuxai, "patuxai.png", "老挝 - 凯旋门"),
+        (draw_chocolate_hills, "chocolate-hills.png", "菲律宾 - 巧克力山"),
+        (draw_petronas, "petronas.png", "马来西亚 - 双子塔"),
+        (draw_borobudur, "borobudur.png", "印尼 - 婆罗浮屠"),
     ]
     
-    print("开始生成卡通世界名塔图片...")
-    for filename, draw_func in towers:
-        filepath = os.path.join(output_dir, filename)
-        img = draw_func()
-        img.save(filepath, "PNG")
-        print(f"✓ 已生成: {filename}")
+    for func, filename, name in towers:
+        print(f"正在生成: {name} -> {filename}")
+        img = func()
+        output_path = os.path.join(OUTPUT_DIR, filename)
+        img.save(output_path, "PNG")
+        print(f"  ✓ 已保存: {output_path}")
     
-    print(f"\n🎉 全部完成！图片保存在: {output_dir}")
+    print("\n全部7张图片生成完成！")
 
 if __name__ == "__main__":
     main()
