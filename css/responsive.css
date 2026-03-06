@@ -1,0 +1,1047 @@
+/**
+ * 命运塔·首登者 - 统一响应式设计系统
+ * Tower of Fate - Unified Responsive Design System
+ * Version: 1.0.0
+ * 
+ * 断点规范:
+ * - 手机: < 768px (Mobile First)
+ * - 平板: 768px - 1023px
+ * - 电脑: >= 1024px
+ */
+
+/* ============================================
+ * 1. CSS 变量系统 - 响应式设计令牌
+ * ============================================ */
+:root {
+  /* 基础颜色 */
+  --color-primary: #FFD700;
+  --color-primary-dark: #FFA500;
+  --color-secondary: #FF4757;
+  --color-bg-dark: #0a0a1a;
+  --color-bg-mid: #1a1a3e;
+  --color-bg-light: #2d2d5a;
+  --color-text: #ffffff;
+  --color-text-muted: #8888aa;
+  --color-border: rgba(255, 215, 0, 0.3);
+  
+  /* 布局尺寸 - 移动端默认值 */
+  --max-width: 100%;
+  --content-padding: 16px;
+  --section-gap: 16px;
+  
+  /* 组件尺寸 - 移动端 */
+  --btn-height: 48px;
+  --btn-padding: 12px 24px;
+  --card-radius: 12px;
+  --touch-target: 44px;
+  
+  /* 字体大小 - 移动端 */
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-base: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 22px;
+  --font-2xl: 28px;
+  --font-3xl: 36px;
+  
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* 动画 */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+  
+  /* Z-index层级 */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-tooltip: 400;
+  --z-toast: 500;
+}
+
+/* ============================================
+ * 2. 平板断点 (768px - 1023px)
+ * ============================================ */
+@media (min-width: 768px) {
+  :root {
+    --max-width: 720px;
+    --content-padding: 24px;
+    --section-gap: 24px;
+    
+    --btn-height: 52px;
+    --btn-padding: 14px 32px;
+    --card-radius: 16px;
+    
+    --font-xs: 12px;
+    --font-sm: 14px;
+    --font-base: 16px;
+    --font-md: 18px;
+    --font-lg: 22px;
+    --font-xl: 28px;
+    --font-2xl: 36px;
+    --font-3xl: 48px;
+    
+    --space-xs: 6px;
+    --space-sm: 12px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --space-2xl: 64px;
+  }
+}
+
+/* ============================================
+ * 3. 电脑断点 (>= 1024px)
+ * ============================================ */
+@media (min-width: 1024px) {
+  :root {
+    --max-width: 1200px;
+    --content-padding: 32px;
+    --section-gap: 32px;
+    
+    --btn-height: 56px;
+    --btn-padding: 16px 40px;
+    --card-radius: 20px;
+    
+    --font-xs: 12px;
+    --font-sm: 14px;
+    --font-base: 16px;
+    --font-md: 20px;
+    --font-lg: 24px;
+    --font-xl: 32px;
+    --font-2xl: 42px;
+    --font-3xl: 56px;
+    
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 32px;
+    --space-lg: 48px;
+    --space-xl: 64px;
+    --space-2xl: 96px;
+  }
+}
+
+/* ============================================
+ * 4. 基础重置和全局样式
+ * ============================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-base);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--color-bg-dark);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 触摸优化 */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  button, a, [role="button"] {
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+  }
+}
+
+/* 选中样式 */
+::selection {
+  background: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+/* ============================================
+ * 5. 响应式容器系统
+ * ============================================ */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--content-padding);
+}
+
+/* 全屏游戏容器 */
+.game-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+ * 6. 响应式网格系统
+ * ============================================ */
+.grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+/* 手机: 单列 */
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+/* 平板: 两列 */
+@media (min-width: 768px) {
+  .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* 电脑: 多列 */
+@media (min-width: 1024px) {
+  .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ============================================
+ * 7. Flexbox 工具类
+ * ============================================ */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.flex-1 { flex: 1; }
+.flex-none { flex: none; }
+
+/* 响应式flex方向 */
+@media (max-width: 767px) {
+  .flex-mobile-col { flex-direction: column; }
+}
+
+@media (min-width: 1024px) {
+  .flex-desktop-row { flex-direction: row; }
+}
+
+/* ============================================
+ * 8. 响应式按钮系统
+ * ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  height: var(--btn-height);
+  padding: var(--btn-padding);
+  font-size: var(--font-md);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--card-radius);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* 按钮变体 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #000;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* 按钮尺寸 */
+.btn-sm {
+  height: calc(var(--btn-height) * 0.8);
+  padding: 8px 16px;
+  font-size: var(--font-sm);
+}
+
+.btn-lg {
+  height: calc(var(--btn-height) * 1.2);
+  padding: 16px 48px;
+  font-size: var(--font-lg);
+}
+
+/* 全宽按钮 - 手机端 */
+.btn-full {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .btn-full {
+    width: auto;
+  }
+}
+
+/* 按钮组 */
+.btn-group {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+ * 9. 响应式卡片系统
+ * ============================================ */
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--card-radius);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 卡片网格 */
+.card-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================
+ * 10. 响应式导航
+ * ============================================ */
+/* 手机端: 底部导航 */
+.nav-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-sm) 0 calc(var(--space-sm) + env(safe-area-inset-bottom, 0));
+  z-index: var(--z-sticky);
+}
+
+.nav-mobile-items {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.nav-mobile-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--font-xs);
+  transition: color var(--transition-fast);
+}
+
+.nav-mobile-item.active,
+.nav-mobile-item:hover {
+  color: var(--color-primary);
+}
+
+.nav-mobile-item i {
+  font-size: var(--font-lg);
+}
+
+/* 电脑端: 侧边导航 */
+.nav-desktop {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  background: rgba(10, 10, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  z-index: var(--z-sticky);
+  overflow-y: auto;
+}
+
+.nav-desktop-header {
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-desktop-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.nav-desktop-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: var(--card-radius);
+  transition: all var(--transition-fast);
+}
+
+.nav-desktop-item:hover,
+.nav-desktop-item.active {
+  background: rgba(255,215,0,0.1);
+  color: var(--color-primary);
+}
+
+/* 导航切换 */
+@media (min-width: 1024px) {
+  .nav-mobile { display: none; }
+  .nav-desktop { display: block; }
+  
+  .with-desktop-nav {
+    padding-left: 260px;
+  }
+}
+
+/* ============================================
+ * 11. 响应式游戏界面
+ * ============================================ */
+/* 游戏布局容器 */
+.game-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .game-layout {
+    flex-direction: row;
+  }
+}
+
+/* 游戏主区域 */
+.game-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 塔显示区域 */
+.tower-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  overflow-y: auto;
+}
+
+/* 塔模型 - 响应式尺寸 */
+.tower-model {
+  width: 100%;
+  max-width: 280px;
+}
+
+@media (min-width: 768px) {
+  .tower-model {
+    max-width: 350px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tower-model {
+    max-width: 400px;
+  }
+}
+
+/* 手牌区域 */
+.hand-area {
+  background: rgba(0,0,0,0.3);
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.hand-cards {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .hand-cards {
+    gap: var(--space-sm);
+  }
+}
+
+/* 游戏信息面板 */
+.game-info-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(0,0,0,0.2);
+}
+
+@media (min-width: 1024px) {
+  .game-info-panel {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================
+ * 12. 响应式间距工具
+ * ============================================ */
+.m-0 { margin: 0; }
+.mt-1 { margin-top: var(--space-xs); }
+.mt-2 { margin-top: var(--space-sm); }
+.mt-3 { margin-top: var(--space-md); }
+.mt-4 { margin-top: var(--space-lg); }
+.mt-5 { margin-top: var(--space-xl); }
+
+.mb-1 { margin-bottom: var(--space-xs); }
+.mb-2 { margin-bottom: var(--space-sm); }
+.mb-3 { margin-bottom: var(--space-md); }
+.mb-4 { margin-bottom: var(--space-lg); }
+.mb-5 { margin-bottom: var(--space-xl); }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: var(--space-xs); }
+.p-2 { padding: var(--space-sm); }
+.p-3 { padding: var(--space-md); }
+.p-4 { padding: var(--space-lg); }
+.p-5 { padding: var(--space-xl); }
+
+/* ============================================
+ * 13. 响应式文本工具
+ * ============================================ */
+.text-xs { font-size: var(--font-xs); }
+.text-sm { font-size: var(--font-sm); }
+.text-base { font-size: var(--font-base); }
+.text-md { font-size: var(--font-md); }
+.text-lg { font-size: var(--font-lg); }
+.text-xl { font-size: var(--font-xl); }
+.text-2xl { font-size: var(--font-2xl); }
+.text-3xl { font-size: var(--font-3xl); }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--color-primary); }
+.text-muted { color: var(--color-text-muted); }
+.text-white { color: #fff; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+
+/* ============================================
+ * 14. 响应式显示工具
+ * ============================================ */
+.hidden { display: none; }
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+
+/* 响应式显示控制 */
+@media (max-width: 767px) {
+  .hide-mobile { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .show-mobile-only { display: none !important; }
+}
+
+@media (max-width: 1023px) {
+  .hide-tablet { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .show-tablet-only { display: none !important; }
+}
+
+@media (max-width: 1023px) {
+  .hide-desktop { display: block !important; }
+}
+
+@media (min-width: 1024px) {
+  .hide-desktop { display: none !important; }
+  .show-desktop { display: block !important; }
+}
+
+/* ============================================
+ * 15. 安全区域适配 (iPhone X+)
+ * ============================================ */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left, 0);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+/* ============================================
+ * 16. 响应式滚动条美化
+ * ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,215,0,0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,215,0,0.5);
+}
+
+/* ============================================
+ * 17. 响应式表单
+ * ============================================ */
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.form-input {
+  width: 100%;
+  height: var(--btn-height);
+  padding: 0 var(--space-md);
+  font-size: var(--font-base);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
+  border-radius: var(--card-radius);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* 表单布局 */
+.form-row {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================
+ * 18. 响应式模态框
+ * ============================================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  z-index: var(--z-modal);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-base);
+}
+
+.modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  background: var(--color-bg-mid);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transform: scale(0.9);
+  transition: transform var(--transition-base);
+}
+
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
+@media (min-width: 768px) {
+  .modal-content {
+    max-width: 600px;
+  }
+}
+
+/* ============================================
+ * 19. 响应式表格
+ * ============================================ */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* 卡片式表格 - 手机端 */
+@media (max-width: 767px) {
+  .table-mobile-cards thead {
+    display: none;
+  }
+  
+  .table-mobile-cards tr {
+    display: block;
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    background: rgba(255,255,255,0.03);
+    border-radius: var(--card-radius);
+    border: 1px solid var(--color-border);
+  }
+  
+  .table-mobile-cards td {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-xs) 0;
+    border-bottom: none;
+  }
+  
+  .table-mobile-cards td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+}
+
+/* ============================================
+ * 20. 响应式图片
+ * ============================================ */
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+}
+
+.img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 背景图片响应式 */
+.bg-responsive {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 767px) {
+  .bg-responsive {
+    background-attachment: scroll;
+  }
+}
+
+/* ============================================
+ * 21. 响应式动画
+ * ============================================ */
+/* 淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+/* 向上滑入 */
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease;
+}
+
+/* 脉冲效果 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* 悬停效果 - 仅电脑端 */
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(255,215,0,0.3);
+  }
+}
+
+/* ============================================
+ * 22. 游戏专用响应式组件
+ * ============================================ */
+/* 游戏卡片 */
+.game-card {
+  aspect-ratio: 3/4;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  border-radius: var(--card-radius);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.game-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+/* 游戏卡片尺寸 - 响应式 */
+.game-card-sm { width: 40px; height: 56px; font-size: var(--font-sm); }
+.game-card-md { width: 50px; height: 70px; font-size: var(--font-base); }
+.game-card-lg { width: 60px; height: 84px; font-size: var(--font-md); }
+
+@media (min-width: 768px) {
+  .game-card-sm { width: 48px; height: 67px; }
+  .game-card-md { width: 60px; height: 84px; }
+  .game-card-lg { width: 72px; height: 100px; }
+}
+
+@media (min-width: 1024px) {
+  .game-card-sm { width: 56px; height: 78px; }
+  .game-card-md { width: 70px; height: 98px; }
+  .game-card-lg { width: 84px; height: 117px; }
+}
+
+/* 状态徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+}
+
+.badge-silver {
+  background: linear-gradient(135deg, #C0C0C0, #808080);
+  color: #000;
+}
+
+.badge-bronze {
+  background: linear-gradient(135deg, #CD7F32, #B87333);
+  color: #fff;
+}
+
+/* 玩家头像 */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+}
+
+.avatar-sm { width: 32px; height: 32px; }
+.avatar-md { width: 48px; height: 48px; }
+.avatar-lg { width: 64px; height: 64px; }
+.avatar-xl { width: 96px; height: 96px; }
+
+/* ============================================
+ * 23. 打印样式
+ * ============================================ */
+@media print {
+  .nav-mobile,
+  .nav-desktop,
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+/* ============================================
+ * 24. 无障碍支持
+ * ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 焦点样式 */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* ============================================
+ * 25. 性能优化
+ * ============================================ */
+/* GPU加速 */
+.gpu-accelerate {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 内容可见性优化 */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}

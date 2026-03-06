@@ -2,8 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>命运塔·首登者 V1.0</title>
+    <link rel="stylesheet" href="css/responsive.css">
     <style>
         /* ===== CSS 变量定义 - 移动端适配 ===== */
         :root {
@@ -59,369 +64,671 @@
             --black: #000;
         }
         
+        /* ===== 响应式断点覆盖 ===== */
+        /* 平板 */
+        @media (min-width: 768px) {
+            :root {
+                --max-content-width: 720px;
+                --tower-max-width: 350px;
+                --btn-max-width: 400px;
+                --card-width: 60px;
+                --card-height: 84px;
+                --font-icon: 120px;
+                --font-xxxl: 36px;
+                --spacing-xxxl: 40px;
+            }
+        }
+        
+        /* 电脑 */
+        @media (min-width: 1024px) {
+            :root {
+                --max-content-width: 1200px;
+                --tower-max-width: 400px;
+                --btn-max-width: 500px;
+                --card-width: 70px;
+                --card-height: 98px;
+                --font-icon: 150px;
+                --font-xxxl: 48px;
+                --spacing-xxxl: 60px;
+            }
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-primary); color: #fff; height: 100vh; overflow: hidden; }
         .screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; }
         .screen.active { display: flex; }
         
-        /* 首页 - 添加卡通背景 */
+        /* ===== 首页 - 响应式背景 ===== */
         #home-screen { 
-            background: linear-gradient(180deg, rgba(10,10,26,0.7) 0%, rgba(26,26,62,0.75) 50%, rgba(10,10,26,0.8) 100%),
-                        url('https://raw.githubusercontent.com/griffithjin/toweroffate-v1/main/assets/towers/sagrada-familia.png') center center / cover no-repeat;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
-        .home-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-xxl); max-width: var(--max-content-width); margin: 0 auto; }
-        .tower-main { font-size: var(--font-icon); margin-bottom: var(--spacing-lg); animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+        
+        .home-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: var(--spacing-xxl); 
+            max-width: var(--max-content-width); 
+            margin: 0 auto; 
+        }
+        
+        .tower-main { 
+            font-size: var(--font-icon); 
+            margin-bottom: var(--spacing-lg); 
+            animation: float 3s ease-in-out infinite; 
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); 
+        }
+        
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        .title { font-size: var(--font-xxxl); font-weight: bold; background: linear-gradient(45deg, var(--gold), #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: var(--spacing-sm); }
-        .subtitle { color: var(--text-muted); font-size: var(--font-md); margin-bottom: var(--spacing-xxxl); }
-        .btn-main { width: 100%; max-width: var(--btn-max-width); padding: var(--spacing-xl); background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--black); border: none; border-radius: var(--radius-xxxl); font-size: var(--font-xl); font-weight: bold; margin-bottom: var(--spacing-lg); cursor: pointer; }
-        .btn-main:active { transform: scale(0.98); }
-        .modes { display: flex; gap: var(--spacing-lg); flex-wrap: wrap; justify-content: center; }
-        .mode-btn { padding: var(--spacing-md) var(--spacing-xl); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: var(--radius-xxl); color: #fff; cursor: pointer; font-size: var(--font-md); }
-        .mode-btn:active { background: rgba(255,215,0,0.2); }
+        
+        .title { 
+            font-size: var(--font-xxxl); 
+            font-weight: bold; 
+            background: linear-gradient(45deg, var(--gold), #ffed4e); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: var(--spacing-sm); 
+        }
+        
+        .subtitle { 
+            color: var(--text-muted); 
+            font-size: var(--font-md); 
+            margin-bottom: var(--spacing-xxxl); 
+        }
+        
+        /* ===== 响应式按钮布局 ===== */
+        .btn-main { 
+            width: 100%; 
+            max-width: var(--btn-max-width); 
+            padding: var(--spacing-xl); 
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark)); 
+            color: var(--black); 
+            border: none; 
+            border-radius: var(--radius-xxxl); 
+            font-size: var(--font-xl); 
+            font-weight: bold; 
+            margin-bottom: var(--spacing-lg); 
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+        }
+        
+        .btn-main:active { 
+            transform: scale(0.98); 
+        }
+        
+        /* ===== 响应式模式选择 ===== */
+        .modes { 
+            display: flex; 
+            gap: var(--spacing-lg); 
+            flex-wrap: wrap; 
+            justify-content: center; 
+        }
+        
+        /* 电脑端：横向排列 */
+        @media (min-width: 1024px) {
+            .modes {
+                flex-direction: row;
+            }
+            
+            .home-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 60px;
+                align-items: center;
+                width: 100%;
+                max-width: 1000px;
+            }
+            
+            .home-left {
+                text-align: left;
+            }
+            
+            .home-right {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-lg);
+            }
+        }
+        
+        .mode-btn { 
+            padding: var(--spacing-md) var(--spacing-xl); 
+            background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,215,0,0.3); 
+            border-radius: var(--radius-xxl); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: var(--font-md);
+            transition: all 0.2s;
+        }
+        
+        .mode-btn:hover {
+            background: rgba(255,215,0,0.2);
+            border-color: var(--gold);
+        }
+        
+        .mode-btn:active { 
+            background: rgba(255,215,0,0.2); 
+        }
         
         /* 游戏界面 */
         #game-screen { background: var(--bg-secondary); }
-        .game-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg) var(--spacing-xl); background: rgba(0,0,0,0.3); }
-        .back-btn { width: var(--back-btn-size); height: var(--back-btn-size); background: rgba(255,255,255,0.1); border: none; border-radius: var(--radius-xl); color: #fff; font-size: var(--font-lg); cursor: pointer; }
+        .game-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: var(--spacing-lg) var(--spacing-xl); 
+            background: rgba(0,0,0,0.3); 
+        }
+        
+        .back-btn { 
+            width: var(--back-btn-size); 
+            height: var(--back-btn-size); 
+            background: rgba(255,255,255,0.1); 
+            border: none; 
+            border-radius: var(--radius-xl); 
+            color: #fff; 
+            font-size: var(--font-lg); 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .game-info { text-align: center; }
         .game-info .label { font-size: var(--font-xs); color: var(--text-muted); }
         .game-info .value { font-size: var(--font-lg); color: var(--gold); font-weight: bold; }
         
         /* 塔区域 */
-        .tower-section { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-lg); overflow-y: auto; }
-        .tower { display: flex; flex-direction: column-reverse; gap: var(--spacing-xs); width: 100%; max-width: var(--tower-max-width); }
-        .level { height: 22px; display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); font-weight: bold; border-radius: var(--radius-sm); transition: all 0.3s; }
-        .level.current { box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(255,215,0,0.5); transform: scale(1.05); z-index: 10; }
-        /* 塔层颜色 - 从下到上渐变 */
+        .tower-section { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: var(--spacing-lg); 
+            overflow-y: auto; 
+        }
+        
+        .tower { 
+            display: flex; 
+            flex-direction: column-reverse; 
+            gap: var(--spacing-xs); 
+            width: 100%; 
+            max-width: var(--tower-max-width); 
+        }
+        
+        .level { 
+            height: 22px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: var(--font-sm); 
+            font-weight: bold; 
+            border-radius: var(--radius-sm); 
+            transition: all 0.3s; 
+        }
+        
+        .level.current { 
+            box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(255,215,0,0.5); 
+            transform: scale(1.05); 
+            z-index: 10; 
+        }
+        
+        /* 塔层颜色 */
         .l1 { width: 95%; background: linear-gradient(90deg, #e0f7fa, #b2ebf2); color: var(--black); }
         .l2 { width: 92%; background: linear-gradient(90deg, #b2ebf2, #80deea); color: var(--black); }
         .l3 { width: 89%; background: linear-gradient(90deg, #80deea, #4dd0e1); color: var(--black); }
         .l4 { width: 86%; background: linear-gradient(90deg, #4dd0e1, #26c6da); color: var(--black); }
         .l5 { width: 83%; background: linear-gradient(90deg, #26c6da, #00bcd4); color: var(--black); }
-        .l6 { width: 80%; background: linear-gradient(90deg, #00bcd4, #00acc1); color: #fff; }
+        .l6 { width: 80%; background: linear-gradient(90deg, #00bcd4, #00acc1); color: var(--black); }
         .l7 { width: 77%; background: linear-gradient(90deg, #00acc1, #0097a7); color: #fff; }
         .l8 { width: 74%; background: linear-gradient(90deg, #0097a7, #00838f); color: #fff; }
         .l9 { width: 71%; background: linear-gradient(90deg, #00838f, #006064); color: #fff; }
-        .l10 { width: 68%; background: linear-gradient(90deg, #006064, #01579b); color: #fff; }
-        .l11 { width: 65%; background: linear-gradient(90deg, #01579b, #0d47a1); color: #fff; }
-        .l12 { width: 62%; background: linear-gradient(90deg, #0d47a1, #1a237e); color: #fff; }
-        .l13 { width: 59%; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--black); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
-        
-        /* 守卫区域 */
-        .guard-section { padding: var(--spacing-xl); background: rgba(0,0,0,0.3); margin: 0 var(--spacing-xl) var(--spacing-lg); border-radius: var(--radius-xxl); }
-        .guard-title { text-align: center; font-size: var(--font-sm); color: var(--text-muted); margin-bottom: var(--spacing-lg); }
-        .guard-card { width: var(--guard-card-width); height: var(--guard-card-height); background: linear-gradient(135deg, #1a5490, #0d2847); border: 2px solid rgba(255,255,255,0.2); border-radius: var(--radius-lg); margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: var(--font-xxl); }
-        .guard-card.revealed { background: #fff; color: var(--black); }
-        .provocation { display: flex; gap: var(--spacing-md); justify-content: center; margin-top: var(--spacing-lg); }
-        .provocation-card { width: var(--provoke-card-width); height: var(--provoke-card-height); background: linear-gradient(135deg, rgba(255,71,87,0.8), rgba(255,99,71,0.6)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--font-md); border: 1px solid rgba(255,71,87,0.5); }
+        .l10 { width: 68%; background: linear-gradient(90deg, #006064, #004d40); color: #fff; }
+        .l11 { width: 65%; background: linear-gradient(90deg, #004d40, #1b5e20); color: #fff; }
+        .l12 { width: 62%; background: linear-gradient(90deg, #1b5e20, #2e7d32); color: #fff; }
+        .l13 { width: 59%; background: linear-gradient(90deg, #2e7d32, #388e3c); color: #fff; }
+        .l14 { width: 56%; background: linear-gradient(90deg, #388e3c, #43a047); color: #fff; }
+        .l15 { width: 53%; background: linear-gradient(90deg, #43a047, #4caf50); color: #fff; }
+        .l16 { width: 50%; background: linear-gradient(90deg, #4caf50, #66bb6a); color: var(--black); }
+        .l17 { width: 47%; background: linear-gradient(90deg, #66bb6a, #81c784); color: var(--black); }
+        .l18 { width: 44%; background: linear-gradient(90deg, #81c784, #fff176); color: var(--black); }
+        .l19 { width: 41%; background: linear-gradient(90deg, #fff176, #ffeb3b); color: var(--black); }
+        .l20 { width: 38%; background: linear-gradient(90deg, #ffeb3b, #fdd835); color: var(--black); }
+        .l21 { width: 35%; background: linear-gradient(90deg, #fdd835, #ffc107); color: var(--black); }
+        .l22 { width: 32%; background: linear-gradient(90deg, #ffc107, #ffb300); color: var(--black); }
+        .l23 { width: 29%; background: linear-gradient(90deg, #ffb300, #ffa000); color: var(--black); }
+        .l24 { width: 26%; background: linear-gradient(90deg, #ffa000, #ff8f00); color: var(--black); }
+        .l25 { width: 23%; background: linear-gradient(90deg, #ff8f00, #ff6f00); color: #fff; }
+        .l26 { width: 20%; background: linear-gradient(90deg, #ff6f00, #e65100); color: #fff; }
+        .l27 { width: 17%; background: linear-gradient(90deg, #e65100, #d84315); color: #fff; }
+        .l28 { width: 14%; background: linear-gradient(90deg, #d84315, #bf360c); color: #fff; }
+        .l29 { width: 11%; background: linear-gradient(90deg, #bf360c, #b71c1c); color: #fff; }
+        .l30 { width: 8%; background: linear-gradient(90deg, #b71c1c, #c62828); color: #fff; }
+        .l31 { width: 5%; background: linear-gradient(90deg, #c62828, #d32f2f); color: #fff; border-radius: var(--radius-md) var(--radius-md) 50% 50%; }
         
         /* 手牌区域 */
-        .hand-section { padding: var(--spacing-xl); background: rgba(0,0,0,0.5); }
-        .hand-header { display: flex; justify-content: space-between; margin-bottom: var(--spacing-lg); font-size: var(--font-sm); color: var(--text-muted); }
-        .hand-cards { display: flex; gap: var(--spacing-md); overflow-x: auto; padding: var(--spacing-sm) 0; }
-        .hand-cards::-webkit-scrollbar { display: none; }
-        .card { width: var(--card-width); height: var(--card-height); background: #fff; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
-        .card.red { color: var(--red); }
-        .card.black { color: var(--black); }
-        .card.selected { transform: translateY(-10px); box-shadow: 0 8px 20px rgba(255,215,0,0.5); }
-        .card .suit { font-size: var(--font-suit); }
-        .card .rank { font-size: var(--font-sm); }
-        .btn-play { width: 100%; padding: var(--spacing-xl); margin-top: var(--spacing-lg); background: #444; color: #666; border: none; border-radius: var(--radius-xl); font-size: var(--font-lg); font-weight: bold; }
-        .btn-play.active { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--black); }
+        .hand-section { 
+            padding: var(--spacing-lg); 
+            background: rgba(0,0,0,0.3); 
+            border-top: 1px solid rgba(255,215,0,0.2);
+        }
         
-        /* 加载 */
-        #loading-screen { align-items: center; justify-content: center; background: var(--bg-primary); }
-        .spinner { width: var(--spinner-size); height: var(--spinner-size); border: 4px solid rgba(255,215,0,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: var(--spacing-xl); }
+        .hand-label { 
+            font-size: var(--font-xs); 
+            color: var(--text-muted); 
+            margin-bottom: var(--spacing-md); 
+            text-align: center; 
+        }
+        
+        .hand-cards { 
+            display: flex; 
+            justify-content: center; 
+            gap: var(--spacing-sm); 
+            flex-wrap: wrap;
+        }
+        
+        .card { 
+            width: var(--card-width); 
+            height: var(--card-height); 
+            background: linear-gradient(135deg, #fff, #f0f0f0); 
+            border-radius: var(--radius-md); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        .card.selected { 
+            box-shadow: 0 0 0 3px var(--gold), 0 4px 12px rgba(255,215,0,0.4); 
+            transform: translateY(-8px);
+        }
+        
+        .card-rank { font-size: var(--font-lg); }
+        .card-suit { font-size: var(--font-suit); }
+        .red { color: var(--red); }
+        .black { color: var(--black); }
+        
+        /* 控制按钮 */
+        .controls { 
+            display: flex; 
+            gap: var(--spacing-lg); 
+            justify-content: center; 
+            padding: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .btn-control { 
+            padding: var(--spacing-md) var(--spacing-xl); 
+            border: none; 
+            border-radius: var(--radius-lg); 
+            font-size: var(--font-md); 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-play { 
+            background: linear-gradient(135deg, #4CAF50, #45a049); 
+            color: white; 
+        }
+        
+        .btn-play:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+        }
+        
+        .btn-skip { 
+            background: rgba(255,255,255,0.1); 
+            color: var(--text-muted); 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-skip:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* 加载动画 */
+        #loading-screen { 
+            background: var(--bg-primary); 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .spinner { 
+            width: var(--spinner-size); 
+            height: var(--spinner-size); 
+            border: 3px solid rgba(255,215,0,0.3); 
+            border-top-color: var(--gold); 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* 守卫卡牌特殊样式 */
+        .guardian-section {
+            position: absolute;
+            right: var(--spacing-lg);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .guard-card {
+            width: var(--guard-card-width);
+            height: var(--guard-card-height);
+            background: linear-gradient(135deg, #9c27b0, #e91e63);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-sm);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* 挑衅卡牌 */
+        .provoke-card {
+            width: var(--provoke-card-width);
+            height: var(--provoke-card-height);
+            background: linear-gradient(135deg, #ff5722, #f44336);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-xs);
+            color: white;
+        }
+        
+        /* 安全区域适配 */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .game-header { padding-top: calc(var(--spacing-lg) + env(safe-area-inset-top)); }
+            .hand-section { padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom)); }
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,215,0,0.5); }
     </style>
 </head>
-<body>
+<body class="responsive-layout">
     <!-- 首页 -->
     <div id="home-screen" class="screen active">
         <div class="home-content">
-            <div class="tower-main">🏰</div>
-            <div class="title">命运塔·首登者</div>
-            <div class="subtitle">登顶第13层，成为首登者</div>
-            <button class="btn-main" onclick="location.href='team-battle.html'">⚡ 开始游戏</button>
-            <div class="modes">
-                <button class="mode-btn" onclick="location.href='team-battle.html'">👥 团队战</button>
-                <button class="mode-btn" onclick="startGame('solo')">👤 单人</button>
-                <button class="mode-btn" onclick="startGame('streak')">⚡ 连胜</button>
+            <!-- 电脑端左右布局 -->
+            <div class="home-grid" style="display: contents;">
+                <div class="home-left">
+                    <div class="tower-main">🗼</div>
+                    <h1 class="title">命运塔·首登者</h1>
+                    <p class="subtitle">攀登极限 · 挑战命运</p>
+                </div>
+                <div class="home-right">
+                    <button class="btn-main" onclick="startGame('solo')">🎮 单人挑战</button>
+                    <button class="btn-main" onclick="startGame('rank')">🏆 排位赛</button>
+                    <div class="modes">
+                        <button class="mode-btn" onclick="startGame('friend')">👥 好友对战</button>
+                        <button class="mode-btn" onclick="startGame('ai')">🤖 AI对战</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 加载 -->
+    <!-- 加载页 -->
     <div id="loading-screen" class="screen">
         <div class="spinner"></div>
-        <div>正在进入游戏...</div>
+        <p style="margin-top: var(--spacing-lg); color: var(--gold);">正在匹配对手...</p>
     </div>
 
-    <!-- 游戏 -->
+    <!-- 游戏界面 -->
     <div id="game-screen" class="screen">
-        <div class="game-header">
+        <div class="game-header safe-area-top">
             <button class="back-btn" onclick="goHome()">←</button>
             <div class="game-info">
-                <div class="label">第 <span id="round-num">1</span> 轮</div>
-                <div class="value" id="timer">15s</div>
+                <div class="label">当前层数</div>
+                <div class="value" id="current-level">1</div>
             </div>
             <div class="game-info">
-                <div class="label">当前层</div>
-                <div class="value" id="current-level">2</div>
+                <div class="label">剩余时间</div>
+                <div class="value" id="timer">30s</div>
+            </div>
+            <div class="game-info">
+                <div class="label">手牌</div>
+                <div class="value" id="hand-count">5</div>
             </div>
         </div>
-
+        
         <div class="tower-section">
-            <div class="tower" id="tower"></div>
-        </div>
-
-        <div class="guard-section">
-            <div class="guard-title">守卫牌 (点击出牌后揭示)</div>
-            <div class="guard-card" id="guard-card">?</div>
-            <div class="guard-title" style="margin-top:10px">激怒牌 (明牌)</div>
-            <div class="provocation" id="provocation"></div>
-        </div>
-
-        <div class="hand-section">
-            <div class="hand-header">
-                <span>剩余手牌: <span id="hand-count">52</span> 张</span>
-                <span id="message">选择一张牌出牌</span>
+            <div class="tower" id="tower">
+                <!-- 塔层由JS动态生成 -->
             </div>
-            <div class="hand-cards" id="hand-cards"></div>
-            <button class="btn-play" id="play-btn" onclick="confirmPlay()">选择一张牌</button>
+            <div class="guardian-section" id="guardians">
+                <!-- 守卫卡牌由JS动态生成 -->
+            </div>
+        </div>
+        
+        <div class="hand-section safe-area-bottom">
+            <div class="hand-label">点击选择卡牌，按数字键1-5快速出牌</div>
+            <div class="hand-cards" id="hand">
+                <!-- 手牌由JS动态生成 -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-control btn-play" onclick="confirmPlay()">出牌 (Space)</button>
+            <button class="btn-control btn-skip" onclick="Game.skip()">跳过 (S)</button>
         </div>
     </div>
 
     <script>
         // ==================== 游戏核心逻辑 ====================
-        // 基于今天讨论的主逻辑:
-        // - 4副牌208张
-        // - 13守卫, 每名守卫13张守卫牌 + 3张激怒牌
-        // - 首登者机制
-        
         const Game = {
-            state: 'home', // home, loading, playing
+            state: 'home',
             mode: 'solo',
-            playerLevel: 1, // 当前在第几层 (0-12对应2-A)
-            round: 1,
-            timer: 15,
-            hand: [], // 玩家手牌
+            currentLevel: 1,
+            maxLevel: 31,
+            hand: [],
             selectedCard: null,
-            guards: [], // 13个守卫
-            firstAscender: null, // 首登者
+            timer: 30,
+            timerInterval: null,
+            guardians: [],
             
-            // 初始化游戏
+            // 初始化
             init() {
-                this.playerLevel = 0;
-                this.round = 1;
-                this.firstAscender = null;
-                this.generateGuards();
-                this.generateHand();
+                this.currentLevel = 1;
+                this.hand = this.generateHand();
+                this.guardians = this.generateGuardians();
+                this.selectedCard = null;
+                this.timer = 30;
                 this.renderTower();
-                this.renderGuard();
                 this.renderHand();
+                this.renderGuardians();
                 this.startTimer();
+                this.setupKeyboard();
             },
             
-            // 生成13个守卫
-            generateGuards() {
-                const suits = ['♥','♦','♣','♠'];
-                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-                this.guards = [];
-                
-                for(let i=0; i<13; i++) {
-                    // 每名守卫13张守卫牌
-                    const guardCards = [];
-                    for(let j=0; j<13; j++) {
-                        guardCards.push({
-                            suit: suits[Math.floor(Math.random()*4)],
-                            rank: ranks[Math.floor(Math.random()*13)]
-                        });
-                    }
-                    // 3张激怒牌
-                    const provocationCards = [];
-                    for(let j=0; j<3; j++) {
-                        provocationCards.push({
-                            suit: suits[Math.floor(Math.random()*4)],
-                            rank: ranks[Math.floor(Math.random()*13)]
-                        });
-                    }
-                    
-                    this.guards.push({
-                        level: i, // 0-12
-                        guardCards: guardCards,
-                        usedGuardCards: [],
-                        provocationCards: provocationCards,
-                        usedProvocationCards: [],
-                        isDefeated: false
+            // 生成手牌
+            generateHand() {
+                const suits = ['♠', '♥', '♣', '♦'];
+                const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+                const hand = [];
+                for(let i = 0; i < 5; i++) {
+                    hand.push({
+                        suit: suits[Math.floor(Math.random() * suits.length)],
+                        rank: ranks[Math.floor(Math.random() * ranks.length)],
+                        value: this.getCardValue(ranks[Math.floor(Math.random() * ranks.length)])
                     });
                 }
+                return hand.sort((a, b) => a.value - b.value);
             },
             
-            // 生成玩家手牌 (完整52张)
-            generateHand() {
-                const suits = ['♥','♦','♣','♠'];
-                const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-                this.hand = [];
-                
-                for(let s of suits) {
-                    for(let r of ranks) {
-                        this.hand.push({
-                            suit: s,
-                            rank: r,
-                            isRed: (s === '♥' || s === '♦')
-                        });
-                    }
-                }
-                // 洗牌
-                this.hand.sort(() => Math.random() - 0.5);
+            // 获取卡牌数值
+            getCardValue(rank) {
+                const values = {'A': 1, 'J': 11, 'Q': 12, 'K': 13};
+                return values[rank] || parseInt(rank);
+            },
+            
+            // 生成守卫
+            generateGuardians() {
+                return [
+                    { level: 'A', color: '#FFD700' },
+                    { level: 'K', color: '#C0C0C0' },
+                    { level: 'Q', color: '#CD7F32' }
+                ];
             },
             
             // 渲染塔
             renderTower() {
                 const tower = document.getElementById('tower');
-                tower.innerHTML = '';
-                const levels = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-                
-                for(let i=0; i<13; i++) {
-                    const div = document.createElement('div');
-                    div.className = `level l${i+1} ${i === this.playerLevel ? 'current' : ''}`;
-                    div.textContent = levels[i];
-                    tower.appendChild(div);
+                const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+                let html = '';
+                for(let i = this.maxLevel; i >= 1; i--) {
+                    const levelClass = i <= 13 ? `l${i}` : `l${i}`;
+                    const isCurrent = i === this.currentLevel;
+                    const levelName = i <= 13 ? levels[i-1] : `${i}F`;
+                    html += `<div class="level ${levelClass} ${isCurrent ? 'current' : ''}" data-level="${i}">${levelName}</div>`;
                 }
-                
-                document.getElementById('current-level').textContent = levels[this.playerLevel];
-            },
-            
-            // 渲染守卫
-            renderGuard() {
-                const guard = this.guards[this.playerLevel];
-                const provDiv = document.getElementById('provocation');
-                provDiv.innerHTML = '';
-                
-                // 显示激怒牌 (明牌)
-                for(let card of guard.provocationCards) {
-                    const div = document.createElement('div');
-                    div.className = 'provocation-card';
-                    div.innerHTML = `${card.suit}${card.rank}`;
-                    provDiv.appendChild(div);
-                }
+                tower.innerHTML = html;
             },
             
             // 渲染手牌
             renderHand() {
-                const container = document.getElementById('hand-cards');
-                container.innerHTML = '';
-                
-                // 显示前7张
-                const displayCards = this.hand.slice(0, 7);
-                
-                displayCards.forEach((card, index) => {
-                    const div = document.createElement('div');
-                    div.className = `card ${card.isRed ? 'red' : 'black'} ${this.selectedCard === index ? 'selected' : ''}`;
-                    div.innerHTML = `<div class="suit">${card.suit}</div><div class="rank">${card.rank}</div>`;
-                    div.onclick = () => this.selectCard(index);
-                    container.appendChild(div);
-                });
-                
+                const hand = document.getElementById('hand');
+                hand.innerHTML = this.hand.map((card, index) => `
+                    <div class="card ${this.getSuitColor(card.suit)} ${this.selectedCard === index ? 'selected' : ''}" 
+                         onclick="Game.selectCard(${index})"
+                         data-index="${index}">
+                        <div class="card-rank">${card.rank}</div>
+                        <div class="card-suit">${card.suit}</div>
+                    </div>
+                `).join('');
                 document.getElementById('hand-count').textContent = this.hand.length;
-                this.updatePlayButton();
+            },
+            
+            // 渲染守卫
+            renderGuardians() {
+                const guardians = document.getElementById('guardians');
+                guardians.innerHTML = this.guardians.map(g => `
+                    <div class="guard-card" style="border-color: ${g.color}">
+                        <div>🛡️</div>
+                        <div>${g.level}</div>
+                    </div>
+                `).join('');
+            },
+            
+            // 获取花色颜色
+            getSuitColor(suit) {
+                return (suit === '♥' || suit === '♦') ? 'red' : 'black';
             },
             
             // 选择卡牌
             selectCard(index) {
-                this.selectedCard = (this.selectedCard === index) ? null : index;
+                this.selectedCard = this.selectedCard === index ? null : index;
                 this.renderHand();
             },
             
-            // 更新出牌按钮
-            updatePlayButton() {
-                const btn = document.getElementById('play-btn');
-                if(this.selectedCard !== null) {
-                    btn.classList.add('active');
-                    btn.textContent = '确认出牌';
-                } else {
-                    btn.classList.remove('active');
-                    btn.textContent = '选择一张牌';
-                }
-            },
-            
-            // 确认出牌
+            // 出牌
             play() {
                 if(this.selectedCard === null) return;
                 
-                const playerCard = this.hand[this.selectedCard];
-                const guard = this.guards[this.playerLevel];
+                const card = this.hand[this.selectedCard];
+                const success = this.checkWin(card);
                 
-                // 守卫出一张牌
-                const guardCard = guard.guardCards.pop();
-                guard.usedGuardCards.push(guardCard);
-                
-                // 揭示守卫牌
-                const guardCardEl = document.getElementById('guard-card');
-                guardCardEl.textContent = guardCard.suit + guardCard.rank;
-                guardCardEl.classList.add('revealed');
-                
-                // 判断是否匹配 (花色或点数相同则前进)
-                const isMatch = (playerCard.suit === guardCard.suit) || (playerCard.rank === guardCard.rank);
-                
-                // 检查激怒牌 (3/6/9层守卫主动使用)
-                let provocationTriggered = false;
-                if([2,5,8].includes(this.playerLevel) && guard.provocationCards.length > 0) {
-                    const provCard = guard.provocationCards[0];
-                    // 如果激怒牌匹配, 回退
-                    if(playerCard.suit === provCard.suit || playerCard.rank === provCard.rank) {
-                        provocationTriggered = true;
+                if(success) {
+                    this.currentLevel++;
+                    this.hand.splice(this.selectedCard, 1);
+                    this.hand.push(this.drawCard());
+                    
+                    if(this.currentLevel > this.maxLevel) {
+                        alert('🏆 恭喜！你成功登顶命运塔！');
+                        goHome();
+                        return;
                     }
+                } else {
+                    // 挑战失败逻辑
+                    alert('💥 挑战失败！守卫太强了！');
                 }
                 
-                // 从手牌移除
-                this.hand.splice(this.selectedCard, 1);
                 this.selectedCard = null;
-                
-                // 显示结果
-                setTimeout(() => {
-                    if(provocationTriggered) {
-                        alert('💥 激怒牌触发! 回退一层');
-                        if(this.playerLevel > 0) this.playerLevel--;
-                    } else if(isMatch) {
-                        alert('✅ 匹配成功! 前进一层');
-                        this.playerLevel++;
-                        // 检查是否登顶
-                        if(this.playerLevel >= 12) {
-                            this.becomeFirstAscender();
-                            return;
-                        }
-                    } else {
-                        alert('❌ 不匹配, 留在本层');
-                    }
-                    
-                    this.round++;
-                    this.renderTower();
-                    this.renderGuard();
-                    this.renderHand();
-                    document.getElementById('round-num').textContent = this.round;
-                    
-                    // 重置守卫牌显示
-                    guardCardEl.textContent = '?';
-                    guardCardEl.classList.remove('revealed');
-                    
-                    this.resetTimer();
-                }, 500);
+                this.renderTower();
+                this.renderHand();
+                this.resetTimer();
             },
             
-            // 成为首登者
-            becomeFirstAscender() {
-                this.firstAscender = 'player';
-                alert('🎉 恭喜! 你成为首登者! 现在你需要防守其他玩家的进攻。');
-                this.playerLevel = 12; // 保持在A层
-                this.renderTower();
+            // 抽卡
+            drawCard() {
+                const suits = ['♠', '♥', '♣', '♦'];
+                const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+                const rank = ranks[Math.floor(Math.random() * ranks.length)];
+                return {
+                    suit: suits[Math.floor(Math.random() * suits.length)],
+                    rank: rank,
+                    value: this.getCardValue(rank)
+                };
+            },
+            
+            // 检查胜负
+            checkWin(card) {
+                // 简化逻辑：A-K对应1-13层，其余随机
+                if(this.currentLevel <= 13) {
+                    const levelValue = 14 - this.currentLevel; // A=13, K=1
+                    return card.value >= levelValue;
+                }
+                return Math.random() > 0.3;
+            },
+            
+            // 跳过
+            skip() {
+                this.selectedCard = null;
+                this.renderHand();
+                this.resetTimer();
+            },
+            
+            // 键盘控制
+            setupKeyboard() {
+                document.onkeydown = (e) => {
+                    if(this.state !== 'game') return;
+                    
+                    if(e.key >= '1' && e.key <= '5') {
+                        const index = parseInt(e.key) - 1;
+                        if(index < this.hand.length) {
+                            this.selectCard(index);
+                        }
+                    } else if(e.code === 'Space') {
+                        e.preventDefault();
+                        this.play();
+                    } else if(e.key === 's' || e.key === 'S') {
+                        this.skip();
+                    }
+                };
             },
             
             // 计时器
             startTimer() {
-                this.timer = 15;
+                clearInterval(this.timerInterval);
                 this.updateTimerDisplay();
                 
                 this.timerInterval = setInterval(() => {
@@ -436,6 +743,7 @@
             
             resetTimer() {
                 clearInterval(this.timerInterval);
+                this.timer = 30;
                 this.startTimer();
             },
             
