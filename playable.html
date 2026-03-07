@@ -11,34 +11,106 @@
             height: 100%; 
             overflow: hidden; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
             color: #fff; 
             font-size: 14px;
         }
         
-        .app { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
+        /* 外层框架容器 */
+        .outer-frame {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid transparent;
+            background: linear-gradient(#1a1a2e, #16213e) padding-box,
+                        linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #ff4757 50%, #4dabf7 75%, #FFD700 100%) border-box;
+            box-shadow: inset 0 0 50px rgba(255,215,0,0.1), 0 0 30px rgba(255,215,0,0.3);
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background: linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,165,0,0.2) 50%, rgba(255,215,0,0.15) 100%);
+            border-bottom: 2px solid rgba(255,215,0,0.4);
+            box-shadow: 0 2px 10px rgba(255,215,0,0.2);
+            flex-shrink: 0;
+        }
+        
+        .nav-item {
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #FFD700;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1));
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,165,0,0.3));
+            box-shadow: 0 0 15px rgba(255,215,0,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.vip {
+            background: linear-gradient(135deg, rgba(147, 112, 219, 0.3), rgba(138, 43, 226, 0.3));
+            border-color: #9370DB;
+            color: #DDA0DD;
+        }
+        
+        .nav-item.vip:hover {
+            box-shadow: 0 0 15px rgba(147, 112, 219, 0.5);
+        }
+        
+        .nav-item.tournament {
+            background: linear-gradient(135deg, rgba(255,71,79,0.2), rgba(220,20,60,0.2));
+            border-color: #ff4757;
+            color: #ff6b6b;
+        }
+        
+        .nav-item.tournament:hover {
+            box-shadow: 0 0 15px rgba(255,71,79,0.4);
+        }
+        
+        .nav-separator {
+            color: rgba(255,215,0,0.4);
+            font-size: 10px;
+        }
+        
+        /* 游戏主容器 */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             max-width: 100%;
             margin: 0 auto;
             position: relative;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
         
         /* 背景音乐 */
         #bgMusic { display: none; }
         #musicToggle {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 50px;
+            right: 15px;
             z-index: 1000;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             border: 1px solid #FFD700;
             color: #FFD700;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
         }
         
@@ -47,34 +119,35 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 15px;
+            padding: 6px 10px;
             background: linear-gradient(90deg, rgba(255,71,79,0.9) 0%, rgba(30,30,50,0.95) 30%, rgba(30,30,50,0.95) 70%, rgba(52,152,219,0.9) 100%);
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
             z-index: 100;
             border-bottom: 2px solid #FFD700;
+            flex-shrink: 0;
         }
         
         .team-section {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .team-panda {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         
         .team-wolf {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             flex-direction: row-reverse;
         }
         
         .team-icon {
-            font-size: 28px;
+            font-size: 22px;
         }
         
         .team-info {
@@ -82,7 +155,7 @@
         }
         
         .team-name {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
@@ -91,16 +164,16 @@
         .team-wolf .team-name { color: #4dabf7; }
         
         .team-count {
-            font-size: 11px;
+            font-size: 9px;
             color: #ccc;
         }
         
         .vs-badge {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #FFD700;
             text-shadow: 0 0 10px rgba(255,215,0,0.8);
-            padding: 4px 12px;
+            padding: 3px 10px;
             background: rgba(0,0,0,0.4);
             border-radius: 15px;
             border: 1px solid #FFD700;
@@ -108,29 +181,29 @@
         
         .team-avatars {
             display: flex;
-            gap: 4px;
+            gap: 3px;
         }
         
         .team-avatar {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: linear-gradient(135deg, #333, #555);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             border: 2px solid;
         }
         
         .team-panda .team-avatar {
             border-color: #ff6b6b;
-            box-shadow: 0 0 8px rgba(255,107,107,0.4);
+            box-shadow: 0 0 6px rgba(255,107,107,0.4);
         }
         
         .team-wolf .team-avatar {
             border-color: #4dabf7;
-            box-shadow: 0 0 8px rgba(77,171,247,0.4);
+            box-shadow: 0 0 6px rgba(77,171,247,0.4);
         }
         
         /* ===== 主战场区域 - 左中右三栏 ===== */
@@ -140,13 +213,14 @@
             overflow: hidden;
             background: rgba(0,0,0,0.2);
             position: relative;
+            min-height: 0;
         }
         
         /* ===== 左侧 - 层叠区域 ===== */
         .layer-panel {
             width: 22%;
-            min-width: 85px;
-            max-width: 120px;
+            min-width: 80px;
+            max-width: 110px;
             background: linear-gradient(180deg, rgba(20,20,40,0.95) 0%, rgba(30,30,60,0.9) 100%);
             border-right: 2px solid rgba(255,215,0,0.3);
             display: flex;
@@ -156,19 +230,21 @@
         
         .layer-panel-title {
             text-align: center;
-            padding: 8px 4px;
-            font-size: 11px;
+            padding: 6px 3px;
+            font-size: 10px;
             color: #FFD700;
             border-bottom: 1px solid rgba(255,215,0,0.2);
             font-weight: bold;
+            flex-shrink: 0;
         }
         
         .layer-list {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 4px;
+            padding: 3px;
             overflow-y: auto;
+            min-height: 0;
         }
         
         .layer-item {
@@ -176,20 +252,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 2px 6px;
+            padding: 2px 4px;
             margin: 1px 0;
             background: rgba(255,255,255,0.05);
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             position: relative;
-            min-height: 28px;
+            min-height: 24px;
         }
         
         .layer-item.current {
-            background: linear-gradient(90deg, rgba(255,215,0,0.3), rgba(255,165,0,0.2));
-            border: 1px solid #FFD700;
-            box-shadow: 0 0 10px rgba(255,215,0,0.3);
+            background: linear-gradient(90deg, rgba(255,215,0,0.4), rgba(255,165,0,0.3));
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 12px rgba(255,215,0,0.5);
+            animation: layer-pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes layer-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 16px rgba(255,215,0,0.7); }
         }
         
         .layer-item.start-layer {
@@ -198,13 +280,13 @@
         }
         
         .layer-rank {
-            width: 24px;
+            width: 20px;
             text-align: center;
             text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
         
         /* 层级颜色 */
-        .layer-item[data-rank="A"] .layer-rank { color: #FFD700; font-size: 16px; }
+        .layer-item[data-rank="A"] .layer-rank { color: #FFD700; font-size: 14px; }
         .layer-item[data-rank="K"] .layer-rank { color: #C0C0C0; }
         .layer-item[data-rank="Q"] .layer-rank { color: #CD7F32; }
         .layer-item[data-rank="J"] .layer-rank { color: #8B7355; }
@@ -223,31 +305,36 @@
             flex-wrap: wrap;
             gap: 2px;
             justify-content: flex-end;
-            max-width: 50px;
+            max-width: 45px;
         }
         
         .layer-player-icon {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: linear-gradient(135deg, #FFD700, #FFA500);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             border: 1px solid #fff;
             box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
         
         .layer-player-icon.self {
             border-color: #00ff00;
-            box-shadow: 0 0 8px rgba(0,255,0,0.8);
-            animation: pulse-self 1.5s infinite;
+            box-shadow: 0 0 8px rgba(0,255,0,0.9);
+            animation: pulse-self 1s infinite;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            z-index: 10;
         }
         
         @keyframes pulse-self {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+            50% { transform: scale(1.2); }
         }
         
         .layer-player-icon.panda-team {
@@ -258,15 +345,35 @@
             background: linear-gradient(135deg, #4dabf7, #2980b9);
         }
         
+        .layer-player-icon.moving-up {
+            animation: move-up 0.5s ease;
+        }
+        
+        .layer-player-icon.moving-down {
+            animation: move-down 0.5s ease;
+        }
+        
+        @keyframes move-up {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.3); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes move-down {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(10px) scale(1.3); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        
         .start-layer-label {
             position: absolute;
-            bottom: 4px;
+            bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 9px;
+            font-size: 8px;
             color: #4ade80;
             background: rgba(0,0,0,0.6);
-            padding: 1px 4px;
+            padding: 1px 3px;
             border-radius: 3px;
             white-space: nowrap;
         }
@@ -282,11 +389,12 @@
         
         .tower-header {
             text-align: center;
-            padding: 8px;
-            font-size: 13px;
+            padding: 6px;
+            font-size: 11px;
             color: #FFD700;
             border-bottom: 1px solid rgba(255,215,0,0.2);
             font-weight: bold;
+            flex-shrink: 0;
         }
         
         .tower-container {
@@ -296,11 +404,12 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            min-height: 0;
         }
         
         .tower-image {
-            height: 90%;
-            max-width: 70%;
+            height: 85%;
+            max-width: 65%;
             object-fit: contain;
             filter: drop-shadow(0 4px 20px rgba(0,0,0,0.6));
             opacity: 0.6;
@@ -309,14 +418,14 @@
         /* 守卫层叠显示 */
         .guard-layers {
             position: absolute;
-            top: 5%;
+            top: 3%;
             left: 5%;
             right: 5%;
-            bottom: 5%;
+            bottom: 3%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 4px 0;
+            padding: 2px 0;
         }
         
         .guard-layer {
@@ -324,20 +433,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             margin: 1px 0;
             position: relative;
         }
         
         .guard-icon {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: linear-gradient(135deg, #666, #444);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
             border: 2px solid #888;
             box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
@@ -361,19 +470,19 @@
         
         .guard-cards-hidden {
             display: flex;
-            gap: 3px;
+            gap: 2px;
         }
         
         .guard-card-hidden {
-            width: 18px;
-            height: 24px;
+            width: 14px;
+            height: 20px;
             background: linear-gradient(135deg, #1a1a3e, #2d2d5a);
             border: 1px solid #666;
             border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
             color: #888;
         }
         
@@ -386,26 +495,26 @@
         /* 当前守卫显示 */
         .current-guard-display {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.85);
             border: 2px solid #ff4757;
             border-radius: 10px;
-            padding: 10px 15px;
+            padding: 8px 12px;
             text-align: center;
             z-index: 50;
         }
         
         .current-guard-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #aaa;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         
         .current-guard-card {
-            width: 50px;
-            height: 70px;
+            width: 44px;
+            height: 60px;
             background: linear-gradient(135deg, #1a1a3e, #2d2d5a);
             border: 2px solid #FFD700;
             border-radius: 6px;
@@ -413,31 +522,39 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             margin: 0 auto;
+            transition: all 0.3s ease;
         }
         
         .current-guard-card.revealed {
             background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            animation: card-reveal 0.5s ease;
+        }
+        
+        @keyframes card-reveal {
+            0% { transform: scale(0.8) rotateY(0deg); }
+            50% { transform: scale(1.1) rotateY(90deg); }
+            100% { transform: scale(1) rotateY(0deg); }
         }
         
         .current-guard-card.revealed.red { color: #d00; }
         .current-guard-card.revealed.black { color: #000; }
         
-        .current-guard-card .suit { font-size: 28px; }
-        .current-guard-card .rank { font-size: 14px; font-weight: bold; margin-top: 2px; }
+        .current-guard-card .suit { font-size: 24px; }
+        .current-guard-card .rank { font-size: 12px; font-weight: bold; margin-top: 2px; }
         
         .guard-remaining {
-            font-size: 11px;
+            font-size: 10px;
             color: #FFD700;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         
         /* ===== 右侧 - 激怒牌面板 ===== */
         .provoke-panel {
-            width: 28%;
-            min-width: 110px;
-            max-width: 150px;
+            width: 26%;
+            min-width: 100px;
+            max-width: 140px;
             background: linear-gradient(180deg, rgba(40,10,10,0.95) 0%, rgba(60,15,15,0.9) 100%);
             border-left: 2px solid rgba(255,71,79,0.4);
             display: flex;
@@ -446,20 +563,22 @@
         
         .provoke-panel-title {
             text-align: center;
-            padding: 8px 4px;
-            font-size: 11px;
+            padding: 6px 3px;
+            font-size: 10px;
             color: #ff6b6b;
             border-bottom: 1px solid rgba(255,71,79,0.3);
             font-weight: bold;
             text-shadow: 0 0 8px rgba(255,71,79,0.5);
+            flex-shrink: 0;
         }
         
         .provoke-list {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 4px;
+            padding: 3px;
             overflow-y: auto;
+            min-height: 0;
         }
         
         .provoke-layer {
@@ -467,102 +586,113 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 2px;
             padding: 2px;
             margin: 1px 0;
             background: rgba(0,0,0,0.2);
             border-radius: 4px;
-            min-height: 28px;
+            min-height: 24px;
         }
         
         .provoke-layer.current {
-            background: linear-gradient(90deg, rgba(255,0,0,0.4), rgba(200,0,0,0.3));
+            background: linear-gradient(90deg, rgba(255,0,0,0.5), rgba(200,0,0,0.4));
             border: 2px solid #ff0000;
-            box-shadow: 0 0 15px rgba(255,0,0,0.5);
-            animation: provoke-pulse 1s infinite;
+            box-shadow: 0 0 20px rgba(255,0,0,0.6), inset 0 0 10px rgba(255,0,0,0.3);
+            animation: provoke-pulse 0.8s infinite;
         }
         
         @keyframes provoke-pulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255,0,0,0.5); }
-            50% { box-shadow: 0 0 20px rgba(255,0,0,0.8); }
+            0%, 100% { box-shadow: 0 0 15px rgba(255,0,0,0.6); transform: scale(1); }
+            50% { box-shadow: 0 0 30px rgba(255,0,0,0.9); transform: scale(1.02); }
         }
         
         .provoke-card {
-            width: 26px;
-            height: 34px;
+            width: 22px;
+            height: 30px;
             background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
             border-radius: 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             border: 1px solid #ccc;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
         
-        .provoke-card.red { color: #d00; }
-        .provoke-card.black { color: #000; }
-        .provoke-card .suit { font-size: 14px; }
-        .provoke-card .rank { font-size: 9px; font-weight: bold; }
+        .provoke-layer.current .provoke-card {
+            animation: provoke-card-glow 0.8s infinite;
+        }
+        
+        @keyframes provoke-card-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(255,0,0,0.5); }
+            50% { box-shadow: 0 0 15px rgba(255,0,0,0.8); }
+        }
+        
+        .provoke-card.red { color: #d00; border-color: #ff6b6b; }
+        .provoke-card.black { color: #000; border-color: #666; }
+        .provoke-card .suit { font-size: 12px; }
+        .provoke-card .rank { font-size: 8px; font-weight: bold; }
         
         /* ===== 底部 - 手牌区域 ===== */
         .bottom-area {
-            flex: 0 0 35%;
-            min-height: 180px;
+            flex: 0 0 32%;
+            min-height: 160px;
             background: linear-gradient(180deg, #1a1a3e 0%, #0f0f1e 100%);
             border-top: 2px solid #333;
             display: flex;
             flex-direction: column;
-            padding: 8px;
+            padding: 6px;
             box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         
         .player-status-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 10px;
+            padding: 5px 8px;
             background: rgba(255,215,0,0.1);
             border-radius: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .player-status {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .player-avatar-main {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, #FFD700, #FFA500);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             border: 2px solid #fff;
             box-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
         
-        .player-details { font-size: 11px; }
+        .player-details { font-size: 10px; }
         .player-name { font-weight: bold; color: #FFD700; }
-        .player-level { color: #aaa; font-size: 10px; }
+        .player-level { color: #aaa; font-size: 9px; }
         
         .turn-info {
             text-align: right;
         }
         
         .turn-status {
-            font-size: 12px;
+            font-size: 11px;
             color: #4ade80;
             font-weight: bold;
         }
         
         .round-info {
-            font-size: 10px;
+            font-size: 9px;
             color: #888;
         }
         
@@ -571,23 +701,24 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            min-height: 0;
         }
         
         .hand-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4px;
+            padding: 0 3px;
         }
         
-        .hand-title { font-size: 11px; color: #888; }
+        .hand-title { font-size: 10px; color: #888; }
         
         .hand-count { 
-            font-size: 10px; 
+            font-size: 9px; 
             color: #FFD700; 
             background: rgba(255,215,0,0.1);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
         }
         
@@ -595,37 +726,37 @@
             flex: 1;
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 8px 4px;
+            padding: 6px 3px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: rgba(255,215,0,0.5) rgba(0,0,0,0.3);
+            min-height: 0;
         }
         
         .hand-cards-container::-webkit-scrollbar {
-            height: 8px;
+            height: 6px;
         }
         
         .hand-cards-container::-webkit-scrollbar-track {
             background: rgba(0,0,0,0.3);
-            border-radius: 4px;
+            border-radius: 3px;
         }
         
         .hand-cards-container::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, rgba(255,215,0,0.6), rgba(255,165,0,0.6));
-            border-radius: 4px;
-            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 3px;
         }
         
         .hand-cards {
             display: flex;
-            gap: 4px;
-            padding: 4px;
+            gap: 3px;
+            padding: 3px;
             min-width: max-content;
         }
         
         .hand-card {
-            width: 38px;
-            height: 54px;
+            width: 34px;
+            height: 48px;
             background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
             border-radius: 5px;
             display: flex;
@@ -639,38 +770,38 @@
             border: 2px solid transparent;
         }
         
-        .hand-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .hand-card:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
         
         .hand-card.selected { 
-            transform: translateY(-8px) scale(1.05); 
-            box-shadow: 0 8px 20px rgba(255,215,0,0.6);
+            transform: translateY(-6px) scale(1.05); 
+            box-shadow: 0 6px 15px rgba(255,215,0,0.6);
             border-color: #FFD700;
         }
         
         .hand-card.red { color: #d00; }
         .hand-card.black { color: #000; }
-        .hand-card .suit { font-size: 18px; }
-        .hand-card .rank { font-size: 11px; font-weight: bold; }
+        .hand-card .suit { font-size: 16px; }
+        .hand-card .rank { font-size: 10px; font-weight: bold; }
         
         /* 出牌按钮区域 */
         .play-section {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
-            padding: 6px;
+            padding: 5px;
             background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            margin-top: 6px;
+            border-radius: 8px;
+            margin-top: 4px;
         }
         
         .play-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             background: linear-gradient(135deg, #333, #444);
             color: #666;
             border: 2px solid #555;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: bold;
             cursor: not-allowed;
             opacity: 0.7;
@@ -687,28 +818,108 @@
         
         @keyframes pulse-btn {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
+            50% { transform: scale(1.02); }
         }
         
-        /* 日志 */
+        /* 日志区域 */
         .log-section {
-            max-height: 50px;
+            max-height: 45px;
             overflow-y: auto;
             background: rgba(0,0,0,0.3);
             border-radius: 6px;
-            padding: 5px;
+            padding: 4px;
             font-size: 9px;
-            margin-top: 6px;
+            margin-top: 4px;
         }
         
         .log-entry { 
             display: flex; 
-            gap: 5px; 
+            gap: 4px; 
             padding: 2px 0; 
             border-bottom: 1px solid #222; 
         }
         
         .log-entry:last-child { border-bottom: none; }
+        
+        /* 底部游戏记录区域 */
+        .game-records {
+            padding: 6px 10px;
+            background: linear-gradient(180deg, rgba(30,30,50,0.95) 0%, rgba(20,20,40,0.9) 100%);
+            border-top: 2px solid rgba(255,215,0,0.3);
+            flex-shrink: 0;
+        }
+        
+        .records-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .records-title {
+            font-size: 11px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .records-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .record-tab {
+            font-size: 9px;
+            color: #888;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        
+        .record-tab.active {
+            color: #FFD700;
+            background: rgba(255,215,0,0.15);
+        }
+        
+        .records-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0;
+            font-size: 9px;
+        }
+        
+        .record-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        
+        .record-item .avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .record-item .action {
+            color: #aaa;
+        }
+        
+        .record-item .result-win {
+            color: #4ade80;
+        }
+        
+        .record-item .result-lose {
+            color: #ff6b6b;
+        }
         
         /* 提示框 */
         .player-tooltip {
@@ -727,42 +938,88 @@
         
         .player-tooltip.show { opacity: 1; }
         
+        /* 层数变化动画提示 */
+        .layer-change-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+        
+        .layer-change-toast.show {
+            opacity: 1;
+            animation: toast-pop 1s ease;
+        }
+        
+        .layer-change-toast.up {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.9), rgba(34, 197, 94, 0.9));
+            color: #fff;
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
+        }
+        
+        .layer-change-toast.down {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(220, 53, 69, 0.9));
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
+        }
+        
+        @keyframes toast-pop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
         /* 响应式适配 */
         @media (max-width: 768px) {
-            .team-icon { font-size: 22px; }
-            .team-name { font-size: 11px; }
-            .vs-badge { font-size: 14px; padding: 3px 8px; }
-            .team-avatar { width: 24px; height: 24px; font-size: 14px; }
+            .outer-frame { border-width: 5px; }
+            .top-nav { gap: 8px; padding: 6px 10px; }
+            .nav-item { padding: 4px 8px; font-size: 10px; }
+            .nav-separator { display: none; }
             
-            .layer-panel { width: 20%; min-width: 70px; }
-            .layer-rank { font-size: 12px; }
-            .layer-player-icon { width: 16px; height: 16px; font-size: 9px; }
+            .team-icon { font-size: 18px; }
+            .team-name { font-size: 9px; }
+            .vs-badge { font-size: 12px; padding: 2px 6px; }
+            .team-avatar { width: 20px; height: 20px; font-size: 12px; }
             
-            .provoke-panel { width: 26%; min-width: 90px; }
-            .provoke-card { width: 22px; height: 30px; }
-            .provoke-card .suit { font-size: 12px; }
-            .provoke-card .rank { font-size: 8px; }
+            .layer-panel { width: 20%; min-width: 65px; }
+            .layer-rank { font-size: 10px; }
+            .layer-player-icon { width: 14px; height: 14px; font-size: 8px; }
             
-            .guard-icon { width: 20px; height: 20px; font-size: 12px; }
-            .guard-card-hidden { width: 16px; height: 22px; font-size: 12px; }
+            .provoke-panel { width: 24%; min-width: 80px; }
+            .provoke-card { width: 18px; height: 26px; }
+            .provoke-card .suit { font-size: 10px; }
+            .provoke-card .rank { font-size: 7px; }
             
-            .hand-card { width: 34px; height: 48px; }
-            .hand-card .suit { font-size: 16px; }
-            .hand-card .rank { font-size: 10px; }
+            .guard-icon { width: 18px; height: 18px; font-size: 10px; }
+            .guard-card-hidden { width: 14px; height: 18px; font-size: 10px; }
             
-            .current-guard-card { width: 44px; height: 60px; }
-            .current-guard-card .suit { font-size: 22px; }
+            .hand-card { width: 30px; height: 42px; }
+            .hand-card .suit { font-size: 14px; }
+            .hand-card .rank { font-size: 9px; }
+            
+            .current-guard-card { width: 38px; height: 52px; }
+            .current-guard-card .suit { font-size: 20px; }
+            
+            .bottom-area { flex: 0 0 30%; min-height: 140px; }
         }
         
         @media (max-width: 393px) {
-            .layer-panel { width: 18%; min-width: 60px; }
-            .provoke-panel { width: 24%; min-width: 80px; }
-            .provoke-card { width: 18px; height: 26px; }
-            .hand-card { width: 30px; height: 42px; }
+            .layer-panel { width: 18%; min-width: 55px; }
+            .provoke-panel { width: 22%; min-width: 70px; }
+            .provoke-card { width: 16px; height: 22px; }
+            .hand-card { width: 26px; height: 36px; }
         }
         
         @media (min-width: 769px) {
-            .app { max-width: 800px; }
+            .game-container { max-width: 750px; }
             .layer-panel { width: 18%; }
             .provoke-panel { width: 22%; }
         }
@@ -774,111 +1031,148 @@
     </audio>
     <button id="musicToggle" onclick="toggleMusic()">🎵</button>
     
-    <div class="app">
-        <!-- 顶部团队战标题 -->
-        <div class="team-battle-header">
-            <div class="team-section team-panda">
-                <div class="team-icon">🐼</div>
-                <div class="team-info">
-                    <div class="team-name">熊猫战队</div>
-                    <div class="team-count">4人</div>
-                </div>
-                <div class="team-avatars" id="pandaAvatars">
-                    <div class="team-avatar">😺</div>
-                    <div class="team-avatar">🦁</div>
-                    <div class="team-avatar">🐯</div>
-                    <div class="team-avatar">🦊</div>
-                </div>
-            </div>
-            
-            <div class="vs-badge">VS</div>
-            
-            <div class="team-section team-wolf">
-                <div class="team-icon">🐺</div>
-                <div class="team-info">
-                    <div class="team-name">战狼战队</div>
-                    <div class="team-count">4人</div>
-                </div>
-                <div class="team-avatars" id="wolfAvatars">
-                    <div class="team-avatar">🐺</div>
-                    <div class="team-avatar">🐻</div>
-                    <div class="team-avatar">🐼</div>
-                    <div class="team-avatar">🐨</div>
-                </div>
-            </div>
-        </div>
+    <div class="outer-frame">
+        <!-- 顶部导航栏 -->
+        <nav class="top-nav">
+            <a class="nav-item" href="shop.html">🏪 商城</a>
+            <span class="nav-separator">|</span>
+            <a class="nav-item" href="profile.html">👤 个人中心</a>
+            <span class="nav-separator">|</span>
+            <a class="nav-item vip" href="vip.html">👑 VIP</a>
+            <span class="nav-separator">|</span>
+            <a class="nav-item" href="streak.html">🔥 连胜模式</a>
+            <span class="nav-separator">|</span>
+            <a class="nav-item tournament" href="tournament.html">🏆 锦标赛</a>
+        </nav>
         
-        <!-- 主战场 - 左中右三栏 -->
-        <div class="battlefield">
-            <!-- 左侧 - 层叠区域 -->
-            <div class="layer-panel">
-                <div class="layer-panel-title">🏔️ 层叠区</div>
-                <div class="layer-list" id="layerList"></div>
+        <div class="game-container">
+            <!-- 顶部团队战标题 -->
+            <div class="team-battle-header">
+                <div class="team-section team-panda">
+                    <div class="team-icon">🐼</div>
+                    <div class="team-info">
+                        <div class="team-name">熊猫战队</div>
+                        <div class="team-count">4人</div>
+                    </div>
+                    <div class="team-avatars" id="pandaAvatars">
+                        <div class="team-avatar">😺</div>
+                        <div class="team-avatar">🦁</div>
+                        <div class="team-avatar">🐯</div>
+                        <div class="team-avatar">🦊</div>
+                    </div>
+                </div>
+                
+                <div class="vs-badge">VS</div>
+                
+                <div class="team-section team-wolf">
+                    <div class="team-icon">🐺</div>
+                    <div class="team-info">
+                        <div class="team-name">战狼战队</div>
+                        <div class="team-count">4人</div>
+                    </div>
+                    <div class="team-avatars" id="wolfAvatars">
+                        <div class="team-avatar">🐺</div>
+                        <div class="team-avatar">🐻</div>
+                        <div class="team-avatar">🐼</div>
+                        <div class="team-avatar">🐨</div>
+                    </div>
+                </div>
             </div>
             
-            <!-- 中间 - 塔+守卫区域 -->
-            <div class="tower-panel">
-                <div class="tower-header" id="towerHeader">🏰 埃菲尔铁塔</div>
-                <div class="tower-container">
-                    <img src="assets/towers/eiffel-tower.png" class="tower-image" id="towerImage" alt="命运塔" 
-                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><text y=%22150%22 font-size=%22120%22 text-anchor=%22middle%22>🗼</text></svg>'">
-                    
-                    <!-- 守卫层叠 -->
-                    <div class="guard-layers" id="guardLayers"></div>
-                    
-                    <!-- 当前守卫显示 -->
-                    <div class="current-guard-display" id="currentGuardDisplay">
-                        <div class="current-guard-label">守卫牌</div>
-                        <div class="current-guard-card" id="currentGuardCard">
-                            <span style="font-size:24px">❓</span>
+            <!-- 主战场 - 左中右三栏 -->
+            <div class="battlefield">
+                <!-- 左侧 - 层叠区域 -->
+                <div class="layer-panel">
+                    <div class="layer-panel-title">🏔️ 层叠区</div>
+                    <div class="layer-list" id="layerList"></div>
+                </div>
+                
+                <!-- 中间 - 塔+守卫区域 -->
+                <div class="tower-panel">
+                    <div class="tower-header" id="towerHeader">🏰 埃菲尔铁塔</div>
+                    <div class="tower-container">
+                        <img src="assets/towers/eiffel-tower.png" class="tower-image" id="towerImage" alt="命运塔" 
+                             onerror="this.src='data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22&gt;&lt;text y=%22150%22 font-size=%22120%22 text-anchor=%22middle%22&gt;🗼&lt;/text&gt;&lt;/svg&gt;'">
+                        
+                        <!-- 守卫层叠 -->
+                        <div class="guard-layers" id="guardLayers"></div>
+                        
+                        <!-- 当前守卫显示 -->
+                        <div class="current-guard-display" id="currentGuardDisplay">
+                            <div class="current-guard-label">守卫牌</div>
+                            <div class="current-guard-card" id="currentGuardCard">
+                                <span style="font-size:24px">❓</span>
+                            </div>
+                            <div class="guard-remaining">剩余: <span id="guardCardsLeft">13</span></div>
                         </div>
-                        <div class="guard-remaining">剩余: <span id="guardCardsLeft">13</span></div>
                     </div>
+                </div>
+                
+                <!-- 右侧 - 激怒牌面板 -->
+                <div class="provoke-panel">
+                    <div class="provoke-panel-title">⚠️ 13层激怒牌</div>
+                    <div class="provoke-list" id="provokeList"></div>
                 </div>
             </div>
             
-            <!-- 右侧 - 激怒牌面板 -->
-            <div class="provoke-panel">
-                <div class="provoke-panel-title">⚠️ 13层激怒牌</div>
-                <div class="provoke-list" id="provokeList"></div>
+            <!-- 底部 - 手牌区域 -->
+            <div class="bottom-area">
+                <div class="player-status-bar">
+                    <div class="player-status">
+                        <div class="player-avatar-main" id="myAvatar">😺</div>
+                        <div class="player-details">
+                            <div class="player-name">我 (黄金)</div>
+                            <div class="player-level" id="myLevelDisplay">第 2 层 (出发层)</div>
+                        </div>
+                    </div>
+                    <div class="turn-info">
+                        <div class="turn-status">🎯 你的回合</div>
+                        <div class="round-info">第 <span id="roundNum">1</span> 轮</div>
+                    </div>
+                </div>
+                
+                <div class="hand-section">
+                    <div class="hand-header">
+                        <span class="hand-title">🎴 我的手牌 (52张)</span>
+                        <span class="hand-count" id="handCount">52张</span>
+                    </div>
+                    <div class="hand-cards-container">
+                        <div class="hand-cards" id="handCards"></div>
+                    </div>
+                </div>
+                
+                <div class="play-section">
+                    <button class="play-btn" id="playBtn" onclick="playCard()">选择手牌</button>
+                </div>
+                
+                <div class="log-section" id="logSection">
+                    <div class="log-entry">🎮 游戏开始！命运塔团队战！</div>
+                </div>
             </div>
         </div>
         
-        <!-- 底部 - 手牌区域 -->
-        <div class="bottom-area">
-            <div class="player-status-bar">
-                <div class="player-status">
-                    <div class="player-avatar-main" id="myAvatar">😺</div>
-                    <div class="player-details">
-                        <div class="player-name">我 (黄金)</div>
-                        <div class="player-level" id="myLevelDisplay">第 2 层 (出发层)</div>
-                    </div>
-                </div>
-                <div class="turn-info">
-                    <div class="turn-status">🎯 你的回合</div>
-                    <div class="round-info">第 <span id="roundNum">1</span> 轮</div>
+        <!-- 底部游戏记录区域 -->
+        <div class="game-records">
+            <div class="records-header">
+                <span class="records-title">📊 游戏记录</span>
+                <div class="records-tabs">
+                    <span class="record-tab active">全部</span>
+                    <span class="record-tab">战斗</span>
+                    <span class="record-tab">奖励</span>
                 </div>
             </div>
-            
-            <div class="hand-section">
-                <div class="hand-header">
-                    <span class="hand-title">🎴 我的手牌 (52张)</span>
-                    <span class="hand-count" id="handCount">52张</span>
+            <div class="records-list" id="recordsList">
+                <div class="record-item">
+                    <span class="avatar">😺</span>
+                    <span class="action">开始游戏</span>
+                    <span class="result-win">✓</span>
                 </div>
-                <div class="hand-cards-container">
-                    <div class="hand-cards" id="handCards"></div>
-                </div>
-            </div>
-            
-            <div class="play-section">
-                <button class="play-btn" id="playBtn" onclick="playCard()">选择手牌</button>
-            </div>
-            
-            <div class="log-section" id="logSection">
-                <div class="log-entry">🎮 游戏开始！命运塔团队战！</div>
             </div>
         </div>
     </div>
+    
+    <!-- 层数变化提示 -->
+    <div class="layer-change-toast" id="layerToast"></div>
     
     <!-- 玩家提示框 -->
     <div class="player-tooltip" id="playerTooltip"></div>
@@ -905,13 +1199,14 @@
         // ============ 游戏状态 ============
         let gameState = {
             round: 1,
-            myPlayer: { id: 'me', name: '我', avatar: '😺', level: 12, team: 'panda' }, // 从第2层开始(索引12)
+            myPlayer: { id: 'me', name: '我', avatar: '😺', level: 12, team: 'panda', previousLevel: 12 }, // 从第2层开始(索引12)
             players: [],
             guards: [],
             hand: [],
             selectedCard: null,
             gameLog: [],
-            currentTower: 0
+            currentTower: 0,
+            records: []
         };
         
         // ============ 初始化游戏 ============
@@ -926,6 +1221,7 @@
                     name: '熊猫' + (i+1),
                     avatar: AVATARS[i+1],
                     level: 12, // 从出发层开始
+                    previousLevel: 12,
                     team: 'panda'
                 });
             }
@@ -937,6 +1233,7 @@
                     name: '战狼' + (i+1),
                     avatar: AVATARS[i+4],
                     level: 12,
+                    previousLevel: 12,
                     team: 'wolf'
                 });
             }
@@ -992,9 +1289,10 @@
             renderProvokeList();
             renderHand();
             updateCurrentGuardDisplay();
+            updateRecords();
             
             addLog('🎮 游戏开始！命运塔团队战！');
-            addLog('💡 提示：避开激怒牌，击败守卫登顶！');
+            addLog('💡 提示：匹配守卫牌上升，避开激怒牌！');
         }
         
         // ============ 渲染左侧层叠区 ============
@@ -1012,8 +1310,9 @@
                 layerDiv.className = `layer-item ${isCurrent ? 'current' : ''} ${isStartLayer ? 'start-layer' : ''}`;
                 layerDiv.setAttribute('data-rank', rank);
                 
-                // 找到在该层的玩家
-                const playersHere = [gameState.myPlayer, ...gameState.players].filter(p => p.level === i);
+                // 找到在该层的所有玩家（包括自己和AI）
+                const allPlayers = [gameState.myPlayer, ...gameState.players];
+                const playersHere = allPlayers.filter(p => p.level === i);
                 
                 let playersHtml = '';
                 if(playersHere.length > 0) {
@@ -1021,7 +1320,10 @@
                         playersHere.map(p => {
                             const isSelf = p.id === 'me';
                             const teamClass = p.team === 'panda' ? 'panda-team' : 'wolf-team';
-                            return `<div class="layer-player-icon ${isSelf ? 'self' : ''} ${teamClass}">${p.avatar}</div>`;
+                            // 检测是否有层数变化
+                            const hasLevelChange = p.previousLevel !== p.level;
+                            const moveClass = hasLevelChange ? (p.level < p.previousLevel ? 'moving-up' : 'moving-down') : '';
+                            return `<div class="layer-player-icon ${isSelf ? 'self' : ''} ${teamClass} ${moveClass}" id="player-${p.id}">${p.avatar}</div>`;
                         }).join('') + 
                         '</div>';
                 }
@@ -1178,6 +1480,9 @@
             const me = gameState.myPlayer;
             const guard = gameState.guards[me.level];
             
+            // 保存之前的层数
+            me.previousLevel = me.level;
+            
             // 标记手牌已使用
             const originalIndex = gameState.hand.findIndex(c => c.suit===playerCard.suit && c.rank===playerCard.rank && !c.used);
             if(originalIndex >=0) {
@@ -1203,11 +1508,22 @@
         
         // ============ 战斗结算 ============
         function resolveBattle(playerCard, guardCard, me, guard) {
-            // 检查激怒牌 (仅3/6/9层，对应索引3,6,9)
+            // 保存旧层数用于显示
+            const oldLevel = me.level;
+            let levelChange = 0;
+            let changeReason = '';
+            
+            // 检查激怒牌 (3/6/9层，对应索引2,5,8 - 因为从0开始)
+            // 注意：层索引0=A, 1=K, 2=Q, 3=J, 4=10, 5=9, 6=8, 7=7, 8=6, 9=5, 10=4, 11=3, 12=2
+            // 激怒层是 3/6/9层，即索引 9, 6, 3 (从底往上数)
+            // 但游戏设计中的3/6/9层是指从顶层A开始数：A(1), K(2), Q(3), J(4), 10(5), 9(6), 8(7), 7(8), 6(9)...
+            // 所以激怒层对应的索引是 2(Q), 5(9), 8(6)
+            const provokeLayers = [2, 5, 8]; // Q层, 9层, 6层
+            
             let provokeTriggered = false;
             let fallBack = 0;
             
-            if([3,6,9].includes(me.level)) {
+            if(provokeLayers.includes(me.level)) {
                 for(let pc of guard.provokeCards) {
                     const suitMatch = playerCard.suit === pc.suit;
                     const rankMatch = playerCard.rank === pc.rank;
@@ -1215,10 +1531,12 @@
                     if(suitMatch && rankMatch) {
                         provokeTriggered = true;
                         fallBack = 2;
+                        changeReason = 'provoke_full';
                         break;
                     } else if(suitMatch || rankMatch) {
                         provokeTriggered = true;
                         fallBack = 1;
+                        changeReason = 'provoke_partial';
                         break;
                     }
                 }
@@ -1227,25 +1545,34 @@
             gameState.selectedCard = null;
             
             if(provokeTriggered) {
-                const oldLevel = me.level;
-                me.level = Math.max(0, me.level - fallBack);
+                me.level = Math.max(0, me.level + fallBack); // 注意：索引越大越在底层，所以回退是+
+                levelChange = -fallBack;
                 
                 if(fallBack === 2) {
-                    addLog(`💥 激怒牌完全匹配！退回${fallBack}层！`, 'danger');
+                    addLog(`💥 激怒牌完全匹配！退回2层！`, 'danger');
+                    showLayerToast('💥 激怒！退2层', 'down');
                 } else {
-                    addLog(`⚠️ 激怒牌触发！退回${fallBack}层`, 'warning');
+                    addLog(`⚠️ 激怒牌触发！退回1层`, 'warning');
+                    showLayerToast('⚠️ 激怒！退1层', 'down');
                 }
             } else if(guardCard) {
                 const suitMatch = playerCard.suit === guardCard.suit;
                 const rankMatch = playerCard.rank === guardCard.rank;
                 
                 if(suitMatch && rankMatch) {
-                    me.level = Math.min(me.level + 2, 12);
+                    me.level = Math.max(0, me.level - 2); // 向上是索引减小
+                    levelChange = 2;
+                    changeReason = 'full_match';
                     addLog(`✅ 完全匹配！上升2层`, 'success');
+                    showLayerToast('🎉 完美！上2层', 'up');
                 } else if(suitMatch || rankMatch) {
-                    me.level = Math.min(me.level + 1, 12);
+                    me.level = Math.max(0, me.level - 1);
+                    levelChange = 1;
+                    changeReason = 'partial_match';
                     addLog(`✅ 部分匹配！上升1层`, 'success');
+                    showLayerToast('✨ 匹配！上1层', 'up');
                 } else {
+                    changeReason = 'no_match';
                     addLog(`❌ 不匹配，停留本层`, 'normal');
                 }
             }
@@ -1256,10 +1583,29 @@
             }
             
             // 更新UI
-            document.getElementById('myLevelDisplay').textContent = `第 ${LEVELS[12-me.level]} 层${me.level===12?' (出发层)':''}`;
+            document.getElementById('myLevelDisplay').textContent = `第 ${LEVELS[me.level]} 层${me.level===12?' (出发层)':''}`;
             document.getElementById('roundNum').textContent = ++gameState.round;
             
+            // 添加游戏记录
+            addRecord({
+                avatar: me.avatar,
+                action: changeReason === 'full_match' ? '完全匹配' : 
+                        changeReason === 'partial_match' ? '部分匹配' :
+                        changeReason === 'provoke_full' ? '激怒完全' :
+                        changeReason === 'provoke_partial' ? '激怒部分' : '未匹配',
+                result: levelChange > 0 ? 'win' : levelChange < 0 ? 'lose' : 'neutral',
+                change: levelChange
+            });
+            
+            // 渲染层叠区（带移动动画）
             renderLayers();
+            
+            // 延迟后清除动画状态
+            setTimeout(() => {
+                gameState.myPlayer.previousLevel = gameState.myPlayer.level;
+                gameState.players.forEach(p => p.previousLevel = p.level);
+            }, 500);
+            
             renderGuardLayers();
             renderProvokeList();
             updateCurrentGuardDisplay();
@@ -1270,18 +1616,54 @@
             // 检查游戏结束
             if(me.level === 0) {
                 addLog(`🎉 恭喜登顶！你成为首登者！`, 'success');
+                showLayerToast('🏆 登顶成功！', 'up');
                 setTimeout(() => alert('🎉 恭喜！你成功登顶命运塔！'), 500);
             }
+        }
+        
+        // ============ 显示层数变化提示 ============
+        function showLayerToast(message, direction) {
+            const toast = document.getElementById('layerToast');
+            toast.textContent = message;
+            toast.className = `layer-change-toast ${direction} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // ============ 添加游戏记录 ============
+        function addRecord(record) {
+            gameState.records.unshift(record);
+            if(gameState.records.length > 10) {
+                gameState.records.pop();
+            }
+            updateRecords();
+        }
+        
+        // ============ 更新游戏记录显示 ============
+        function updateRecords() {
+            const container = document.getElementById('recordsList');
+            if(gameState.records.length === 0) return;
+            
+            container.innerHTML = gameState.records.map(r => `
+                <div class="record-item">
+                    <span class="avatar">${r.avatar}</span>
+                    <span class="action">${r.action}</span>
+                    <span class="result-${r.result}">${r.change > 0 ? '↑' + r.change : r.change < 0 ? '↓' + Math.abs(r.change) : '-'}</span>
+                </div>
+            `).join('');
         }
         
         // ============ 模拟其他玩家 ============
         function simulateOtherPlayers() {
             gameState.players.forEach(player => {
-                if(Math.random() < 0.25) {
+                player.previousLevel = player.level;
+                if(Math.random() < 0.3) {
                     if(Math.random() < 0.6) {
-                        player.level = Math.max(0, player.level - 1);
+                        player.level = Math.min(12, player.level + 1);
                     } else {
-                        player.level = Math.min(player.level + 1, 12);
+                        player.level = Math.max(0, player.level - 1);
                     }
                 }
             });

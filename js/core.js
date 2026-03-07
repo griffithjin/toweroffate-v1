@@ -1,13 +1,16 @@
 /**
  * 命运塔·首登者 - 核心游戏逻辑
- * V1.0 - 2026-03-05
+ * V1.1 - 2026-03-07 - 修复玩家头像上升逻辑
  */
 
 class FateTowerGame {
     constructor(mode = 'solo') {
         this.mode = mode; // 'solo', 'team', 'streak'
         this.maxLayers = 13;
-        this.currentLayer = 1; // 从第1层开始
+        this.currentLayer = 12; // 从第12层(索引，对应2层/出发层)开始
+        
+        // 层级映射：0=A(顶层), 12=2(出发层/底层)
+        this.levels = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
         
         // 牌组配置
         this.deckConfig = mode === 'streak' ? 
@@ -30,6 +33,9 @@ class FateTowerGame {
             revealedGuardCards: {}, // 每层守卫已亮出的牌
             angerCardsUsed: {} // 已使用的激怒牌
         };
+        
+        // 激怒牌层（Q层、9层、6层，对应索引2,5,8）
+        this.provokeLayers = [2, 5, 8];
     }
 
     /**
@@ -58,7 +64,8 @@ class FateTowerGame {
                         suit: suit,
                         rank: rank,
                         id: `${suit}${rank}_${d}`,
-                        value: this.getCardValue(rank)
+                        value: this.getCardValue(rank),
+                        isRed: suit === '♥️' || suit === '♦️'
                     });
                 }
             }
@@ -75,7 +82,7 @@ class FateTowerGame {
         this.guards = [];
         let remainingDeck = [...this.deck];
 
-        for (let i = 1; i <= this.deckConfig.guards; i++) {
+        for (let i = 0; i < this.deckConfig.guards; i++) {
             // 抽取守卫牌
             const guardCards = remainingDeck.splice(0, this.deckConfig.cardsPerGuard);
 
@@ -83,7 +90,7 @@ class FateTowerGame {
             const angerCards = remainingDeck.splice(0, 3);
 
             this.guards.push({
-                layer: i,
+                level: i, // 0=A(顶层), 12=2(底层)
                 cards: guardCards, // 13张（或4张连胜模式）- 隐藏
                 angerCards: angerCards, // 3张激怒牌 - 明牌！玩家可见
                 angerCardsRevealed: angerCards.map(c => ({...c, revealed: true})), // 激怒牌对玩家可见
@@ -106,9 +113,11 @@ class FateTowerGame {
             this.players.push({
                 id: i,
                 name: i === 0 ? '金先生' : `玩家${i + 1}`,
+                avatar: ['😺','🦁','🐯','🦊','🐺','🐻','🐼','🐨'][i % 8],
                 team: i < 2 ? 'A' : 'B', // 团队赛分组
                 hand: this.createPlayerHand(),
-                currentLayer: 1,
+                currentLevel: 12, // 从出发层开始（索引12对应2层）
+                previousLevel: 12,
                 score: 0,
                 isFirstAscender: false,
                 isEliminated: false,
@@ -130,7 +139,8 @@ class FateTowerGame {
                 hand.push({
                     suit: suit,
                     rank: rank,
-                    played: false
+                    played: false,
+                    isRed: suit === '♥️' || suit === '♦️'
                 });
             }
         }
@@ -138,7 +148,17 @@ class FateTowerGame {
     }
 
     /**
-     * 玩家出牌
+     * 玩家出牌 - 修复：正确处理层数变化和头像上升逻辑
+     * 
+     * 层数索引说明：
+     * - 0 = A (顶层，目标)
+     * - 2 = Q (激怒层)
+     * - 5 = 9 (激怒层) 
+     * - 8 = 6 (激怒层)
+     * - 12 = 2 (出发层/底层)
+     * 
+     * 上升 = 层数索引减小
+     * 下降 = 层数索引增加
      */
     playCard(playerId, cardIndex) {
         const player = this.players[playerId];
@@ -147,19 +167,24 @@ class FateTowerGame {
         const card = player.hand[cardIndex];
         if (card.played) return { success: false, error: '牌已出完' };
         
+        // 保存之前层数用于动画
+        player.previousLevel = player.currentLevel;
+        
         // 标记为已出
         card.played = true;
         this.history.playedCards.push(card);
         
         // 守卫响应
-        const guard = this.guards[player.currentLayer - 1];
+        const guard = this.guards[player.currentLevel];
         const guardCard = this.revealGuardCard(guard);
         
         // 检查激怒牌触发
         const angerResult = this.checkAngerCards(player, card, guard);
         
-        // 检查层数变化
-        const layerResult = this.checkLayerChange(player, card, guardCard);
+        // 检查层数变化（仅在未触发激怒牌时）
+        const layerResult = !angerResult.triggered ? 
+            this.checkLayerChange(player, card, guardCard) : 
+            { changed: false };
         
         // 检查是否登顶
         const ascensionResult = this.checkAscension(player);
@@ -177,7 +202,8 @@ class FateTowerGame {
             angerResult: angerResult,
             layerResult: layerResult,
             ascensionResult: ascensionResult,
-            gameEndResult: gameEndResult
+            gameEndResult: gameEndResult,
+            levelChange: player.currentLevel - player.previousLevel // 负数表示上升，正数表示下降
         };
     }
 
@@ -292,10 +318,11 @@ class FateTowerGame {
             // 使用激怒牌
             guard.angerCardsUsed.push(bestAnger);
             
-            // 计算新层数
-            const newLayer = Math.max(1, targetPlayer.currentLayer - maxImpact);
-            const actualDrop = targetPlayer.currentLayer - newLayer;
-            targetPlayer.currentLayer = newLayer;
+            // 计算新层数（回退 = 层数索引增加）
+            const newLevel = Math.min(12, targetPlayer.currentLevel + maxImpact);
+            const actualDrop = newLevel - targetPlayer.currentLevel;
+            targetPlayer.previousLevel = targetPlayer.currentLevel;
+            targetPlayer.currentLevel = newLevel;
             
             return {
                 success: true,
@@ -311,7 +338,11 @@ class FateTowerGame {
     }
 
     /**
-     * 检查激怒牌触发
+     * 检查激怒牌触发 - 修复层数计算逻辑
+     * 
+     * 激怒层：Q层(索引2)、9层(索引5)、6层(索引8)
+     * 完全匹配 → 退2层（层数索引+2）
+     * 部分匹配 → 退1层（层数索引+1）
      */
     checkAngerCards(player, playedCard, guard) {
         const result = {
@@ -320,6 +351,11 @@ class FateTowerGame {
             effect: null,
             layersLost: 0
         };
+        
+        // 检查是否在激怒层
+        if (!this.provokeLayers.includes(player.currentLevel)) {
+            return result;
+        }
         
         // 检查守卫是否还有激怒牌
         const availableAnger = guard.angerCards.filter(c => 
@@ -334,7 +370,7 @@ class FateTowerGame {
             const suitMatch = angerCard.suit === playedCard.suit;
             
             if (rankMatch && suitMatch) {
-                // 完全一致 → 退2层
+                // 完全一致 → 退2层（层数索引+2）
                 result.triggered = true;
                 result.usedAngerCard = angerCard;
                 result.effect = 'both_match';
@@ -342,7 +378,7 @@ class FateTowerGame {
                 guard.angerCardsUsed.push(angerCard);
                 break;
             } else if (rankMatch || suitMatch) {
-                // 点数或花色一致 → 退1层
+                // 点数或花色一致 → 退1层（层数索引+1）
                 result.triggered = true;
                 result.usedAngerCard = angerCard;
                 result.effect = 'partial_match';
@@ -352,17 +388,22 @@ class FateTowerGame {
             }
         }
         
-        // 应用效果
-        if (result.triggered && player.currentLayer > 1) {
-            const newLayer = Math.max(1, player.currentLayer - result.layersLost);
-            player.currentLayer = newLayer;
+        // 应用效果（回退 = 层数索引增加）
+        if (result.triggered) {
+            const newLevel = Math.min(12, player.currentLevel + result.layersLost);
+            player.previousLevel = player.currentLevel;
+            player.currentLevel = newLevel;
         }
         
         return result;
     }
 
     /**
-     * 检查层数变化（普通规则）
+     * 检查层数变化（普通规则）- 修复层数计算逻辑
+     * 
+     * 完全匹配（花色+点数）→ 升2层（层数索引-2）
+     * 部分匹配（花色或点数）→ 升1层（层数索引-1）
+     * 不匹配 → 停留本层
      */
     checkLayerChange(player, playedCard, guardCard) {
         if (!guardCard) return { changed: false };
@@ -371,29 +412,32 @@ class FateTowerGame {
         const suitMatch = playedCard.suit === guardCard.suit;
 
         if (rankMatch && suitMatch) {
-            // 点数 AND 花色都匹配 → 晋升2层
-            if (player.currentLayer < this.maxLayers) {
-                const oldLayer = player.currentLayer;
-                player.currentLayer = Math.min(player.currentLayer + 2, this.maxLayers);
-                const layersGained = player.currentLayer - oldLayer;
+            // 点数 AND 花色都匹配 → 晋升2层（层数索引-2）
+            if (player.currentLevel > 0) {
+                const oldLevel = player.currentLevel;
+                player.previousLevel = oldLevel;
+                player.currentLevel = Math.max(0, player.currentLevel - 2);
+                const layersGained = oldLevel - player.currentLevel;
                 return { changed: true, direction: 'up', reason: 'full_match', layers: layersGained };
             }
         } else if (rankMatch || suitMatch) {
-            // 点数 OR 花色匹配 → 晋升1层
-            if (player.currentLayer < this.maxLayers) {
-                player.currentLayer++;
+            // 点数 OR 花色匹配 → 晋升1层（层数索引-1）
+            if (player.currentLevel > 0) {
+                player.previousLevel = player.currentLevel;
+                player.currentLevel = Math.max(0, player.currentLevel - 1);
                 return { changed: true, direction: 'up', reason: 'partial_match', layers: 1 };
             }
         }
+        
         // 不匹配 → 不晋升
         return { changed: false };
     }
 
     /**
-     * 检查是否登顶
+     * 检查是否登顶（到达A层，索引0）
      */
     checkAscension(player) {
-        if (player.currentLayer === this.maxLayers && !player.isFirstAscender) {
+        if (player.currentLevel === 0 && !player.isFirstAscender) {
             if (this.firstAscender === null) {
                 // 首位登顶 - 成为首登者守卫
                 player.isFirstAscender = true;
@@ -425,20 +469,20 @@ class FateTowerGame {
      */
     transformToGuard(player) {
         // 找到最高失守层（从顶层往下找）
-        let targetLayer = this.maxLayers;
+        let targetLayer = this.maxLayers - 1;
         for (let i = this.guards.length - 1; i >= 0; i--) {
             if (this.guards[i].isDefeated || this.guards[i].cards.length === 0) {
-                targetLayer = i + 1;
+                targetLayer = i;
                 break;
             }
         }
         
-        // 如果没有失守层，则占据第7层（中间层）
-        if (targetLayer === this.maxLayers) {
-            targetLayer = 7;
+        // 如果没有失守层，则占据第7层（中间层，索引6）
+        if (targetLayer === this.maxLayers - 1) {
+            targetLayer = 6;
         }
         
-        const guard = this.guards[targetLayer - 1];
+        const guard = this.guards[targetLayer];
         
         // 设置守卫控制者
         guard.controller = player.id;
@@ -457,10 +501,11 @@ class FateTowerGame {
         player.isGuard = true;
         player.guardAvatar = '🛡️';
         
-        console.log(`🛡️ ${player.name} 化身为第${targetLayer}层守卫！`);
+        console.log(`🛡️ ${player.name} 化身为第${this.levels[targetLayer]}层守卫！`);
         
         return {
             layer: targetLayer,
+            layerName: this.levels[targetLayer],
             guard: guard
         };
     }
@@ -480,7 +525,8 @@ class FateTowerGame {
                 suit: suit,
                 rank: rank,
                 id: `${suit}${rank}_${Date.now()}_${i}`,
-                value: this.getCardValue(rank)
+                value: this.getCardValue(rank),
+                isRed: suit === '♥️' || suit === '♦️'
             });
         }
         
@@ -513,12 +559,12 @@ class FateTowerGame {
             if (this.firstAscender !== null) {
                 const otherAscended = this.players.find(p => 
                     p.id !== this.firstAscender.id && 
-                    p.currentLayer === this.maxLayers
+                    p.currentLevel === 0
                 );
                 
                 if (otherAscended) {
                     // 首登者退回最高失守层
-                    this.firstAscender.currentLayer = this.highestFallenLayer || 1;
+                    this.firstAscender.currentLevel = this.highestFallenLayer || 12;
                     this.firstAscender.isFirstAscender = false;
                     
                     // 移交守卫控制权
@@ -544,9 +590,9 @@ class FateTowerGame {
             const teamA = this.players.filter(p => p.team === 'A');
             const teamB = this.players.filter(p => p.team === 'B');
             
-            // 一队全员登顶
-            const teamAAllAscended = teamA.every(p => p.currentLayer === this.maxLayers);
-            const teamBAllAscended = teamB.every(p => p.currentLayer === this.maxLayers);
+            // 一队全员登顶（currentLevel === 0）
+            const teamAAllAscended = teamA.every(p => p.currentLevel === 0);
+            const teamBAllAscended = teamB.every(p => p.currentLevel === 0);
             
             if (teamAAllAscended || teamBAllAscended) {
                 this.gameState = 'ended';
@@ -697,6 +743,21 @@ class FateTowerGame {
             from: from.name,
             to: to.name
         };
+    }
+    
+    /**
+     * 获取当前层名称
+     */
+    getCurrentLevelName(playerId) {
+        const player = this.players[playerId];
+        return this.levels[player.currentLevel];
+    }
+    
+    /**
+     * 获取玩家所在层的所有玩家（用于层叠区显示）
+     */
+    getPlayersAtLevel(level) {
+        return this.players.filter(p => p.currentLevel === level);
     }
 }
 
