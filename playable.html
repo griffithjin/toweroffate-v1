@@ -165,6 +165,12 @@
             max-width: 85%;
             object-fit: contain;
             filter: drop-shadow(0 4px 20px rgba(0,0,0,0.6));
+            opacity: 0.75; /* 透明度确保层级线可见 */
+            transition: opacity 0.3s ease;
+        }
+        
+        .tower-image:hover {
+            opacity: 0.9;
         }
         
         /* 13条层级线条 - 浮在塔上 */
@@ -180,23 +186,25 @@
         .level-line {
             position: absolute;
             width: 100%;
-            height: 2px;
-            background: rgba(255,255,255,0.25);
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 5px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 5px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
-            color: rgba(255,255,255,0.6);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 3px rgba(0,0,0,1), 0 0 5px rgba(0,0,0,0.8);
+            border-radius: 2px;
         }
         
         .level-line.active {
-            background: rgba(255,215,0,0.5);
+            background: linear-gradient(90deg, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.8) 50%, rgba(255,215,0,0.6) 100%);
             color: #FFD700;
-            height: 3px;
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+            height: 4px;
+            box-shadow: 0 0 10px rgba(255,215,0,0.6), 0 1px 3px rgba(0,0,0,0.8);
         }
         
         /* 层级颜色标识 */
@@ -566,17 +574,19 @@
         /* 塔名称显示 */
         .tower-name {
             position: absolute;
-            top: 8px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
+            background: rgba(0,0,0,0.75);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 13px;
             color: #FFD700;
             font-weight: bold;
-            border: 1px solid rgba(255,215,0,0.3);
+            border: 1px solid rgba(255,215,0,0.4);
             z-index: 30;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
         
         /* 响应式适配 - 移动端优先 */
@@ -930,9 +940,12 @@
                 <!-- 塔名称 -->
                 <div class="tower-name" id="towerName">🏰 埃菲尔铁塔</div>
                 
-                <!-- 塔图片 - 800x1200尺寸 -->
-                <img src="assets/towers/france-eiffel.png" class="tower-image" id="towerImage" alt="埃菲尔铁塔" 
+                <!-- 塔图片 - 卡通风格 -->
+                <img src="assets/towers/eiffel-tower.png" class="tower-image" id="towerImage" alt="命运塔" 
                      onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><text y=%22150%22 font-size=%22120%22 text-anchor=%22middle%22>🗼</text></svg>'">
+                
+                <!-- 塔切换按钮 -->
+                <button onclick="switchTower()" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);padding:6px 12px;background:rgba(0,0,0,0.7);border:1px solid #FFD700;border-radius:15px;color:#FFD700;font-size:11px;cursor:pointer;z-index:40;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">🔄 切换塔</button>
                 
                 <!-- 13条层级线条 -->
                 <div class="level-lines" id="levelLines"></div>
@@ -994,21 +1007,77 @@
         const SUITS = ['♥','♦','♣','♠'];
         const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
         
-        // 世界名塔列表
+        // 世界名塔列表 - 使用卡通塔图片
         const TOWERS = [
-            { name: '🗼 比萨斜塔', country: 'Italy', file: 'italy-pisa.png' },
-            { name: '🏰 埃菲尔铁塔', country: 'France', file: 'france-eiffel.png' },
-            { name: '🏛️ 自由女神像', country: 'USA', file: 'usa-liberty.png' },
-            { name: '⛩️ 东京塔', country: 'Japan', file: 'japan-tokyo.png' },
-            { name: '🏯 东方明珠', country: 'China', file: 'china-pearl.png' },
-            { name: '🗽 帝国大厦', country: 'USA', file: 'usa-empire.png' },
-            { name: '🏰 大本钟', country: 'UK', file: 'uk-bigben.png' },
-            { name: '🌉 金门大桥', country: 'USA', file: 'usa-golden.png' },
-            { name: '🏛️ 悉尼歌剧院', country: 'Australia', file: 'australia-sydney.png' },
-            { name: '🏰 新天鹅堡', country: 'Germany', file: 'germany-neuschwanstein.png' },
-            { name: '🗼 迪拜塔', country: 'UAE', file: 'uae-burj.png' },
-            { name: '⛩️ 吉隆坡双子塔', country: 'Malaysia', file: 'malaysia-klcc.png' },
-            { name: '🏛️ 泰姬陵', country: 'India', file: 'india-taj.png' }
+            { name: '🗼 比萨斜塔', country: 'Italy', file: 'pisa-tower.png' },
+            { name: '🏰 埃菲尔铁塔', country: 'France', file: 'eiffel-tower.png' },
+            { name: '🏛️ 自由女神像', country: 'USA', file: 'statue-of-liberty.png' },
+            { name: '⛩️ 东京塔', country: 'Japan', file: 'tokyo-tower.png' },
+            { name: '🏯 东方明珠', country: 'China', file: 'oriental-pearl.png' },
+            { name: '🏰 帝国大厦', country: 'USA', file: 'empire-state.png' },
+            { name: '🏰 大本钟', country: 'UK', file: 'big-ben.png' },
+            { name: '🏰 悉尼歌剧院', country: 'Australia', file: 'sydney-opera.png' },
+            { name: '🏰 泰姬陵', country: 'India', file: 'taj-mahal.png' },
+            { name: '🗼 迪拜塔', country: 'UAE', file: 'burj-khalifa.png' },
+            { name: '⛩️ 双子塔', country: 'Malaysia', file: 'petronas.png' },
+            { name: '🏛️ 吴哥窟', country: 'Cambodia', file: 'angkor-wat.png' },
+            { name: '🏰 圣瓦西里大教堂', country: 'Russia', file: 'st-basil.png' },
+            { name: '🏰 勃兰登堡门', country: 'Germany', file: 'brandenburg-gate.png' },
+            { name: '🏛️ 佩特拉古城', country: 'Jordan', file: 'petra.png' },
+            { name: '🏰 马丘比丘', country: 'Peru', file: 'machu-picchu.png' },
+            { name: '🏛️ 救世基督像', country: 'Brazil', file: 'christ-redeemer.png' },
+            { name: '🏰 蓝色清真寺', country: 'Turkey', file: 'blue-mosque.png' },
+            { name: '🏰 布拉格城堡', country: 'Czech', file: 'prague.png' },
+            { name: '🏛️ 金字塔', country: 'Egypt', file: 'pyramids.png' },
+            { name: '🏰 马泰尔峰', country: 'Switzerland', file: 'matterhorn.png' },
+            { name: '🏛️ 圣家族大教堂', country: 'Spain', file: 'sagrada-familia.png' },
+            { name: '🏰 鱼尾狮', country: 'Singapore', file: 'marina-bay.png' },
+            { name: '🏰 CN塔', country: 'Canada', file: 'cn-tower.png' },
+            { name: '🗼 N首尔塔', country: 'Korea', file: 'n-tower.png' },
+            { name: '🏛️ 哈瓦那', country: 'Cuba', file: 'havana.png' },
+            { name: '🏰 天空塔', country: 'New Zealand', file: 'sky-tower.png' },
+            { name: '🏛️ 救世主山', country: 'Bolivia', file: 'lalibela.png' },
+            { name: '🏰 阿伦德尔火山', country: 'Costa Rica', file: 'arenal.png' },
+            { name: '🏛️ 杜布罗夫尼克', country: 'Croatia', file: 'dubrovnik.png' },
+            { name: '🏰 下龙湾', country: 'Vietnam', file: 'ha-long-bay.png' },
+            { name: '🏛️ 大皇宫', country: 'Thailand', file: 'grand-palace.png' },
+            { name: '🏰 舒韦多贡塔', country: 'Myanmar', file: 'shwedagon.png' },
+            { name: '🏛️ 婆罗浮屠', country: 'Indonesia', file: 'borobudur.png' },
+            { name: '🏰 布拉迪斯拉发', country: 'Slovakia', file: 'bratislava.png' },
+            { name: '🏛️ 布达佩斯', country: 'Hungary', file: 'budapest.png' },
+            { name: '🏰 多哈博物馆', country: 'Qatar', file: 'doha-museum.png' },
+            { name: '🏛️ 复活节岛', country: 'Chile', file: 'easter-island.png' },
+            { name: '🏰 斐济', country: 'Fiji', file: 'fiji.png' },
+            { name: '🏛️ 峡湾', country: 'Norway', file: 'fjord.png' },
+            { name: '🏰 极光', country: 'Iceland', file: 'aurora.png' },
+            { name: '🏛️ 猴面包树', country: 'Madagascar', file: 'baobab.png' },
+            { name: '🏰 巧克力山', country: 'Philippines', file: 'chocolate-hills.png' },
+            { name: '🏛️ 舍夫沙万', country: 'Morocco', file: 'chefchaouen.png' },
+            { name: '🏰 悬崖', country: 'Ireland', file: 'cliffs-of-moher.png' },
+            { name: '🏛️ 哥本哈根', country: 'Denmark', file: 'copenhagen.png' },
+            { name: '🏰 邓恩河瀑布', country: 'Jamaica', file: 'dunn-river.png' },
+            { name: '🏛️ 耶路撒冷', country: 'Israel', file: 'jerusalem.png' },
+            { name: '🏰 乞力马扎罗', country: 'Tanzania', file: 'kilimanjaro.png' },
+            { name: '🏛️ 基辅', country: 'Ukraine', file: 'kyiv.png' },
+            { name: '🏰 莫恩山', country: 'Mauritius', file: 'le-morne.png' },
+            { name: '🏛️ 伊玛目广场', country: 'Iran', file: 'imam-square.png' },
+            { name: '🏰 帕特农神庙', country: 'Greece', file: 'parthenon.png' },
+            { name: '🏛️ 凯旋门', country: 'Laos', file: 'patuxai.png' },
+            { name: '🏰 方尖碑', country: 'Argentina', file: 'obelisk.png' },
+            { name: '🏛️ 巴拿马运河', country: 'Panama', file: 'panama-canal.png' },
+            { name: '🏰 里拉修道院', country: 'Bulgaria', file: 'rila.png' },
+            { name: '🏛️ 罗瓦涅米', country: 'Finland', file: 'rovaniemi.png' },
+            { name: '🏰 萨瓦寺', country: 'Vietnam', file: 'sava-temple.png' },
+            { name: '🏛️ 塞伦盖蒂', country: 'Tanzania', file: 'serengeti.png' },
+            { name: '🏰 斯德哥尔摩', country: 'Sweden', file: 'stockholm.png' },
+            { name: '🏛️ 桌山', country: 'South Africa', file: 'table-mountain.png' },
+            { name: '🏰 维也纳歌剧院', country: 'Austria', file: 'vienna-opera.png' },
+            { name: '🏛️ 华沙', country: 'Poland', file: 'warsaw.png' },
+            { name: '🏰 风车', country: 'Netherlands', file: 'windmill.png' },
+            { name: '🏛️ 维多利亚瀑布', country: 'Zimbabwe', file: 'victoria-falls.png' },
+            { name: '🏰 瓦努阿图', country: 'Vanuatu', file: 'vanuatu.png' },
+            { name: '🏛️ 草原', country: 'Mongolia', file: 'steppe.png' },
+            { name: '🏰 布兰城堡', country: 'Romania', file: 'bran-castle.png' }
         ];
         
         // 玩家头像池
@@ -1127,7 +1196,7 @@
             renderPlayerIcons();
             renderProvokeCards();
             updateGuardPanel();
-            updateTowerDisplay();
+            updateTowerDisplay(); // 随机选择一座塔
             renderHand();
             
             addLog('🎮 游戏开始！命运塔首登者挑战！');
@@ -1304,13 +1373,39 @@
         }
         
         // ============ 更新塔显示 ============
-        function updateTowerDisplay() {
-            const tower = TOWERS[gameState.currentTower % TOWERS.length];
+        function updateTowerDisplay(towerIndex = null) {
+            // 如果指定了索引则使用，否则随机选择
+            if (towerIndex !== null) {
+                gameState.currentTower = towerIndex;
+            } else {
+                gameState.currentTower = Math.floor(Math.random() * TOWERS.length);
+            }
+            
+            const tower = TOWERS[gameState.currentTower];
             document.getElementById('towerName').textContent = tower.name;
             
             const img = document.getElementById('towerImage');
             img.src = `assets/towers/${tower.file}`;
             img.alt = tower.name;
+            
+            addLog(`🏰 当前战场: ${tower.name}`, 'info');
+        }
+        
+        // ============ 切换塔 ============
+        function switchTower() {
+            // 随机选择一个不同的塔
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * TOWERS.length);
+            } while (newIndex === gameState.currentTower && TOWERS.length > 1);
+            
+            updateTowerDisplay(newIndex);
+        }
+        
+        // ============ 根据国家获取塔 ============
+        function getTowerByCountry(country) {
+            const index = TOWERS.findIndex(t => t.country.toLowerCase() === country.toLowerCase());
+            return index >= 0 ? index : Math.floor(Math.random() * TOWERS.length);
         }
         
         // ============ 渲染手牌 ============
