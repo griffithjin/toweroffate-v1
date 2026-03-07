@@ -1101,16 +1101,15 @@
             
             container.innerHTML = '';
             
-            guard.provokeCards.forEach(c => {
-                const isRed = c.suit==='♥'||c.suit==='♦';
+            // 激怒牌默认隐藏，显示"?"
+            for(let i = 0; i < 3; i++) {
                 const cardDiv = document.createElement('div');
-                cardDiv.className = `provoke-card ${isRed?'':'black'}`;
+                cardDiv.className = 'provoke-card';
                 cardDiv.innerHTML = `
-                    <span class="suit">${c.suit}</span>
-                    <span class="rank">${c.rank}</span>
+                    <span class="suit">?</span>
                 `;
                 container.appendChild(cardDiv);
-            });
+            }
         }
         
         // ============ 更新守卫牌面板 ============
@@ -1124,17 +1123,11 @@
             // 更新剩余牌数
             document.getElementById('guardCardsLeft').textContent = guard.cardsLeft;
             
-            // 如果有守卫牌，显示当前守卫牌
+            // 守卫牌默认隐藏，显示"?"
             if(guard.cardsLeft > 0) {
-                const currentCard = guard.guardCards[13 - guard.cardsLeft];
-                const isRed = currentCard.isRed;
-                
-                display.className = `guard-card-display ${isRed?'red':'black'}`;
-                display.innerHTML = `
-                    <span class="suit">${currentCard.suit}</span>
-                    <span class="rank">${currentCard.rank}</span>
-                `;
-                panel.classList.add('revealed');
+                display.className = 'guard-card-display';
+                display.innerHTML = '<span style="font-size:24px">?</span>';
+                panel.classList.remove('revealed');
             } else {
                 display.className = 'guard-card-display';
                 display.innerHTML = '<span style="font-size:20px">✓</span>';

@@ -74,26 +74,26 @@ class FateTowerGame {
     createGuards() {
         this.guards = [];
         let remainingDeck = [...this.deck];
-        
+
         for (let i = 1; i <= this.deckConfig.guards; i++) {
             // 抽取守卫牌
             const guardCards = remainingDeck.splice(0, this.deckConfig.cardsPerGuard);
-            
+
             // 抽取激怒牌（3张）
             const angerCards = remainingDeck.splice(0, 3);
-            
+
             this.guards.push({
                 layer: i,
                 cards: guardCards, // 13张（或4张连胜模式）
                 angerCards: angerCards, // 3张激怒牌
-                angerCardsRevealed: [...angerCards], // 明牌展示
+                angerCardsRevealed: [], // 初始隐藏，只有透视技能才能查看
                 revealedCards: [], // 已亮出的牌
                 angerCardsUsed: [], // 已使用的激怒牌
                 isDefeated: false,
                 controller: null // 首登者控制
             });
         }
-        
+
         this.remainingDeck = remainingDeck;
     }
 
@@ -271,18 +271,26 @@ class FateTowerGame {
      */
     checkLayerChange(player, playedCard, guardCard) {
         if (!guardCard) return { changed: false };
-        
+
         const rankMatch = playedCard.rank === guardCard.rank;
         const suitMatch = playedCard.suit === guardCard.suit;
-        
-        if (rankMatch || suitMatch) {
-            // 成功，可进一层
+
+        if (rankMatch && suitMatch) {
+            // 点数 AND 花色都匹配 → 晋升2层
+            if (player.currentLayer < this.maxLayers) {
+                const oldLayer = player.currentLayer;
+                player.currentLayer = Math.min(player.currentLayer + 2, this.maxLayers);
+                const layersGained = player.currentLayer - oldLayer;
+                return { changed: true, direction: 'up', reason: 'full_match', layers: layersGained };
+            }
+        } else if (rankMatch || suitMatch) {
+            // 点数 OR 花色匹配 → 晋升1层
             if (player.currentLayer < this.maxLayers) {
                 player.currentLayer++;
-                return { changed: true, direction: 'up', reason: 'match' };
+                return { changed: true, direction: 'up', reason: 'partial_match', layers: 1 };
             }
         }
-        
+        // 不匹配 → 不晋升
         return { changed: false };
     }
 
