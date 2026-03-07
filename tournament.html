@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>全球锦标赛 - 命运塔·首登者</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: #fff;
-            padding-bottom: 30px;
+            overflow-x: hidden;
         }
+        
+        /* ===== 通用样式 ===== */
+        .hidden { display: none !important; }
+        
+        /* ===== 头部 ===== */
         .header {
             background: linear-gradient(90deg, #ff6b35, #f7931e);
             padding: 15px 20px;
@@ -59,10 +65,6 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.02); }
-        }
-        @media (max-width: 480px) {
-            .players-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-            .countdown-time { font-size: 32px; }
         }
         .countdown-progress {
             margin-top: 20px;
@@ -131,7 +133,7 @@
         }
         @media (max-width: 480px) {
             .players-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-            .countdown-time { font-size: 42px; }
+            .countdown-time { font-size: 32px; }
         }
         .player-avatar {
             aspect-ratio: 1;
@@ -201,22 +203,6 @@
             position: relative;
             overflow: hidden;
         }
-        .register-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .register-btn:active::before {
-            width: 300px;
-            height: 300px;
-        }
         .register-btn.idle {
             background: linear-gradient(135deg, #ffd700, #ff6b35);
             color: #000;
@@ -229,11 +215,6 @@
         .register-btn.registered {
             background: linear-gradient(135deg, #48bb78, #38a169);
             color: #fff;
-            cursor: default;
-        }
-        .register-btn.registered::after {
-            content: '✓';
-            margin-left: 8px;
         }
         .register-btn.ingame {
             background: linear-gradient(135deg, #4299e1, #3182ce);
@@ -244,9 +225,6 @@
         @keyframes pulse-blue {
             0%, 100% { box-shadow: 0 0 0 0 rgba(66,153,225,0.4); }
             50% { box-shadow: 0 0 0 10px rgba(66,153,225,0); }
-        }
-        .register-btn:disabled {
-            opacity: 0.8;
         }
         
         /* ===== 奖励预览样式 ===== */
@@ -275,89 +253,21 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
             border: 2px solid transparent;
         }
         .reward-card.gold { border-color: rgba(255,215,0,0.3); }
         .reward-card.silver { border-color: rgba(192,192,192,0.3); }
         .reward-card.bronze { border-color: rgba(205,127,50,0.3); }
-        
-        .reward-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-        .reward-card.gold:hover {
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
-            border-color: rgba(255,215,0,0.8);
-            box-shadow: 0 15px 40px rgba(255,215,0,0.3);
-        }
-        .reward-card.silver:hover {
-            background: linear-gradient(135deg, rgba(192,192,192,0.2), rgba(192,192,192,0.1));
-            border-color: rgba(192,192,192,0.8);
-            box-shadow: 0 15px 40px rgba(192,192,192,0.3);
-        }
-        .reward-card.bronze:hover {
-            background: linear-gradient(135deg, rgba(205,127,50,0.2), rgba(205,127,50,0.1));
-            border-color: rgba(205,127,50,0.8);
-            box-shadow: 0 15px 40px rgba(205,127,50,0.3);
-        }
-        .reward-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-            transition: transform 0.3s;
-        }
-        .reward-card:hover .reward-icon {
-            transform: scale(1.2) rotate(5deg);
-        }
-        .reward-rank {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+        .reward-card:hover { transform: translateY(-8px) scale(1.02); }
+        .reward-icon { font-size: 48px; margin-bottom: 10px; }
+        .reward-rank { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
         .reward-card.gold .reward-rank { color: #ffd700; }
         .reward-card.silver .reward-rank { color: #c0c0c0; }
         .reward-card.bronze .reward-rank { color: #cd7f32; }
-        .reward-amount {
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .reward-detail {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            background: rgba(0,0,0,0.9);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 10;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .reward-card:hover .reward-detail {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(-10px);
-        }
-        .reward-detail::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 8px solid transparent;
-            border-top-color: rgba(0,0,0,0.9);
-        }
+        .reward-amount { font-size: 20px; font-weight: bold; color: #fff; }
         
         /* ===== 世界地图区域 ===== */
-        .world-map {
-            padding: 20px;
-            text-align: center;
-        }
+        .world-map { padding: 20px; text-align: center; }
         .map-title {
             font-size: 24px;
             font-weight: bold;
@@ -387,354 +297,946 @@
             border-color: #ffd700;
             transform: scale(1.02);
         }
-        .continent-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        .continent-name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .continent-countries {
-            font-size: 12px;
-            color: #aaa;
-        }
+        .continent-icon { font-size: 48px; margin-bottom: 10px; }
+        .continent-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .continent-countries { font-size: 12px; color: #aaa; }
         
-        /* 国家列表 */
-        .countries-section {
+        /* 国家选择弹窗 */
+        .country-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
-        .section-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .countries-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .country-tag {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 16px;
+        .country-modal.show { display: flex; }
+        .country-modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
             border-radius: 20px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 25px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255,215,0,0.3);
         }
-        .country-tag:hover {
-            background: rgba(255,215,0,0.2);
-            transform: scale(1.05);
-        }
-        .country-tag .flag {
-            font-size: 18px;
-        }
-        
-        /* 当前锦标赛 */
-        .current-tournament {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 20px;
-            padding: 20px;
-            border-radius: 16px;
-        }
-        .tournament-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .tournament-info {
+        .country-modal-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .tournament-prize {
-            font-size: 24px;
-            color: #ffd700;
-        }
-        .join-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #ffd700, #ff6b35);
-            color: #000;
+        .country-modal-title { font-size: 20px; font-weight: bold; }
+        .country-modal-close {
+            background: none;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
+            color: #fff;
+            font-size: 24px;
             cursor: pointer;
         }
+        .countries-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .country-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .country-item:hover {
+            background: rgba(255,215,0,0.1);
+            transform: translateX(5px);
+        }
+        .country-flag { font-size: 24px; }
+        .country-info { flex: 1; }
+        .country-name { font-weight: bold; font-size: 14px; }
+        .country-difficulty { font-size: 11px; color: #aaa; }
         
-        /* 排行榜 */
-        .leaderboard {
+        /* ===== 锦标赛游戏主界面 ===== */
+        .tournament-game-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            z-index: 2000;
+            flex-direction: column;
+        }
+        .tournament-game-container.active { display: flex; }
+        
+        /* 游戏顶部栏 */
+        .game-top-bar {
+            background: linear-gradient(90deg, #ff6b35, #f7931e);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .game-info { display: flex; align-items: center; gap: 15px; }
+        .game-tower-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+        .game-tower-flag { font-size: 20px; }
+        
+        /* 双计时器 */
+        .game-timers {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .timer-box {
+            background: rgba(0,0,0,0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .timer-label { font-size: 9px; opacity: 0.8; }
+        .timer-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .timer-value.warning { color: #ff4757; animation: blink 0.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* 团队战标题 */
+        .team-battle-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 15px;
+            background: linear-gradient(90deg, rgba(255,71,79,0.9) 0%, rgba(30,30,50,0.95) 30%, rgba(30,30,50,0.95) 70%, rgba(52,152,219,0.9) 100%);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+        }
+        .team-section { display: flex; align-items: center; gap: 8px; }
+        .team-panda .team-name { color: #ff6b6b; font-size: 12px; font-weight: bold; }
+        .team-wolf .team-name { color: #4dabf7; font-size: 12px; font-weight: bold; }
+        .team-avatars { display: flex; gap: 3px; }
+        .team-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 2px solid;
+        }
+        .team-panda .team-avatar { border-color: #ff6b6b; background: linear-gradient(135deg, #ff6b6b, #c0392b); }
+        .team-wolf .team-avatar { border-color: #4dabf7; background: linear-gradient(135deg, #4dabf7, #2980b9); }
+        .vs-badge {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+            padding: 3px 10px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            border: 1px solid #FFD700;
+        }
+        
+        /* 主战场 */
+        .battlefield {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        /* 左侧层叠区 */
+        .layer-panel {
+            width: 22%;
+            min-width: 80px;
+            max-width: 110px;
+            background: linear-gradient(180deg, rgba(20,20,40,0.95) 0%, rgba(30,30,60,0.9) 100%);
+            border-right: 2px solid rgba(255,215,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .layer-panel-title {
+            text-align: center;
+            padding: 8px 3px;
+            font-size: 11px;
+            color: #FFD700;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+            font-weight: bold;
+        }
+        .layer-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 3px;
+            overflow-y: auto;
+        }
+        .layer-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 4px;
+            margin: 1px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            min-height: 22px;
+        }
+        .layer-item.current {
+            background: linear-gradient(90deg, rgba(255,215,0,0.4), rgba(255,165,0,0.3));
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 12px rgba(255,215,0,0.5);
+            animation: layer-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes layer-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 16px rgba(255,215,0,0.7); }
+        }
+        .layer-rank { width: 20px; text-align: center; }
+        .layer-item[data-rank="A"] .layer-rank { color: #FFD700; font-size: 14px; }
+        .layer-item[data-rank="K"] .layer-rank { color: #C0C0C0; }
+        .layer-item[data-rank="Q"] .layer-rank { color: #CD7F32; }
+        .layer-players { display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-end; }
+        .layer-player-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            border: 1px solid;
+        }
+        .layer-player-icon.self { border-color: #00ff00; box-shadow: 0 0 6px rgba(0,255,0,0.9); width: 16px; height: 16px; font-size: 9px; }
+        .layer-player-icon.panda-team { background: linear-gradient(135deg, #ff6b6b, #c0392b); border-color: #ff6b6b; }
+        .layer-player-icon.wolf-team { background: linear-gradient(135deg, #4dabf7, #2980b9); border-color: #4dabf7; }
+        
+        /* 中间塔区 */
+        .tower-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: linear-gradient(180deg, rgba(15,15,35,0.9) 0%, rgba(25,25,50,0.8) 100%);
+        }
+        .tower-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .tower-image {
+            max-height: 85%;
+            max-width: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.6));
+            opacity: 0.7;
+        }
+        .tower-emoji {
+            font-size: 120px;
+            opacity: 0.5;
+        }
+        
+        /* 当前守卫显示 */
+        .current-guard-display {
+            position: absolute;
+            bottom: 15px;
+            right: 8px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,71,79,0.6);
+            border-radius: 8px;
+            padding: 6px 8px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .current-guard-label { font-size: 9px; color: #aaa; margin-bottom: 3px; }
+        .current-guard-card {
+            width: 32px;
+            height: 44px;
+            background: linear-gradient(135deg, #1a1a3e, #2d2d5a);
+            border: 1px solid #FFD700;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin: 0 auto;
+        }
+        .current-guard-card.red { color: #d00; }
+        .current-guard-card.black { color: #888; }
+        .guard-remaining { font-size: 9px; color: #FFD700; margin-top: 3px; }
+        
+        /* 右侧激怒牌区 */
+        .provoke-panel {
+            width: 26%;
+            min-width: 100px;
+            max-width: 140px;
+            background: linear-gradient(180deg, rgba(40,10,10,0.95) 0%, rgba(60,15,15,0.9) 100%);
+            border-left: 2px solid rgba(255,71,79,0.4);
+            display: flex;
+            flex-direction: column;
+        }
+        .provoke-panel-title {
+            text-align: center;
+            padding: 8px 3px;
+            font-size: 10px;
+            color: #ff6b6b;
+            border-bottom: 1px solid rgba(255,71,79,0.3);
+            font-weight: bold;
+        }
+        .provoke-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 3px;
+            overflow-y: auto;
+        }
+        .provoke-layer {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 2px;
+            margin: 1px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            min-height: 22px;
+        }
+        .provoke-layer.current {
+            background: linear-gradient(90deg, rgba(255,0,0,0.5), rgba(200,0,0,0.4));
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 15px rgba(255,0,0,0.6);
+            animation: provoke-pulse 0.8s infinite;
+        }
+        @keyframes provoke-pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            50% { box-shadow: 0 0 20px rgba(255,0,0,0.8); }
+        }
+        .provoke-card {
+            width: 20px;
+            height: 28px;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            border: 1px solid;
+        }
+        .provoke-card.red { color: #d00; border-color: #ff6b6b; }
+        .provoke-card.black { color: #000; border-color: #666; }
+        .provoke-card .suit { font-size: 10px; }
+        .provoke-card .rank { font-size: 7px; font-weight: bold; }
+        
+        /* 底部区域 */
+        .bottom-area {
+            background: linear-gradient(180deg, #1a1a3e 0%, #0f0f1e 100%);
+            border-top: 2px solid #333;
+            padding: 8px;
+            flex-shrink: 0;
+        }
+        .player-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .player-status { display: flex; align-items: center; gap: 10px; }
+        .player-avatar-main {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .player-details { font-size: 11px; }
+        .player-name-display { font-weight: bold; color: #FFD700; }
+        .player-level-display { color: #aaa; font-size: 10px; }
+        .turn-info { text-align: right; }
+        .turn-status { font-size: 12px; color: #4ade80; font-weight: bold; }
+        .turn-status.my-turn { color: #ffd700; animation: blink 1s infinite; }
+        .round-info { font-size: 10px; color: #888; }
+        
+        /* 手牌区 */
+        .hand-section { margin-bottom: 8px; }
+        .hand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+            margin-bottom: 5px;
+        }
+        .hand-title { font-size: 11px; color: #888; }
+        .hand-count {
+            font-size: 10px;
+            color: #FFD700;
+            background: rgba(255,215,0,0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .hand-cards-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hand-cards {
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            min-width: max-content;
+        }
+        .hand-card {
+            width: 44px;
+            height: 60px;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .hand-card:hover { transform: translateY(-3px); }
+        .hand-card.selected {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(255,215,0,0.6);
+            border-color: #FFD700;
+        }
+        .hand-card.red { color: #d00; }
+        .hand-card.black { color: #000; }
+        .hand-card .suit { font-size: 20px; }
+        .hand-card .rank { font-size: 12px; font-weight: bold; }
+        .gift-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+            background: #ff4757;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 出牌区 */
+        .play-section { display: flex; gap: 10px; }
+        .play-btn {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #333, #444);
+            color: #666;
+            border: 2px solid #555;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: not-allowed;
+        }
+        .play-btn.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border-color: #FFD700;
+            cursor: pointer;
+            animation: pulse-btn 1s ease infinite;
+        }
+        @keyframes pulse-btn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .play-btn:disabled { opacity: 0.6; }
+        
+        /* 日志区 */
+        .log-section {
+            max-height: 60px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            padding: 5px;
+            font-size: 10px;
+            margin-top: 8px;
+        }
+        .log-entry { padding: 2px 0; border-bottom: 1px solid #222; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-time { color: #888; margin-right: 5px; }
+        
+        /* ===== 结果界面 ===== */
+        .result-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
+        .result-screen.show { display: flex; }
+        .result-container {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 450px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255,215,0,0.5);
+            text-align: center;
+        }
+        .result-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .leaderboard-section { margin-bottom: 25px; }
+        .leaderboard-section h3 { font-size: 16px; margin-bottom: 15px; color: #FFD700; }
         .leaderboard-item {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .leaderboard-item.is-me { background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.3); }
+        .leaderboard-item .rank { font-size: 20px; width: 30px; }
+        .leaderboard-item .avatar { font-size: 24px; }
+        .leaderboard-item .name { flex: 1; text-align: left; }
+        .leaderboard-item .team { font-size: 18px; }
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+        
+        .rewards-section { margin-bottom: 25px; }
+        .my-rank { font-size: 18px; margin-bottom: 15px; }
+        .rewards-list { display: flex; flex-direction: column; gap: 10px; }
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 12px;
             background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            margin-bottom: 10px;
+            border-radius: 10px;
         }
-        .rank-number {
-            width: 32px;
-            height: 32px;
+        .reward-item .icon { font-size: 28px; }
+        .reward-item.postcard { border: 2px solid; }
+        .reward-item.postcard.gold { border-color: #FFD700; background: rgba(255,215,0,0.1); }
+        .reward-item.postcard.silver { border-color: #C0C0C0; background: rgba(192,192,192,0.1); }
+        .reward-item.postcard.bronze { border-color: #CD7F32; background: rgba(205,127,50,0.1); }
+        .reward-item .amount { font-size: 20px; font-weight: bold; color: #FFD700; }
+        .reward-item .name { font-size: 14px; }
+        
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .result-actions button {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-share {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+        .btn-collection {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: #fff;
+        }
+        .btn-again {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            color: #000;
+        }
+        .result-actions button:hover { transform: translateY(-2px); }
+        
+        /* ===== Toast提示 ===== */
+        .game-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(30,30,50,0.95));
+            padding: 16px 32px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 4000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,215,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .game-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        /* ===== 明信片收集册入口 ===== */
+        .collection-entry {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, #ffd700, #ff6b35);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #000;
+            font-size: 28px;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+            cursor: pointer;
+            z-index: 500;
+            transition: all 0.3s;
+            text-decoration: none;
         }
-        .rank-number.top3 { background: linear-gradient(135deg, #C0C0C0, #808080); }
-        .player-info {
-            flex: 1;
-        }
-        .player-name {
-            font-weight: bold;
-        }
-        .player-country {
-            font-size: 12px;
-            color: #aaa;
-        }
-        .player-score {
-            font-size: 18px;
-            color: #ffd700;
-            font-weight: bold;
-        }
+        .collection-entry:hover { transform: scale(1.1); }
         
-        /* 模拟WebSocket状态指示器 */
-        .connection-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #48bb78;
-        }
-        .connection-status::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #48bb78;
-            border-radius: 50%;
-            animation: blink 1s ease-in-out infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        /* ===== 响应式 ===== */
+        @media (max-width: 480px) {
+            .hand-card { width: 38px; height: 52px; }
+            .hand-card .suit { font-size: 16px; }
+            .hand-card .rank { font-size: 10px; }
+            .provoke-card { width: 18px; height: 24px; }
+            .layer-player-icon { width: 12px; height: 12px; font-size: 7px; }
         }
     </style>
-  <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
-<body class="responsive-layout">
-    <div class="header">
-        <a href="index.html" class="back-btn">← 返回</a>
-        <div class="header-title">全球锦标赛</div>
-        <div class="connection-status">实时连接中</div>
-    </div>
-    
-    <!-- ===== 倒计时组件 ===== -->
-    <div class="countdown-section">
-        <div class="countdown-label">⏱️ 报名倒计时</div>
-        <div class="countdown-time" id="countdownTime">报名剩余 02:00</div>
-        <div class="countdown-progress">
-            <div class="countdown-progress-bar" id="countdownProgress" style="width: 0%"></div>
+<body>
+    <!-- ============ 主页面内容 ============ -->
+    <div id="mainPage">
+        <div class="header">
+            <a href="index.html" class="back-btn">← 返回</a>
+            <div class="header-title">全球锦标赛</div>
+            <div class="connection-status">实时连接中</div>
         </div>
-        <div class="countdown-status" id="countdownStatus">下一局即将开始，立即报名！</div>
-    </div>
-    
-    <!-- ===== 报名队列系统 ===== -->
-    <div class="queue-section">
-        <div class="queue-header">
-            <div class="queue-title">👥 报名队列 <span class="connection-status"></span></div>
-            <div class="queue-count" id="queueCount">3/10</div>
-        </div>
-        <div class="players-grid" id="playersGrid">
-            <!-- 玩家头像将由JavaScript动态生成 -->
-        </div>
-        <button class="register-btn idle" id="registerBtn" onclick="toggleRegistration()">
-            🎮 立即报名
-        </button>
-    </div>
-    
-    <!-- ===== 奖励预览 ===== -->
-    <div class="rewards-section">
-        <div class="rewards-title">🏆 奖励预览</div>
-        <div class="rewards-grid">
-            <div class="reward-card gold">
-                <div class="reward-icon">🥇</div>
-                <div class="reward-rank">冠军</div>
-                <div class="reward-amount">💎 5000</div>
-                <div class="reward-detail">
-                    🏆 冠军奖杯<br>
-                    ✨ 限定称号"首登者"<br>
-                    💎 5000钻石 + 100万金币
-                </div>
+        
+        <!-- 倒计时组件 -->
+        <div class="countdown-section">
+            <div class="countdown-label">⏱️ 报名倒计时</div>
+            <div class="countdown-time" id="countdownTime">报名剩余 02:00</div>
+            <div class="countdown-progress">
+                <div class="countdown-progress-bar" id="countdownProgress" style="width: 0%"></div>
             </div>
-            <div class="reward-card silver">
-                <div class="reward-icon">🥈</div>
-                <div class="reward-rank">亚军</div>
-                <div class="reward-amount">💎 3000</div>
-                <div class="reward-detail">
-                    🥈 亚军奖章<br>
-                    ✨ 称号"攀登者"<br>
-                    💎 3000钻石 + 50万金币
-                </div>
+            <div class="countdown-status" id="countdownStatus">下一局即将开始，立即报名！</div>
+        </div>
+        
+        <!-- 报名队列系统 -->
+        <div class="queue-section">
+            <div class="queue-header">
+                <div class="queue-title">👥 报名队列</div>
+                <div class="queue-count" id="queueCount">3/10</div>
             </div>
-            <div class="reward-card bronze">
-                <div class="reward-icon">🥉</div>
-                <div class="reward-rank">季军</div>
-                <div class="reward-amount">💎 1500</div>
-                <div class="reward-detail">
-                    🥉 季军徽章<br>
-                    ✨ 称号"挑战者"<br>
-                    💎 1500钻石 + 20万金币
+            <div class="players-grid" id="playersGrid"></div>
+            <button class="register-btn idle" id="registerBtn" onclick="toggleRegistration()">
+                🎮 立即报名
+            </button>
+        </div>
+        
+        <!-- 奖励预览 -->
+        <div class="rewards-section">
+            <div class="rewards-title">🏆 奖励预览</div>
+            <div class="rewards-grid">
+                <div class="reward-card gold">
+                    <div class="reward-icon">🥇</div>
+                    <div class="reward-rank">冠军</div>
+                    <div class="reward-amount">💎 5000</div>
+                </div>
+                <div class="reward-card silver">
+                    <div class="reward-icon">🥈</div>
+                    <div class="reward-rank">亚军</div>
+                    <div class="reward-amount">💎 3000</div>
+                </div>
+                <div class="reward-card bronze">
+                    <div class="reward-icon">🥉</div>
+                    <div class="reward-rank">季军</div>
+                    <div class="reward-amount">💎 1500</div>
                 </div>
             </div>
         </div>
+        
+        <!-- 世界地图 -->
+        <div class="world-map">
+            <div class="map-title">🌍 选择你的战场</div>
+        </div>
+        
+        <!-- 大洲选择 -->
+        <div class="continents-grid">
+            <div class="continent-card" onclick="showCountries('asia')">
+                <div class="continent-icon">🌏</div>
+                <div class="continent-name">亚洲</div>
+                <div class="continent-countries">49个国家</div>
+            </div>
+            <div class="continent-card" onclick="showCountries('europe')">
+                <div class="continent-icon">🏰</div>
+                <div class="continent-name">欧洲</div>
+                <div class="continent-countries">44个国家</div>
+            </div>
+            <div class="continent-card" onclick="showCountries('america')">
+                <div class="continent-icon">🗽</div>
+                <div class="continent-name">美洲</div>
+                <div class="continent-countries">35个国家</div>
+            </div>
+            <div class="continent-card" onclick="showCountries('africa')">
+                <div class="continent-icon">🦁</div>
+                <div class="continent-name">非洲</div>
+                <div class="continent-countries">54个国家</div>
+            </div>
+        </div>
+        
+        <!-- 明信片收集册入口 -->
+        <a href="collection.html" class="collection-entry" title="我的明信片">📮</a>
     </div>
     
-    <div class="world-map">
-        <div class="map-title">🌍 选择你的战场</div>
-    </div>
-    
-    <!-- 大洲选择 -->
-    <div class="continents-grid">
-        <div class="continent-card" onclick="showCountries('asia')">
-            <div class="continent-icon">🌏</div>
-            <div class="continent-name">亚洲</div>
-            <div class="continent-countries">49个国家</div>
-        </div>
-        
-        <div class="continent-card" onclick="showCountries('europe')">
-            <div class="continent-icon">🏰</div>
-            <div class="continent-name">欧洲</div>
-            <div class="continent-countries">44个国家</div>
-        </div>
-        
-        <div class="continent-card" onclick="showCountries('america')">
-            <div class="continent-icon">🗽</div>
-            <div class="continent-name">美洲</div>
-            <div class="continent-countries">35个国家</div>
-        </div>
-        
-        <div class="continent-card" onclick="showCountries('africa')">
-            <div class="continent-icon">🦁</div>
-            <div class="continent-name">非洲</div>
-            <div class="continent-countries">54个国家</div>
+    <!-- ============ 国家选择弹窗 ============ -->
+    <div class="country-modal" id="countryModal">
+        <div class="country-modal-content">
+            <div class="country-modal-header">
+                <div class="country-modal-title" id="countryModalTitle">选择国家</div>
+                <button class="country-modal-close" onclick="closeCountryModal()">×</button>
+            </div>
+            <div class="countries-list" id="countriesList"></div>
         </div>
     </div>
     
-    <!-- 当前锦标赛 -->
-    <div class="current-tournament">
-        <div class="tournament-title">🔥 中国锦标赛 - 上海站</div>
-        <div class="tournament-info">
-            <div>
-                <div style="font-size: 14px; opacity: 0.8;">参赛人数</div>
-                <div style="font-size: 20px; font-weight: bold;">1,234人</div>
+    <!-- ============ 锦标赛游戏主界面 ============ -->
+    <div class="tournament-game-container" id="tournamentGameContainer">
+        <!-- 游戏顶部栏 -->
+        <div class="game-top-bar">
+            <div class="game-info">
+                <a href="javascript:void(0)" onclick="exitGame()" style="color:#fff;text-decoration:none;">←</a>
+                <div class="game-tower-info">
+                    <span class="game-tower-flag" id="gameTowerFlag">🇨🇳</span>
+                    <span id="gameTowerName">中国·东方明珠</span>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 14px; opacity: 0.8;">奖池</div>
-                <div class="tournament-prize">💎 5000</div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 12px; opacity: 0.7;">当前层数</div>
-                <div style="font-size: 18px; font-weight: bold;">第 7 层</div>
-            </div>
-            <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 12px; opacity: 0.7;">剩余时间</div>
-                <div style="font-size: 18px; font-weight: bold;">02:45:12</div>
+            <div class="game-timers">
+                <div class="timer-box">
+                    <div class="timer-label">出牌</div>
+                    <div class="timer-value" id="turnTimerValue">30</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-label">对局</div>
+                    <div class="timer-value" id="gameTimerValue">26:00</div>
+                </div>
             </div>
         </div>
         
-        <button class="join-btn" onclick="joinTournament()">立即参赛</button>
+        <!-- 团队战标题 -->
+        <div class="team-battle-header">
+            <div class="team-section team-panda">
+                <div class="team-icon">🐼</div>
+                <div class="team-info">
+                    <div class="team-name">熊猫战队</div>
+                </div>
+                <div class="team-avatars" id="pandaAvatars"></div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="team-section team-wolf">
+                <div class="team-icon">🐺</div>
+                <div class="team-info">
+                    <div class="team-name">战狼战队</div>
+                </div>
+                <div class="team-avatars" id="wolfAvatars"></div>
+            </div>
+        </div>
+        
+        <!-- 主战场 -->
+        <div class="battlefield">
+            <!-- 左侧层叠区 -->
+            <div class="layer-panel">
+                <div class="layer-panel-title">🏔️ 层叠区</div>
+                <div class="layer-list" id="layerList"></div>
+            </div>
+            
+            <!-- 中间塔区 -->
+            <div class="tower-panel">
+                <div class="tower-container">
+                    <img src="" class="tower-image" id="towerImage" alt="塔" style="display:none;">
+                    <div class="tower-emoji" id="towerEmoji">🏯</div>
+                    <div class="current-guard-display">
+                        <div class="current-guard-label">守卫牌</div>
+                        <div class="current-guard-card" id="currentGuardCard">
+                            <span style="font-size:20px">❓</span>
+                        </div>
+                        <div class="guard-remaining">剩余: <span id="guardCardsLeft">13</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧激怒牌区 -->
+            <div class="provoke-panel">
+                <div class="provoke-panel-title">⚠️ 激怒牌</div>
+                <div class="provoke-list" id="provokeList"></div>
+            </div>
+        </div>
+        
+        <!-- 底部区域 -->
+        <div class="bottom-area">
+            <div class="player-status-bar">
+                <div class="player-status">
+                    <div class="player-avatar-main" id="myAvatar">😎</div>
+                    <div class="player-details">
+                        <div class="player-name-display">我</div>
+                        <div class="player-level-display" id="myLevelDisplay">第 2 层</div>
+                    </div>
+                </div>
+                <div class="turn-info">
+                    <div class="turn-status" id="turnStatus">等待中...</div>
+                    <div class="round-info">第 <span id="roundNum">1</span> 轮</div>
+                </div>
+            </div>
+            
+            <div class="hand-section">
+                <div class="hand-header">
+                    <span class="hand-title">🎴 我的手牌</span>
+                    <span class="hand-count" id="handCount">52张</span>
+                </div>
+                <div class="hand-cards-container">
+                    <div class="hand-cards" id="handCards"></div>
+                </div>
+            </div>
+            
+            <div class="play-section">
+                <button class="play-btn" id="playBtn" onclick="confirmPlay()" disabled>
+                    请选择手牌
+                </button>
+            </div>
+            
+            <div class="log-section" id="logSection">
+                <div class="log-entry"><span class="log-time"></span>🎮 游戏开始！</div>
+            </div>
+        </div>
     </div>
     
-    <!-- 排行榜 -->
-    <div class="leaderboard">
-        <div class="section-title">🏅 全球排行榜</div>
-        
-        <div class="leaderboard-item">
-            <div class="rank-number">1</div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #e74c3c, #c0392b); display: flex; align-items: center; justify-content: center; font-size: 20px;">🐲</div>
-            <div class="player-info">
-                <div class="player-name">龙霸天下</div>
-                <div class="player-country">🇨🇳 中国</div>
-            </div>
-            <div class="player-score">12,580</div>
-        </div>
-        
-        <div class="leaderboard-item">
-            <div class="rank-number top3">2</div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3498db, #2980b9); display: flex; align-items: center; justify-content: center; font-size: 20px;">🗼</div>
-            <div class="player-info">
-                <div class="player-name">巴黎绅士</div>
-                <div class="player-country">🇫🇷 法国</div>
-            </div>
-            <div class="player-score">11,234</div>
-        </div>
-        
-        <div class="leaderboard-item">
-            <div class="rank-number top3">3</div>
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f39c12, #e67e22); display: flex; align-items: center; justify-content: center; font-size: 20px;">🤠</div>
-            <div class="player-info">
-                <div class="player-name">德州牛仔</div>
-                <div class="player-country">🇺🇸 美国</div>
-            </div>
-            <div class="player-score">10,876</div>
+    <!-- ============ 结果界面 ============ -->
+    <div class="result-screen" id="resultScreen">
+        <div class="result-container">
+            <h2>🎉 游戏结束</h2>
+            <div class="leaderboard-section" id="resultLeaderboard"></div>
+            <div class="rewards-section" id="resultRewards"></div>
         </div>
     </div>
+    
+    <!-- 引入游戏逻辑 -->
+    <script src="js/tournament-game.js"></script>
     
     <script>
-        // ===== 配置参数 =====
+        // ============ 配置参数 ============
         const CONFIG = {
-            COUNTDOWN_DURATION: 120, // 2分钟 = 120秒（报名倒计时）
+            COUNTDOWN_DURATION: 120,
             MAX_PLAYERS: 10,
             INITIAL_BOTS: 7,
-            BOT_REFILL_DELAY: 120000, // 2分钟 = 120000毫秒
-            SIMULATION_INTERVAL: 3000, // 模拟WebSocket更新间隔
-            REGISTRATION_LABEL: '报名剩余', // 倒计时标签
+            BOT_REFILL_DELAY: 120000,
+            SIMULATION_INTERVAL: 3000,
         };
         
-        // ===== 状态管理 =====
+        // ============ 国家数据 ============
+        const COUNTRIES = {
+            asia: [
+                { code: 'china', name: '中国', flag: '🇨🇳', tower: '东方明珠', difficulty: 'normal' },
+                { code: 'japan', name: '日本', flag: '🇯🇵', tower: '东京塔', difficulty: 'normal' },
+                { code: 'south_korea', name: '韩国', flag: '🇰🇷', tower: 'N首尔塔', difficulty: 'normal' },
+                { code: 'india', name: '印度', flag: '🇮🇳', tower: '印度门', difficulty: 'hard' },
+                { code: 'thailand', name: '泰国', flag: '🇹🇭', tower: '郑王庙', difficulty: 'easy' },
+                { code: 'singapore', name: '新加坡', flag: '🇸🇬', tower: '鱼尾狮', difficulty: 'easy' },
+            ],
+            europe: [
+                { code: 'france', name: '法国', flag: '🇫🇷', tower: '埃菲尔铁塔', difficulty: 'normal' },
+                { code: 'italy', name: '意大利', flag: '🇮🇹', tower: '比萨斜塔', difficulty: 'easy' },
+                { code: 'uk', name: '英国', flag: '🇬🇧', tower: '大本钟', difficulty: 'normal' },
+                { code: 'germany', name: '德国', flag: '🇩🇪', tower: '科隆大教堂', difficulty: 'hard' },
+                { code: 'russia', name: '俄罗斯', flag: '🇷🇺', tower: '克里姆林宫', difficulty: 'hard' },
+            ],
+            america: [
+                { code: 'usa', name: '美国', flag: '🇺🇸', tower: '自由女神像', difficulty: 'normal' },
+                { code: 'brazil', name: '巴西', flag: '🇧🇷', tower: '基督像', difficulty: 'normal' },
+                { code: 'canada', name: '加拿大', flag: '🇨🇦', tower: 'CN塔', difficulty: 'easy' },
+                { code: 'mexico', name: '墨西哥', flag: '🇲🇽', tower: '玛雅金字塔', difficulty: 'hard' },
+            ],
+            africa: [
+                { code: 'egypt', name: '埃及', flag: '🇪🇬', tower: '金字塔', difficulty: 'hard' },
+                { code: 'south_africa', name: '南非', flag: '🇿🇦', tower: '桌山', difficulty: 'normal' },
+                { code: 'morocco', name: '摩洛哥', flag: '🇲🇦', tower: '哈桑塔', difficulty: 'easy' },
+            ]
+        };
+        
+        // ============ 状态管理 ============
         const state = {
             timeRemaining: CONFIG.COUNTDOWN_DURATION,
             isRunning: true,
             players: [],
             bots: CONFIG.INITIAL_BOTS,
-            humans: 3, // 初始真人玩家数
+            humans: 3,
             userRegistered: false,
             inGame: false,
             lastHumanJoined: null,
+            selectedCountry: null,
         };
         
-        // 头像表情库
         const AVATARS = ['🐲', '🦁', '🦅', '🐯', '🐺', '🦊', '🐼', '🐨', '🐸', '🦉'];
         
-        // ===== 初始化 =====
+        // ============ 初始化 ============
         function init() {
             initPlayers();
             startCountdown();
             renderPlayers();
             startSimulation();
             updateQueueCount();
-            updateCountdownDisplay(); // 确保初始显示正确
+            updateCountdownDisplay();
         }
         
-        // 初始化玩家列表（3真人 + 7Bot）
         function initPlayers() {
             state.players = [];
-            // 添加真人玩家
             for (let i = 0; i < state.humans; i++) {
                 state.players.push({
                     id: i,
@@ -743,7 +1245,6 @@
                     name: `玩家${i + 1}`
                 });
             }
-            // 添加Bot
             for (let i = 0; i < state.bots; i++) {
                 state.players.push({
                     id: state.humans + i,
@@ -754,18 +1255,15 @@
             }
         }
         
-        // ===== 倒计时系统 =====
+        // ============ 倒计时系统 ============
         function startCountdown() {
             const timer = setInterval(() => {
                 if (!state.isRunning) return;
-                
                 state.timeRemaining--;
-                
                 if (state.timeRemaining <= 0) {
                     state.timeRemaining = CONFIG.COUNTDOWN_DURATION;
                     onRoundStart();
                 }
-                
                 updateCountdownDisplay();
             }, 1000);
         }
@@ -773,66 +1271,29 @@
         function updateCountdownDisplay() {
             const minutes = Math.floor(state.timeRemaining / 60);
             const seconds = state.timeRemaining % 60;
-            const timeStr = `${CONFIG.REGISTRATION_LABEL} ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('countdownTime').textContent = 
+                `报名剩余 ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
-            document.getElementById('countdownTime').textContent = timeStr;
-            
-            // 更新进度条
             const progress = ((CONFIG.COUNTDOWN_DURATION - state.timeRemaining) / CONFIG.COUNTDOWN_DURATION) * 100;
             document.getElementById('countdownProgress').style.width = `${progress}%`;
             
-            // 更新状态文字
-            const statusEl = document.getElementById('countdownStatus');
             const humanCount = state.players.filter(p => p.type === 'human').length;
             const botCount = state.players.filter(p => p.type === 'bot').length;
-            
-            if (state.timeRemaining <= 10) {
-                statusEl.textContent = '⚡ 报名截止！正在分配对手...';
-                statusEl.style.color = '#ffd700';
-            } else if (state.timeRemaining <= 30) {
-                statusEl.textContent = `🔥 最后${state.timeRemaining}秒！当前${humanCount}真人+${botCount}Bot`;
-                statusEl.style.color = '#ff6b35';
-            } else if (state.timeRemaining <= 60) {
-                statusEl.textContent = `⏰ 还剩1分钟！当前${humanCount}真人玩家`;
-                statusEl.style.color = '#ff6b35';
-            } else {
-                statusEl.textContent = `等待中... 当前${humanCount}真人+${botCount}Bot | 满10人立即开赛或2分钟后自动补Bot`;
-                statusEl.style.color = 'rgba(255,255,255,0.8)';
-            }
+            document.getElementById('countdownStatus').textContent = 
+                `当前${humanCount}真人+${botCount}Bot | 满10人立即开赛`;
         }
         
         function onRoundStart() {
-            // 2分钟倒计时结束，自动用Bot补足10人
             fillWithBots();
-            
             if (state.userRegistered) {
                 state.inGame = true;
                 updateRegisterButton();
-                showNotification('🎮 比赛开始！正在进入战场...');
-                setTimeout(() => {
-                    location.href = 'playable.html?tournament=china';
-                }, 2000);
-            } else {
-                // 重置倒计时，开始下一局报名
-                state.timeRemaining = CONFIG.COUNTDOWN_DURATION;
-                state.inGame = false;
-                state.players = [];
-                state.humans = 0;
-                state.bots = 0;
-                state.userRegistered = false;
-                initPlayers();
-                renderPlayers();
-                updateQueueCount();
-                updateRegisterButton();
-                showNotification('🔄 新一局报名开始！');
+                showNotification('🎮 比赛开始！');
             }
         }
         
-        // 用Bot补足到10人
         function fillWithBots() {
-            const currentPlayerCount = state.players.length;
-            const botsNeeded = CONFIG.MAX_PLAYERS - currentPlayerCount;
-            
+            const botsNeeded = CONFIG.MAX_PLAYERS - state.players.length;
             if (botsNeeded > 0) {
                 for (let i = 0; i < botsNeeded; i++) {
                     state.players.push({
@@ -845,21 +1306,17 @@
                 state.bots += botsNeeded;
                 renderPlayers();
                 updateQueueCount();
-                showNotification(`🤖 已自动补充 ${botsNeeded} 个Bot，比赛即将开始！`);
             }
         }
         
-        // ===== 玩家队列渲染 =====
+        // ============ 玩家队列渲染 ============
         function renderPlayers() {
             const grid = document.getElementById('playersGrid');
             grid.innerHTML = '';
-            
-            // 确保始终显示10个位置
             for (let i = 0; i < CONFIG.MAX_PLAYERS; i++) {
                 const player = state.players[i];
                 const avatar = document.createElement('div');
                 avatar.className = 'player-avatar';
-                
                 if (player) {
                     avatar.classList.add(player.type);
                     avatar.textContent = player.avatar;
@@ -868,7 +1325,6 @@
                     avatar.classList.add('empty');
                     avatar.innerHTML = '<span style="opacity:0.3">+</span>';
                 }
-                
                 grid.appendChild(avatar);
             }
         }
@@ -877,30 +1333,20 @@
             const totalPlayers = state.players.length;
             const countEl = document.getElementById('queueCount');
             countEl.textContent = `${totalPlayers}/${CONFIG.MAX_PLAYERS}`;
-            
-            if (totalPlayers >= CONFIG.MAX_PLAYERS) {
-                countEl.classList.add('full');
-            } else {
-                countEl.classList.remove('full');
-            }
+            countEl.classList.toggle('full', totalPlayers >= CONFIG.MAX_PLAYERS);
         }
         
-        // ===== 报名按钮功能 =====
+        // ============ 报名按钮功能 ============
         function toggleRegistration() {
             if (state.inGame) return;
-            
             state.userRegistered = !state.userRegistered;
-            
             if (state.userRegistered) {
-                // 用户报名 - 添加真人玩家
                 addHumanPlayer('我', '😎');
-                showNotification('✅ 报名成功！等待比赛开始...');
+                showNotification('✅ 报名成功！请选择战场');
             } else {
-                // 取消报名 - 移除用户
                 removePlayerByName('我');
                 showNotification('❌ 已取消报名');
             }
-            
             updateRegisterButton();
             renderPlayers();
             updateQueueCount();
@@ -909,7 +1355,6 @@
         function updateRegisterButton() {
             const btn = document.getElementById('registerBtn');
             btn.className = 'register-btn';
-            
             if (state.inGame) {
                 btn.classList.add('ingame');
                 btn.textContent = '🎮 比赛中...';
@@ -924,99 +1369,372 @@
             }
         }
         
-        // ===== Bot占位逻辑 =====
         function addHumanPlayer(name, avatar) {
-            // 移除一个Bot来腾出位置
             const botIndex = state.players.findIndex(p => p.type === 'bot');
             if (botIndex !== -1) {
-                const botEl = document.querySelectorAll('.player-avatar')[botIndex];
-                if (botEl) botEl.classList.add('leaving');
-                
-                setTimeout(() => {
-                    state.players.splice(botIndex, 1);
-                    state.bots--;
-                    state.humans++;
-                    
-                    // 添加真人玩家
-                    state.players.unshift({
-                        id: Date.now(),
-                        type: 'human',
-                        avatar: avatar,
-                        name: name
-                    });
-                    
-                    state.lastHumanJoined = Date.now();
-                    renderPlayers();
-                    updateQueueCount();
-                }, 300);
+                state.players.splice(botIndex, 1);
+                state.bots--;
+                state.humans++;
+                state.players.unshift({
+                    id: Date.now(),
+                    type: 'human',
+                    avatar: avatar,
+                    name: name
+                });
+                state.lastHumanJoined = Date.now();
+                renderPlayers();
+                updateQueueCount();
             }
-            
-            // 设置Bot补满定时器
-            setTimeout(() => {
-                refillBots();
-            }, CONFIG.BOT_REFILL_DELAY);
         }
         
         function removePlayerByName(name) {
             const index = state.players.findIndex(p => p.name === name);
             if (index !== -1) {
-                const playerEl = document.querySelectorAll('.player-avatar')[index];
-                if (playerEl) playerEl.classList.add('leaving');
-                
-                setTimeout(() => {
-                    state.players.splice(index, 1);
-                    state.humans--;
-                    
-                    // 添加Bot补充
-                    if (state.players.length < CONFIG.MAX_PLAYERS) {
-                        state.players.push({
-                            id: Date.now(),
-                            type: 'bot',
-                            avatar: '🤖',
-                            name: `Bot${Date.now()}`
-                        });
-                        state.bots++;
-                    }
-                    
-                    renderPlayers();
-                    updateQueueCount();
-                }, 300);
-            }
-        }
-        
-        function refillBots() {
-            const timeSinceLastJoin = Date.now() - (state.lastHumanJoined || 0);
-            if (timeSinceLastJoin >= CONFIG.BOT_REFILL_DELAY && state.bots < CONFIG.INITIAL_BOTS) {
-                while (state.players.length < CONFIG.MAX_PLAYERS && state.bots < CONFIG.INITIAL_BOTS) {
+                state.players.splice(index, 1);
+                state.humans--;
+                if (state.players.length < CONFIG.MAX_PLAYERS) {
                     state.players.push({
-                        id: Date.now() + Math.random(),
+                        id: Date.now(),
                         type: 'bot',
                         avatar: '🤖',
-                        name: `Bot${state.bots + 1}`
+                        name: `Bot${Date.now()}`
                     });
                     state.bots++;
                 }
                 renderPlayers();
                 updateQueueCount();
-                showNotification('🤖 Bot已补满队列');
             }
         }
         
-        // ===== 模拟WebSocket实时更新 =====
+        // ============ 国家选择 ============
+        function showCountries(continent) {
+            const modal = document.getElementById('countryModal');
+            const title = document.getElementById('countryModalTitle');
+            const list = document.getElementById('countriesList');
+            
+            const names = { asia: '亚洲', europe: '欧洲', america: '美洲', africa: '非洲' };
+            title.textContent = `选择${names[continent]}国家`;
+            
+            const countries = COUNTRIES[continent] || [];
+            list.innerHTML = countries.map(c => `
+                <div class="country-item" onclick="selectCountry('${c.code}', '${c.name}', '${c.flag}', '${c.tower}')">
+                    <span class="country-flag">${c.flag}</span>
+                    <div class="country-info">
+                        <div class="country-name">${c.name}</div>
+                        <div class="country-difficulty">${c.tower} · ${c.difficulty === 'easy' ? '简单' : c.difficulty === 'hard' ? '困难' : '普通'}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            modal.classList.add('show');
+        }
+        
+        function closeCountryModal() {
+            document.getElementById('countryModal').classList.remove('show');
+        }
+        
+        function selectCountry(code, name, flag, tower) {
+            if (!state.userRegistered) {
+                showNotification('❌ 请先报名！');
+                return;
+            }
+            
+            state.selectedCountry = code;
+            closeCountryModal();
+            
+            // 启动锦标赛游戏
+            startTournamentGame(code);
+        }
+        
+        // ============ 启动锦标赛游戏 ============
+        function startTournamentGame(countryCode) {
+            console.log(`🎮 启动锦标赛: ${countryCode}`);
+            
+            // 显示游戏界面
+            document.getElementById('tournamentGameContainer').classList.add('active');
+            
+            // 初始化游戏
+            const result = initTournamentGame(countryCode, true);
+            
+            // 设置游戏事件监听
+            setupGameEventListeners();
+        }
+        
+        // ============ 游戏事件监听 ============
+        function setupGameEventListeners() {
+            if (!window.tournamentGame) return;
+            
+            const game = window.tournamentGame;
+            
+            game.on('turnTimeUpdate', (data) => {
+                const timerEl = document.getElementById('turnTimerValue');
+                timerEl.textContent = data.remaining;
+                timerEl.classList.toggle('warning', data.remaining <= 10);
+            });
+            
+            game.on('gameTimeUpdate', (data) => {
+                document.getElementById('gameTimerValue').textContent = game.formatTime(data.remaining);
+            });
+            
+            game.on('myTurn', () => {
+                document.getElementById('turnStatus').textContent = '🎯 你的回合';
+                document.getElementById('turnStatus').classList.add('my-turn');
+            });
+            
+            game.on('turnStarted', (data) => {
+                if (data.player.id !== game.state.myPlayerId) {
+                    document.getElementById('turnStatus').textContent = `⏳ ${data.player.name}的回合`;
+                    document.getElementById('turnStatus').classList.remove('my-turn');
+                }
+                updateUI();
+            });
+            
+            game.on('cardPlayed', () => {
+                updateUI();
+            });
+            
+            game.on('logAdded', (data) => {
+                addGameLog(data.message);
+            });
+            
+            game.on('gameEnded', (data) => {
+                showResultScreen(data);
+            });
+        }
+        
+        // ============ UI更新 ============
+        function updateUI() {
+            if (!window.tournamentGame) return;
+            
+            const game = window.tournamentGame;
+            const myPlayer = game.getMyPlayer();
+            
+            // 更新手牌
+            renderHand();
+            
+            // 更新层叠区
+            renderLayerList();
+            
+            // 更新激怒牌
+            renderProvokeList();
+            
+            // 更新我的信息
+            document.getElementById('myLevelDisplay').textContent = `第 ${game.getLevelName(game.state.myLevel)} 层`;
+            document.getElementById('roundNum').textContent = game.state.round;
+            document.getElementById('handCount').textContent = `${myPlayer.cardsRemaining}张`;
+            
+            // 更新出牌按钮
+            const playBtn = document.getElementById('playBtn');
+            const isMyTurn = game.state.players[game.state.currentTurn]?.id === game.state.myPlayerId;
+            const hasSelected = game.state.mySelectedCard !== null;
+            playBtn.disabled = !isMyTurn || !hasSelected;
+            playBtn.classList.toggle('active', isMyTurn && hasSelected);
+            playBtn.textContent = isMyTurn ? (hasSelected ? '⚔️ 出牌攻击' : '请选择手牌') : '等待其他玩家...';
+        }
+        
+        function renderHand() {
+            if (!window.tournamentGame) return;
+            
+            const game = window.tournamentGame;
+            const handCards = document.getElementById('handCards');
+            const myHand = game.state.myHand.filter(c => !c.used);
+            
+            handCards.innerHTML = myHand.map((card, index) => {
+                const isSelected = game.state.mySelectedCard === index;
+                const colorClass = card.isRed ? 'red' : 'black';
+                return `
+                    <div class="hand-card ${colorClass} ${isSelected ? 'selected' : ''}" 
+                         onclick="selectCard(${index})">
+                        <span class="suit">${card.suit}</span>
+                        <span class="rank">${card.rank}</span>
+                        ${card.isGift ? '<span class="gift-badge">🎁</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderLayerList() {
+            if (!window.tournamentGame) return;
+            
+            const game = window.tournamentGame;
+            const layerList = document.getElementById('layerList');
+            const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+            
+            layerList.innerHTML = levels.map((level, index) => {
+                const isCurrent = game.state.myLevel === index;
+                const playersHere = game.state.players.filter(p => p.level === index);
+                const playersHtml = playersHere.map(p => {
+                    const isSelf = p.id === game.state.myPlayerId;
+                    const teamClass = p.team === 'panda' ? 'panda-team' : 'wolf-team';
+                    return `<span class="layer-player-icon ${teamClass} ${isSelf ? 'self' : ''}">${p.avatar}</span>`;
+                }).join('');
+                
+                return `
+                    <div class="layer-item ${isCurrent ? 'current' : ''}" data-rank="${level}">
+                        <span class="layer-rank">${level}</span>
+                        <div class="layer-players">${playersHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderProvokeList() {
+            if (!window.tournamentGame) return;
+            
+            const game = window.tournamentGame;
+            const provokeList = document.getElementById('provokeList');
+            const myLevel = game.state.myLevel;
+            const guard = game.state.guards[myLevel];
+            
+            if (!guard) return;
+            
+            document.getElementById('guardCardsLeft').textContent = guard.cardsLeft;
+            
+            provokeList.innerHTML = game.state.guards.map((g, index) => {
+                const isCurrent = index === myLevel;
+                const cardsHtml = g.provokeCards.map(card => {
+                    const colorClass = card.isRed ? 'red' : 'black';
+                    return `
+                        <div class="provoke-card ${colorClass}">
+                            <span class="suit">${card.suit}</span>
+                            <span class="rank">${card.rank}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                return `<div class="provoke-layer ${isCurrent ? 'current' : ''}">${cardsHtml}</div>`;
+            }).join('');
+        }
+        
+        // ============ 玩家操作 ============
+        function selectCard(index) {
+            if (!window.tournamentGame) return;
+            window.tournamentGame.selectCard(index);
+            updateUI();
+        }
+        
+        function confirmPlay() {
+            if (!window.tournamentGame) return;
+            window.tournamentGame.confirmPlay();
+            updateUI();
+        }
+        
+        function addGameLog(message) {
+            const logSection = document.getElementById('logSection');
+            const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">${time}</span>${message}`;
+            logSection.insertBefore(entry, logSection.firstChild);
+            
+            while (logSection.children.length > 10) {
+                logSection.removeChild(logSection.lastChild);
+            }
+        }
+        
+        // ============ 结果界面 ============
+        function showResultScreen(data) {
+            const screen = document.getElementById('resultScreen');
+            const leaderboardEl = document.getElementById('resultLeaderboard');
+            const rewardsEl = document.getElementById('resultRewards');
+            
+            // 渲染排行榜
+            let leaderboardHtml = '<h3>🏆 最终排名</h3>';
+            data.leaderboard.slice(0, 5).forEach((player, index) => {
+                const isMe = player.id === window.tournamentGame.state.myPlayerId;
+                const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
+                leaderboardHtml += `
+                    <div class="leaderboard-item ${isMe ? 'is-me' : ''}">
+                        <span class="rank rank-${index + 1}">${rankIcon}</span>
+                        <span class="avatar">${player.avatar}</span>
+                        <span class="name">${player.name}${isMe ? ' (我)' : ''}</span>
+                        <span class="team">${player.team === 'panda' ? '🐼' : '🐺'}</span>
+                    </div>
+                `;
+            });
+            leaderboardEl.innerHTML = leaderboardHtml;
+            
+            // 渲染奖励
+            const myRank = data.rewards.rank;
+            const rankText = myRank === 1 ? '🥇 冠军' : myRank === 2 ? '🥈 亚军' : myRank === 3 ? '🥉 季军' : `第${myRank}名`;
+            
+            let rewardsHtml = `
+                <div class="my-rank">你的排名: <span class="rank-${myRank}">${rankText}</span></div>
+                <div class="rewards-list">
+            `;
+            
+            if (data.rewards.postcard) {
+                const type = data.rewards.postcard.type;
+                const typeNames = { gold: '金质明信片', silver: '银质明信片', bronze: '铜质明信片' };
+                rewardsHtml += `
+                    <div class="reward-item postcard ${type}">
+                        <span class="icon">🏛️</span>
+                        <span class="name">${window.tournamentGame.state.towerData.name} ${typeNames[type]}</span>
+                    </div>
+                `;
+            }
+            
+            rewardsHtml += `
+                    <div class="reward-item">
+                        <span class="icon">💎</span>
+                        <span class="amount">${data.rewards.diamonds}</span>
+                    </div>
+                    <div class="reward-item">
+                        <span class="icon">🪙</span>
+                        <span class="amount">${data.rewards.coins.toLocaleString()}</span>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button class="btn-share" onclick="shareResult()">📤 分享战绩</button>
+                    <button class="btn-collection" onclick="viewCollection()">📔 查看明信片</button>
+                    <button class="btn-again" onclick="location.reload()">🎮 再来一局</button>
+                </div>
+            `;
+            
+            rewardsEl.innerHTML = rewardsHtml;
+            screen.classList.add('show');
+        }
+        
+        function shareResult() {
+            if (!window.tournamentGame) return;
+            const rewards = window.tournamentGame.calculateRewards();
+            const myRank = rewards.rank;
+            const rankText = myRank === 1 ? '🥇 冠军' : myRank === 2 ? '🥈 亚军' : myRank === 3 ? '🥉 季军' : `第${myRank}名`;
+            
+            const shareText = `🏆 命运塔锦标赛\n` +
+                `🗼 ${window.tournamentGame.state.towerData.name}\n` +
+                `🎯 我的排名: ${rankText}\n` +
+                `💎 获得钻石: ${rewards.diamonds}\n` +
+                `🪙 获得金币: ${rewards.coins.toLocaleString()}`;
+            
+            if (navigator.share) {
+                navigator.share({ title: '命运塔锦标赛战绩', text: shareText });
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => showNotification('✅ 战绩已复制'));
+            }
+        }
+        
+        function viewCollection() {
+            window.location.href = 'collection.html';
+        }
+        
+        function exitGame() {
+            if (confirm('确定要退出当前游戏吗？')) {
+                location.reload();
+            }
+        }
+        
+        // ============ 模拟系统 ============
         function startSimulation() {
-            // 模拟随机玩家加入/离开
             setInterval(() => {
                 if (Math.random() > 0.7 && state.players.length < CONFIG.MAX_PLAYERS) {
                     simulatePlayerJoin();
-                } else if (Math.random() > 0.8 && state.humans > 1) {
-                    simulatePlayerLeave();
                 }
             }, CONFIG.SIMULATION_INTERVAL);
         }
         
         function simulatePlayerJoin() {
             if (state.players.length >= CONFIG.MAX_PLAYERS) return;
-            
             const isHuman = Math.random() > 0.6;
             const newPlayer = {
                 id: Date.now(),
@@ -1024,114 +1742,35 @@
                 avatar: isHuman ? AVATARS[Math.floor(Math.random() * AVATARS.length)] : '🤖',
                 name: isHuman ? `玩家${state.humans + 1}` : `Bot${state.bots + 1}`
             };
-            
-            // 找到第一个空位或替换Bot
             const botIndex = state.players.findIndex(p => p.type === 'bot');
             if (isHuman && botIndex !== -1) {
                 state.players.splice(botIndex, 1);
                 state.bots--;
             }
-            
             state.players.push(newPlayer);
             if (isHuman) state.humans++;
             else state.bots++;
-            
             renderPlayers();
             updateQueueCount();
-            
-            // 添加入场动画
-            setTimeout(() => {
-                const avatars = document.querySelectorAll('.player-avatar');
-                const lastAvatar = avatars[state.players.length - 1];
-                if (lastAvatar) lastAvatar.classList.add('joining');
-            }, 50);
         }
         
-        function simulatePlayerLeave() {
-            const humanPlayers = state.players.filter(p => p.type === 'human' && p.name !== '我');
-            if (humanPlayers.length === 0) return;
-            
-            const playerToRemove = humanPlayers[Math.floor(Math.random() * humanPlayers.length)];
-            const index = state.players.findIndex(p => p.id === playerToRemove.id);
-            
-            if (index !== -1) {
-                const avatar = document.querySelectorAll('.player-avatar')[index];
-                if (avatar) avatar.classList.add('leaving');
-                
-                setTimeout(() => {
-                    state.players.splice(index, 1);
-                    state.humans--;
-                    
-                    // 补充Bot
-                    if (state.players.length < CONFIG.MAX_PLAYERS) {
-                        state.players.push({
-                            id: Date.now(),
-                            type: 'bot',
-                            avatar: '🤖',
-                            name: `Bot${state.bots + 1}`
-                        });
-                        state.bots++;
-                    }
-                    
-                    renderPlayers();
-                    updateQueueCount();
-                }, 400);
-            }
-        }
-        
-        // ===== 通知系统 =====
+        // ============ 通知系统 ============
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.style.cssText = `
-                position: fixed;
-                top: 80px;
-                left: 50%;
-                transform: translateX(-50%);
+                position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
                 background: linear-gradient(135deg, #667eea, #764ba2);
-                color: #fff;
-                padding: 12px 24px;
-                border-radius: 25px;
-                font-size: 14px;
-                font-weight: bold;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                z-index: 1000;
-                animation: slideDown 0.3s ease;
+                color: #fff; padding: 12px 24px; border-radius: 25px;
+                font-size: 14px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                z-index: 1000; animation: slideDown 0.3s ease;
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideUp 0.3s ease forwards';
-                setTimeout(() => notification.remove(), 300);
-            }, 2500);
+            setTimeout(() => notification.remove(), 2500);
         }
         
-        // 添加动画样式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideDown {
-                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-                to { transform: translateX(-50%) translateY(0); opacity: 1; }
-            }
-            @keyframes slideUp {
-                from { transform: translateX(-50%) translateY(0); opacity: 1; }
-                to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // ===== 页面加载完成后初始化 =====
+        // ============ 初始化 ============
         document.addEventListener('DOMContentLoaded', init);
-        
-        // 原有的函数
-        function showCountries(continent) {
-            alert('加载' + continent + '国家列表...');
-        }
-        
-        function joinTournament() {
-            alert('正在进入锦标赛...');
-            location.href = 'playable.html?tournament=china';
-        }
     </script>
 </body>
 </html>
