@@ -84,9 +84,9 @@ class FateTowerGame {
 
             this.guards.push({
                 layer: i,
-                cards: guardCards, // 13张（或4张连胜模式）
-                angerCards: angerCards, // 3张激怒牌
-                angerCardsRevealed: [], // 初始隐藏，只有透视技能才能查看
+                cards: guardCards, // 13张（或4张连胜模式）- 隐藏
+                angerCards: angerCards, // 3张激怒牌 - 明牌！玩家可见
+                angerCardsRevealed: angerCards.map(c => ({...c, revealed: true})), // 激怒牌对玩家可见
                 revealedCards: [], // 已亮出的牌
                 angerCardsUsed: [], // 已使用的激怒牌
                 isDefeated: false,

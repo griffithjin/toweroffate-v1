@@ -357,6 +357,7 @@
             font-weight: bold;
             text-align: center;
             margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(255, 71, 79, 0.5);
         }
         
         .provoke-cards {
@@ -381,6 +382,13 @@
         
         .provoke-card.black { 
             background: linear-gradient(135deg, #2c3e50, #34495e); 
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+        }
+        
+        .provoke-card.red { 
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
         }
         
         .provoke-card .suit { font-size: 16px; }
@@ -962,9 +970,9 @@
                     <div class="guard-count">剩余: <span id="guardCardsLeft">13</span></div>
                 </div>
                 
-                <!-- 激怒牌浮动区 -->
+                <!-- 激怒牌浮动区 - 明牌显示！玩家需要避开这些牌 -->
                 <div class="provoke-float" id="provokeFloat">
-                    <div class="provoke-title">⚠️ 激怒</div>
+                    <div class="provoke-title">⚠️ 避开这些牌！</div>
                     <div class="provoke-cards" id="provokeCards"></div>
                 </div>
             </div>
@@ -1314,12 +1322,14 @@
             
             container.innerHTML = '';
             
-            // 激怒牌默认隐藏，显示"?"
+            // 激怒牌是明牌！玩家可以看到具体花色和点数
             for(let i = 0; i < 3; i++) {
+                const card = guard.provokeCards[i];
                 const cardDiv = document.createElement('div');
-                cardDiv.className = 'provoke-card';
+                cardDiv.className = `provoke-card ${card.isRed ? 'red' : 'black'}`;
                 cardDiv.innerHTML = `
-                    <span class="suit">?</span>
+                    <span class="suit">${card.suit}</span>
+                    <span class="rank">${card.rank}</span>
                 `;
                 container.appendChild(cardDiv);
             }
