@@ -494,37 +494,38 @@
             color: #000;
         }
         
-        /* 当前守卫显示 */
+        /* 当前守卫显示 - 移到右侧避免遮挡塔 */
         .current-guard-display {
             position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            border: 2px solid #ff4757;
-            border-radius: 10px;
-            padding: 8px 12px;
+            bottom: 15px;
+            right: 8px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,71,79,0.6);
+            border-radius: 8px;
+            padding: 6px 8px;
             text-align: center;
-            z-index: 50;
+            z-index: 30;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         
         .current-guard-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #aaa;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .current-guard-card {
-            width: 44px;
-            height: 60px;
+            width: 32px;
+            height: 44px;
             background: linear-gradient(135deg, #1a1a3e, #2d2d5a);
-            border: 2px solid #FFD700;
-            border-radius: 6px;
+            border: 1px solid #FFD700;
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
             margin: 0 auto;
             transition: all 0.3s ease;
         }
@@ -543,13 +544,13 @@
         .current-guard-card.revealed.red { color: #d00; }
         .current-guard-card.revealed.black { color: #000; }
         
-        .current-guard-card .suit { font-size: 24px; }
-        .current-guard-card .rank { font-size: 12px; font-weight: bold; margin-top: 2px; }
-        
+        .current-guard-card .suit { font-size: 18px; }
+        .current-guard-card .rank { font-size: 10px; font-weight: bold; margin-top: 1px; }
+
         .guard-remaining {
-            font-size: 10px;
+            font-size: 9px;
             color: #FFD700;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         
         /* ===== 右侧 - 激怒牌面板 ===== */
@@ -1012,8 +1013,16 @@
             .hand-card .suit { font-size: 18px; }
             .hand-card .rank { font-size: 11px; }
             
-            .current-guard-card { width: 38px; height: 52px; }
-            .current-guard-card .suit { font-size: 20px; }
+                        .current-guard-display { 
+                bottom: 10px; 
+                right: 5px; 
+                padding: 4px 6px; 
+                border-radius: 6px;
+            }
+            .current-guard-card { width: 28px; height: 38px; border-radius: 3px; }
+            .current-guard-card .suit { font-size: 14px; }
+            .current-guard-card .rank { font-size: 9px; }
+            .guard-remaining { font-size: 8px; }
             
             .bottom-area { flex: 0 0 35%; min-height: 160px; }
         }
