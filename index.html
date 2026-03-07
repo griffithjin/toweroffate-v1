@@ -24,7 +24,7 @@
             --provoke-card-height: 56px;
             --back-btn-size: 36px;
             --spinner-size: 50px;
-            
+
             /* 间距 */
             --spacing-xs: 2px;
             --spacing-sm: 5px;
@@ -33,7 +33,7 @@
             --spacing-xl: 15px;
             --spacing-xxl: 20px;
             --spacing-xxxl: 30px;
-            
+
             /* 字体大小 */
             --font-xs: 11px;
             --font-sm: 12px;
@@ -44,7 +44,7 @@
             --font-xxxl: 28px;
             --font-icon: 80px;
             --font-suit: 20px;
-            
+
             /* 圆角 */
             --radius-sm: 4px;
             --radius-md: 6px;
@@ -52,7 +52,7 @@
             --radius-xl: 10px;
             --radius-xxl: 12px;
             --radius-xxxl: 16px;
-            
+
             /* 颜色 */
             --bg-primary: #0a0a1a;
             --bg-secondary: #0d1b2a;
@@ -63,7 +63,7 @@
             --red: #d00;
             --black: #000;
         }
-        
+
         /* ===== 响应式断点覆盖 ===== */
         /* 平板 */
         @media (min-width: 768px) {
@@ -78,7 +78,7 @@
                 --spacing-xxxl: 40px;
             }
         }
-        
+
         /* 电脑 */
         @media (min-width: 1024px) {
             :root {
@@ -92,91 +92,91 @@
                 --spacing-xxxl: 60px;
             }
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-primary); color: #fff; height: 100vh; overflow: hidden; }
         .screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; }
         .screen.active { display: flex; }
-        
+
         /* ===== 首页 - 响应式背景 ===== */
-        #home-screen { 
+        #home-screen {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
-        
-        .home-content { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: var(--spacing-xxl); 
-            max-width: var(--max-content-width); 
-            margin: 0 auto; 
+
+        .home-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xxl);
+            max-width: var(--max-content-width);
+            margin: 0 auto;
         }
-        
-        .tower-main { 
-            font-size: var(--font-icon); 
-            margin-bottom: var(--spacing-lg); 
-            animation: float 3s ease-in-out infinite; 
-            filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); 
+
+        .tower-main {
+            font-size: var(--font-icon);
+            margin-bottom: var(--spacing-lg);
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.5));
         }
-        
+
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        
-        .title { 
-            font-size: var(--font-xxxl); 
-            font-weight: bold; 
-            background: linear-gradient(45deg, var(--gold), #ffed4e); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            margin-bottom: var(--spacing-sm); 
+
+        .title {
+            font-size: var(--font-xxxl);
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--gold), #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: var(--spacing-sm);
         }
-        
-        .subtitle { 
-            color: var(--text-muted); 
-            font-size: var(--font-md); 
-            margin-bottom: var(--spacing-xxxl); 
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: var(--font-md);
+            margin-bottom: var(--spacing-xxxl);
         }
-        
+
         /* ===== 响应式按钮布局 ===== */
-        .btn-main { 
-            width: 100%; 
-            max-width: var(--btn-max-width); 
-            padding: var(--spacing-xl); 
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark)); 
-            color: var(--black); 
-            border: none; 
-            border-radius: var(--radius-xxxl); 
-            font-size: var(--font-xl); 
-            font-weight: bold; 
-            margin-bottom: var(--spacing-lg); 
+        .btn-main {
+            width: 100%;
+            max-width: var(--btn-max-width);
+            padding: var(--spacing-xl);
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: var(--black);
+            border: none;
+            border-radius: var(--radius-xxxl);
+            font-size: var(--font-xl);
+            font-weight: bold;
+            margin-bottom: var(--spacing-lg);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         .btn-main:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(255,215,0,0.4);
         }
-        
-        .btn-main:active { 
-            transform: scale(0.98); 
+
+        .btn-main:active {
+            transform: scale(0.98);
         }
-        
+
         /* ===== 响应式模式选择 ===== */
-        .modes { 
-            display: flex; 
-            gap: var(--spacing-lg); 
-            flex-wrap: wrap; 
-            justify-content: center; 
+        .modes {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        
+
         /* 电脑端：横向排列 */
         @media (min-width: 1024px) {
             .modes {
                 flex-direction: row;
             }
-            
+
             .home-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -185,102 +185,102 @@
                 width: 100%;
                 max-width: 1000px;
             }
-            
+
             .home-left {
                 text-align: left;
             }
-            
+
             .home-right {
                 display: flex;
                 flex-direction: column;
                 gap: var(--spacing-lg);
             }
         }
-        
-        .mode-btn { 
-            padding: var(--spacing-md) var(--spacing-xl); 
-            background: rgba(255,255,255,0.1); 
-            border: 1px solid rgba(255,215,0,0.3); 
-            border-radius: var(--radius-xxl); 
-            color: #fff; 
-            cursor: pointer; 
+
+        .mode-btn {
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: var(--radius-xxl);
+            color: #fff;
+            cursor: pointer;
             font-size: var(--font-md);
             transition: all 0.2s;
         }
-        
+
         .mode-btn:hover {
             background: rgba(255,215,0,0.2);
             border-color: var(--gold);
         }
-        
-        .mode-btn:active { 
-            background: rgba(255,215,0,0.2); 
+
+        .mode-btn:active {
+            background: rgba(255,215,0,0.2);
         }
-        
+
         /* 游戏界面 */
         #game-screen { background: var(--bg-secondary); }
-        .game-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: var(--spacing-lg) var(--spacing-xl); 
-            background: rgba(0,0,0,0.3); 
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            background: rgba(0,0,0,0.3);
         }
-        
-        .back-btn { 
-            width: var(--back-btn-size); 
-            height: var(--back-btn-size); 
-            background: rgba(255,255,255,0.1); 
-            border: none; 
-            border-radius: var(--radius-xl); 
-            color: #fff; 
-            font-size: var(--font-lg); 
+
+        .back-btn {
+            width: var(--back-btn-size);
+            height: var(--back-btn-size);
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: var(--radius-xl);
+            color: #fff;
+            font-size: var(--font-lg);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
+
         .game-info { text-align: center; }
         .game-info .label { font-size: var(--font-xs); color: var(--text-muted); }
         .game-info .value { font-size: var(--font-lg); color: var(--gold); font-weight: bold; }
-        
+
         /* 塔区域 */
-        .tower-section { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: var(--spacing-lg); 
-            overflow-y: auto; 
+        .tower-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
         }
-        
-        .tower { 
-            display: flex; 
-            flex-direction: column-reverse; 
-            gap: var(--spacing-xs); 
-            width: 100%; 
-            max-width: var(--tower-max-width); 
+
+        .tower {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: var(--spacing-xs);
+            width: 100%;
+            max-width: var(--tower-max-width);
         }
-        
-        .level { 
-            height: 22px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: var(--font-sm); 
-            font-weight: bold; 
-            border-radius: var(--radius-sm); 
-            transition: all 0.3s; 
+
+        .level {
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-sm);
+            font-weight: bold;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s;
         }
-        
-        .level.current { 
-            box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(255,215,0,0.5); 
-            transform: scale(1.05); 
-            z-index: 10; 
+
+        .level.current {
+            box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(255,215,0,0.5);
+            transform: scale(1.05);
+            z-index: 10;
         }
-        
+
         /* 塔层颜色 */
         .l1 { width: 95%; background: linear-gradient(90deg, #e0f7fa, #b2ebf2); color: var(--black); }
         .l2 { width: 92%; background: linear-gradient(90deg, #b2ebf2, #80deea); color: var(--black); }
@@ -313,116 +313,116 @@
         .l29 { width: 11%; background: linear-gradient(90deg, #bf360c, #b71c1c); color: #fff; }
         .l30 { width: 8%; background: linear-gradient(90deg, #b71c1c, #c62828); color: #fff; }
         .l31 { width: 5%; background: linear-gradient(90deg, #c62828, #d32f2f); color: #fff; border-radius: var(--radius-md) var(--radius-md) 50% 50%; }
-        
+
         /* 手牌区域 */
-        .hand-section { 
-            padding: var(--spacing-lg); 
-            background: rgba(0,0,0,0.3); 
+        .hand-section {
+            padding: var(--spacing-lg);
+            background: rgba(0,0,0,0.3);
             border-top: 1px solid rgba(255,215,0,0.2);
         }
-        
-        .hand-label { 
-            font-size: var(--font-xs); 
-            color: var(--text-muted); 
-            margin-bottom: var(--spacing-md); 
-            text-align: center; 
+
+        .hand-label {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+            text-align: center;
         }
-        
-        .hand-cards { 
-            display: flex; 
-            justify-content: center; 
-            gap: var(--spacing-sm); 
+
+        .hand-cards {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-sm);
             flex-wrap: wrap;
         }
-        
-        .card { 
-            width: var(--card-width); 
-            height: var(--card-height); 
-            background: linear-gradient(135deg, #fff, #f0f0f0); 
-            border-radius: var(--radius-md); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            cursor: pointer; 
+
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        
+
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
-        
-        .card.selected { 
-            box-shadow: 0 0 0 3px var(--gold), 0 4px 12px rgba(255,215,0,0.4); 
+
+        .card.selected {
+            box-shadow: 0 0 0 3px var(--gold), 0 4px 12px rgba(255,215,0,0.4);
             transform: translateY(-8px);
         }
-        
+
         .card-rank { font-size: var(--font-lg); }
         .card-suit { font-size: var(--font-suit); }
         .red { color: var(--red); }
         .black { color: var(--black); }
-        
+
         /* 控制按钮 */
-        .controls { 
-            display: flex; 
-            gap: var(--spacing-lg); 
-            justify-content: center; 
+        .controls {
+            display: flex;
+            gap: var(--spacing-lg);
+            justify-content: center;
             padding: var(--spacing-lg);
             flex-wrap: wrap;
         }
-        
-        .btn-control { 
-            padding: var(--spacing-md) var(--spacing-xl); 
-            border: none; 
-            border-radius: var(--radius-lg); 
-            font-size: var(--font-md); 
-            font-weight: bold; 
+
+        .btn-control {
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: var(--font-md);
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
-        
-        .btn-play { 
-            background: linear-gradient(135deg, #4CAF50, #45a049); 
-            color: white; 
+
+        .btn-play {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
         }
-        
+
         .btn-play:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(76,175,80,0.4);
         }
-        
-        .btn-skip { 
-            background: rgba(255,255,255,0.1); 
-            color: var(--text-muted); 
+
+        .btn-skip {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-muted);
             border: 1px solid rgba(255,255,255,0.2);
         }
-        
+
         .btn-skip:hover {
             background: rgba(255,255,255,0.2);
         }
-        
+
         /* 加载动画 */
-        #loading-screen { 
-            background: var(--bg-primary); 
-            align-items: center; 
-            justify-content: center; 
+        #loading-screen {
+            background: var(--bg-primary);
+            align-items: center;
+            justify-content: center;
         }
-        
-        .spinner { 
-            width: var(--spinner-size); 
-            height: var(--spinner-size); 
-            border: 3px solid rgba(255,215,0,0.3); 
-            border-top-color: var(--gold); 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
+
+        .spinner {
+            width: var(--spinner-size);
+            height: var(--spinner-size);
+            border: 3px solid rgba(255,215,0,0.3);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin { to { transform: rotate(360deg); } }
-        
+
         /* 守卫卡牌特殊样式 */
         .guardian-section {
             position: absolute;
@@ -433,7 +433,7 @@
             flex-direction: column;
             gap: var(--spacing-sm);
         }
-        
+
         .guard-card {
             width: var(--guard-card-width);
             height: var(--guard-card-height);
@@ -447,7 +447,7 @@
             color: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
-        
+
         /* 挑衅卡牌 */
         .provoke-card {
             width: var(--provoke-card-width);
@@ -460,13 +460,13 @@
             font-size: var(--font-xs);
             color: white;
         }
-        
+
         /* 安全区域适配 */
         @supports (padding-top: env(safe-area-inset-top)) {
             .game-header { padding-top: calc(var(--spacing-lg) + env(safe-area-inset-top)); }
             .hand-section { padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom)); }
         }
-        
+
         /* 滚动条美化 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -486,12 +486,97 @@
                     <p class="subtitle">攀登极限 · 挑战命运</p>
                 </div>
                 <div class="home-right">
-                    <button class="btn-main" onclick="startGame('solo')">🎮 单人挑战</button>
-                    <button class="btn-main" onclick="startGame('rank')">🏆 排位赛</button>
+                    <button class="btn-main" onclick="showModeModal()">🎮 开始游戏</button>
                     <div class="modes">
-                        <button class="mode-btn" onclick="startGame('friend')">👥 好友对战</button>
-                        <button class="mode-btn" onclick="startGame('ai')">🤖 AI对战</button>
+                        <button class="mode-btn" onclick="showRules()">📜 游戏规则</button>
+                        <button class="mode-btn" onclick="showSettings()">⚙️ 设置</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏模式选择弹窗 -->
+    <div id="modeModal" class="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
+        <div class="modal-content" style="background:linear-gradient(135deg, #1a1a3e, #0f0f1e);border:2px solid #FFD700;border-radius:20px;padding:30px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <h2 style="color:#FFD700;font-size:20px;margin:0;">选择游戏模式</h2>
+                <button onclick="closeModeModal()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">×</button>
+            </div>
+
+            <!-- 个人挑战 -->
+            <div class="mode-option" onclick="selectMode('solo')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:15px;padding:20px;margin-bottom:15px;cursor:pointer;transition:all 0.3s;">
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <div style="font-size:40px;">👤</div>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:bold;color:#FFD700;">个人挑战</div>
+                        <div style="font-size:12px;color:#888;margin-top:5px;">独自攀登命运塔，成为首登者！</div>
+                    </div>
+                </div>
+                <div class="mode-rules" style="margin-top:15px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#aaa;line-height:1.6;">
+                    <div>📋 <strong>规则说明：</strong></div>
+                    <div>• 每人持有52张完整手牌</div>
+                    <div>• 击败13名守卫登顶</div>
+                    <div>• 首位登顶者化身为守卫</div>
+                    <div>• 可使用激怒牌干扰其他玩家</div>
+                    <div>• 最后存活者获胜</div>
+                </div>
+            </div>
+
+            <!-- 团队战 -->
+            <div class="mode-option" onclick="selectMode('team')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:15px;padding:20px;margin-bottom:15px;cursor:pointer;transition:all 0.3s;">
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <div style="font-size:40px;">👥</div>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:bold;color:#3498db;">团队战</div>
+                        <div style="font-size:12px;color:#888;margin-top:5px;">红蓝两队对抗，协作登顶！</div>
+                    </div>
+                </div>
+                <div class="mode-rules" style="margin-top:15px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#aaa;line-height:1.6;">
+                    <div>📋 <strong>规则说明：</strong></div>
+                    <div>• 10名玩家分为红蓝两队</div>
+                    <div>• 队友可以互相赠牌</div>
+                    <div>• 全队登顶即可获胜</div>
+                    <div>• 首登者守卫仍可协助队友</div>
+                    <div>• 团队配合是关键</div>
+                </div>
+            </div>
+
+            <!-- 排位赛 -->
+            <div class="mode-option" onclick="selectMode('rank')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:15px;padding:20px;margin-bottom:15px;cursor:pointer;transition:all 0.3s;">
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <div style="font-size:40px;">🏆</div>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:bold;color:#e74c3c;">排位赛</div>
+                        <div style="font-size:12px;color:#888;margin-top:5px;">竞技排名，冲击巅峰！</div>
+                    </div>
+                </div>
+                <div class="mode-rules" style="margin-top:15px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#aaa;line-height:1.6;">
+                    <div>📋 <strong>规则说明：</strong></div>
+                    <div>• 计分制排名对战</div>
+                    <div>• 登顶速度、守层表现均有积分</div>
+                    <div>• 赛季排行榜竞争</div>
+                    <div>• 段位晋升系统</div>
+                    <div>• 高段位解锁专属奖励</div>
+                </div>
+            </div>
+
+            <!-- 连胜模式 -->
+            <div class="mode-option" onclick="selectMode('streak')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:15px;padding:20px;cursor:pointer;transition:all 0.3s;">
+                <div style="display:flex;align-items:center;gap:15px;">
+                    <div style="font-size:40px;">🔥</div>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:bold;color:#ff6b6b;">连胜模式</div>
+                        <div style="font-size:12px;color:#888;margin-top:5px;">快节奏挑战，2副牌速战！</div>
+                    </div>
+                </div>
+                <div class="mode-rules" style="margin-top:15px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#aaa;line-height:1.6;">
+                    <div>📋 <strong>规则说明：</strong></div>
+                    <div>• 使用2副牌（104张）</div>
+                    <div>• 守卫仅持4张牌</div>
+                    <div>• 游戏节奏更快</div>
+                    <div>• 适合快速对战</div>
+                    <div>• 连胜获得额外奖励</div>
                 </div>
             </div>
         </div>
@@ -520,7 +605,7 @@
                 <div class="value" id="hand-count">5</div>
             </div>
         </div>
-        
+
         <div class="tower-section">
             <div class="tower" id="tower">
                 <!-- 塔层由JS动态生成 -->
@@ -529,14 +614,14 @@
                 <!-- 守卫卡牌由JS动态生成 -->
             </div>
         </div>
-        
+
         <div class="hand-section safe-area-bottom">
             <div class="hand-label">点击选择卡牌，按数字键1-5快速出牌</div>
             <div class="hand-cards" id="hand">
                 <!-- 手牌由JS动态生成 -->
             </div>
         </div>
-        
+
         <div class="controls">
             <button class="btn-control btn-play" onclick="confirmPlay()">出牌 (Space)</button>
             <button class="btn-control btn-skip" onclick="Game.skip()">跳过 (S)</button>
@@ -555,7 +640,7 @@
             timer: 30,
             timerInterval: null,
             guardians: [],
-            
+
             // 初始化
             init() {
                 this.currentLevel = 1;
@@ -569,7 +654,7 @@
                 this.startTimer();
                 this.setupKeyboard();
             },
-            
+
             // 生成手牌
             generateHand() {
                 const suits = ['♠', '♥', '♣', '♦'];
@@ -584,13 +669,13 @@
                 }
                 return hand.sort((a, b) => a.value - b.value);
             },
-            
+
             // 获取卡牌数值
             getCardValue(rank) {
                 const values = {'A': 1, 'J': 11, 'Q': 12, 'K': 13};
                 return values[rank] || parseInt(rank);
             },
-            
+
             // 生成守卫
             generateGuardians() {
                 return [
@@ -599,7 +684,7 @@
                     { level: 'Q', color: '#CD7F32' }
                 ];
             },
-            
+
             // 渲染塔
             renderTower() {
                 const tower = document.getElementById('tower');
@@ -613,12 +698,12 @@
                 }
                 tower.innerHTML = html;
             },
-            
+
             // 渲染手牌
             renderHand() {
                 const hand = document.getElementById('hand');
                 hand.innerHTML = this.hand.map((card, index) => `
-                    <div class="card ${this.getSuitColor(card.suit)} ${this.selectedCard === index ? 'selected' : ''}" 
+                    <div class="card ${this.getSuitColor(card.suit)} ${this.selectedCard === index ? 'selected' : ''}"
                          onclick="Game.selectCard(${index})"
                          data-index="${index}">
                         <div class="card-rank">${card.rank}</div>
@@ -627,7 +712,7 @@
                 `).join('');
                 document.getElementById('hand-count').textContent = this.hand.length;
             },
-            
+
             // 渲染守卫
             renderGuardians() {
                 const guardians = document.getElementById('guardians');
@@ -638,30 +723,30 @@
                     </div>
                 `).join('');
             },
-            
+
             // 获取花色颜色
             getSuitColor(suit) {
                 return (suit === '♥' || suit === '♦') ? 'red' : 'black';
             },
-            
+
             // 选择卡牌
             selectCard(index) {
                 this.selectedCard = this.selectedCard === index ? null : index;
                 this.renderHand();
             },
-            
+
             // 出牌
             play() {
                 if(this.selectedCard === null) return;
-                
+
                 const card = this.hand[this.selectedCard];
                 const success = this.checkWin(card);
-                
+
                 if(success) {
                     this.currentLevel++;
                     this.hand.splice(this.selectedCard, 1);
                     this.hand.push(this.drawCard());
-                    
+
                     if(this.currentLevel > this.maxLevel) {
                         alert('🏆 恭喜！你成功登顶命运塔！');
                         goHome();
@@ -671,13 +756,13 @@
                     // 挑战失败逻辑
                     alert('💥 挑战失败！守卫太强了！');
                 }
-                
+
                 this.selectedCard = null;
                 this.renderTower();
                 this.renderHand();
                 this.resetTimer();
             },
-            
+
             // 抽卡
             drawCard() {
                 const suits = ['♠', '♥', '♣', '♦'];
@@ -689,7 +774,7 @@
                     value: this.getCardValue(rank)
                 };
             },
-            
+
             // 检查胜负
             checkWin(card) {
                 // 简化逻辑：A-K对应1-13层，其余随机
@@ -699,19 +784,19 @@
                 }
                 return Math.random() > 0.3;
             },
-            
+
             // 跳过
             skip() {
                 this.selectedCard = null;
                 this.renderHand();
                 this.resetTimer();
             },
-            
+
             // 键盘控制
             setupKeyboard() {
                 document.onkeydown = (e) => {
                     if(this.state !== 'game') return;
-                    
+
                     if(e.key >= '1' && e.key <= '5') {
                         const index = parseInt(e.key) - 1;
                         if(index < this.hand.length) {
@@ -725,32 +810,32 @@
                     }
                 };
             },
-            
+
             // 计时器
             startTimer() {
                 clearInterval(this.timerInterval);
                 this.updateTimerDisplay();
-                
+
                 this.timerInterval = setInterval(() => {
                     this.timer--;
                     this.updateTimerDisplay();
-                    
+
                     if(this.timer <= 0) {
                         this.autoPlay();
                     }
                 }, 1000);
             },
-            
+
             resetTimer() {
                 clearInterval(this.timerInterval);
                 this.timer = 30;
                 this.startTimer();
             },
-            
+
             updateTimerDisplay() {
                 document.getElementById('timer').textContent = this.timer + 's';
             },
-            
+
             // 自动出牌
             autoPlay() {
                 if(this.hand.length > 0) {
@@ -767,10 +852,41 @@
             Game.state = id;
         }
 
+        // ==================== 游戏模式选择弹窗 ====================
+        function showModeModal() {
+            document.getElementById('modeModal').style.display = 'flex';
+        }
+
+        function closeModeModal() {
+            document.getElementById('modeModal').style.display = 'none';
+        }
+
+        function selectMode(mode) {
+            closeModeModal();
+            // 保存选择的模式到本地存储
+            localStorage.setItem('selectedGameMode', mode);
+            startGame(mode);
+        }
+
+        function showRules() {
+            alert('📜 游戏规则\n\n1. 使用52张完整手牌攀登命运塔\n2. 击败每层守卫获得上升机会\n3. 激怒牌会触发惩罚（退层）\n4. 首位登顶者化身为守卫\n5. 最后存活者获胜！');
+        }
+
+        function showSettings() {
+            alert('⚙️ 设置功能开发中...');
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('modeModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModeModal();
+            }
+        });
+
         function startGame(mode) {
             Game.mode = mode;
             showScreen('loading');
-            
+
             setTimeout(() => {
                 Game.init();
                 showScreen('game');

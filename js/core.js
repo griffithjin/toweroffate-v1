@@ -184,22 +184,18 @@ class FateTowerGame {
     /**
      * 守卫亮牌
      */
-    revealGuardCard(guard) {
+    revealGuardCard(guard, playerCard) {
         if (guard.cards.length === 0) {
             guard.isDefeated = true;
             return null;
         }
         
-        // 如果有首登者控制，由首登者选择
-        if (guard.controller !== null) {
-            // AI选择或玩家选择
-            const cardIndex = this.selectGuardCard(guard);
-            const card = guard.cards.splice(cardIndex, 1)[0];
-            guard.revealedCards.push(card);
-            return card;
+        // 如果是玩家控制的守卫，根据玩家策略选择牌
+        if (guard.isPlayerGuard && guard.controller !== null) {
+            return this.selectPlayerGuardCard(guard, playerCard);
         }
         
-        // 随机亮牌
+        // AI守卫：随机亮牌
         const cardIndex = Math.floor(Math.random() * guard.cards.length);
         const card = guard.cards.splice(cardIndex, 1)[0];
         guard.revealedCards.push(card);
@@ -207,12 +203,111 @@ class FateTowerGame {
     }
 
     /**
-     * 首登者选择守卫牌
+     * 玩家控制守卫选择出牌（智能策略）
      */
-    selectGuardCard(guard) {
-        // AI策略：选择能淘汰玩家的牌
-        // 简化版：随机选择
-        return Math.floor(Math.random() * guard.cards.length);
+    selectPlayerGuardCard(guard, playerCard) {
+        // 首登者作为守卫，选择能阻止玩家的牌
+        let bestIndex = 0;
+        let bestScore = -1;
+        
+        for (let i = 0; i < guard.cards.length; i++) {
+            const guardCard = guard.cards[i];
+            let score = 0;
+            
+            // 如果玩家出了牌，评估这张守卫牌的效果
+            if (playerCard) {
+                const rankMatch = guardCard.rank === playerCard.rank;
+                const suitMatch = guardCard.suit === playerCard.suit;
+                
+                if (rankMatch && suitMatch) {
+                    // 完全匹配可以阻止玩家上升
+                    score = 100;
+                } else if (rankMatch || suitMatch) {
+                    // 部分匹配也有一定阻挡效果
+                    score = 50;
+                } else {
+                    // 不匹配，玩家可以上升
+                    score = 0;
+                }
+            } else {
+                // 没有玩家出牌信息，随机选择
+                score = Math.random() * 10;
+            }
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestIndex = i;
+            }
+        }
+        
+        const card = guard.cards.splice(bestIndex, 1)[0];
+        guard.revealedCards.push(card);
+        return card;
+    }
+    
+    /**
+     * 玩家守卫使用激怒牌干扰其他玩家
+     */
+    useAngerCardAsGuard(guard, targetPlayer, playedCard) {
+        if (!guard.isPlayerGuard || !guard.angerCards || guard.angerCards.length === 0) {
+            return { success: false, error: '没有可用的激怒牌' };
+        }
+        
+        const availableAnger = guard.angerCards.filter(c => 
+            !guard.angerCardsUsed.includes(c)
+        );
+        
+        if (availableAnger.length === 0) {
+            return { success: false, error: '激怒牌已用完' };
+        }
+        
+        // 选择最佳的激怒牌
+        let bestAnger = null;
+        let bestEffect = null;
+        let maxImpact = 0;
+        
+        for (let angerCard of availableAnger) {
+            const rankMatch = angerCard.rank === playedCard.rank;
+            const suitMatch = angerCard.suit === playedCard.suit;
+            
+            let impact = 0;
+            let effect = null;
+            
+            if (rankMatch && suitMatch) {
+                impact = 2; // 退2层
+                effect = 'both_match';
+            } else if (rankMatch || suitMatch) {
+                impact = 1; // 退1层
+                effect = 'partial_match';
+            }
+            
+            if (impact > maxImpact) {
+                maxImpact = impact;
+                bestAnger = angerCard;
+                bestEffect = effect;
+            }
+        }
+        
+        if (bestAnger && maxImpact > 0) {
+            // 使用激怒牌
+            guard.angerCardsUsed.push(bestAnger);
+            
+            // 计算新层数
+            const newLayer = Math.max(1, targetPlayer.currentLayer - maxImpact);
+            const actualDrop = targetPlayer.currentLayer - newLayer;
+            targetPlayer.currentLayer = newLayer;
+            
+            return {
+                success: true,
+                angerCard: bestAnger,
+                effect: bestEffect,
+                layersLost: actualDrop,
+                targetPlayer: targetPlayer,
+                message: `🛡️ 守卫${guard.controllerName}发动激怒牌！${targetPlayer.name}退${actualDrop}层！`
+            };
+        }
+        
+        return { success: false, error: '没有匹配的激怒牌' };
     }
 
     /**
@@ -300,17 +395,18 @@ class FateTowerGame {
     checkAscension(player) {
         if (player.currentLayer === this.maxLayers && !player.isFirstAscender) {
             if (this.firstAscender === null) {
-                // 首位登顶
+                // 首位登顶 - 成为首登者守卫
                 player.isFirstAscender = true;
                 this.firstAscender = player;
                 
-                // 玩家成为最高失守层守卫的控制者
-                this.updateGuardControl();
+                // 玩家成为最高失守层守卫
+                this.transformToGuard(player);
                 
                 return { 
                     ascended: true, 
                     isFirst: true,
-                    message: '恭喜成为首登者！'
+                    message: '恭喜成为首登者！你已化身为命运塔守卫！',
+                    becameGuard: true
                 };
             } else {
                 // 后续登顶
@@ -325,22 +421,80 @@ class FateTowerGame {
     }
 
     /**
-     * 更新守卫控制
+     * 玩家化身为守卫
      */
-    updateGuardControl() {
-        // 找到最高失守层
+    transformToGuard(player) {
+        // 找到最高失守层（从顶层往下找）
+        let targetLayer = this.maxLayers;
         for (let i = this.guards.length - 1; i >= 0; i--) {
-            if (this.guards[i].isDefeated) {
-                this.highestFallenLayer = i + 1;
-                this.guards[i].controller = this.firstAscender.id;
-                
-                // 重新激活守卫牌
-                this.guards[i].isDefeated = false;
-                this.guards[i].cards = [...this.guards[i].revealedCards];
-                this.guards[i].revealedCards = [];
-                this.guards[i].angerCardsUsed = [];
+            if (this.guards[i].isDefeated || this.guards[i].cards.length === 0) {
+                targetLayer = i + 1;
                 break;
             }
+        }
+        
+        // 如果没有失守层，则占据第7层（中间层）
+        if (targetLayer === this.maxLayers) {
+            targetLayer = 7;
+        }
+        
+        const guard = this.guards[targetLayer - 1];
+        
+        // 设置守卫控制者
+        guard.controller = player.id;
+        guard.controllerName = player.name;
+        guard.isPlayerGuard = true;
+        
+        // 重新激活守卫牌（补满13张）
+        guard.isDefeated = false;
+        guard.cards = this.generateGuardCards(13);
+        guard.revealedCards = [];
+        guard.angerCardsUsed = [];
+        guard.angerCards = this.generateGuardCards(3); // 新的激怒牌
+        
+        // 记录玩家化身守卫的信息
+        player.guardLayer = targetLayer;
+        player.isGuard = true;
+        player.guardAvatar = '🛡️';
+        
+        console.log(`🛡️ ${player.name} 化身为第${targetLayer}层守卫！`);
+        
+        return {
+            layer: targetLayer,
+            guard: guard
+        };
+    }
+    
+    /**
+     * 生成守卫卡牌
+     */
+    generateGuardCards(count) {
+        const suits = ['♥️', '♠️', '♦️', '♣️'];
+        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const cards = [];
+        
+        for (let i = 0; i < count; i++) {
+            const suit = suits[Math.floor(Math.random() * suits.length)];
+            const rank = ranks[Math.floor(Math.random() * ranks.length)];
+            cards.push({
+                suit: suit,
+                rank: rank,
+                id: `${suit}${rank}_${Date.now()}_${i}`,
+                value: this.getCardValue(rank)
+            });
+        }
+        
+        return cards;
+    }
+
+    /**
+     * 更新守卫控制（兼容旧逻辑）
+     */
+    updateGuardControl() {
+        // 此逻辑已被整合到 transformToGuard 方法中
+        // 保留此方法以兼容可能的旧调用
+        if (this.firstAscender) {
+            this.transformToGuard(this.firstAscender);
         }
     }
 

@@ -52,6 +52,63 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             z-index: 100;
         }
+        
+        /* 游戏模式标签 */
+        .game-mode-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255,215,0,0.9), rgba(255,165,0,0.9));
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255,215,0,0.3);
+            z-index: 10;
+        }
+        
+        .game-mode-badge.team {
+            background: linear-gradient(135deg, rgba(100,200,255,0.9), rgba(50,150,255,0.9));
+            color: #fff;
+        }
+        
+        .game-mode-badge.streak {
+            background: linear-gradient(135deg, rgba(255,100,100,0.9), rgba(255,50,50,0.9));
+            color: #fff;
+        }
+        
+        /* 队伍标识 */
+        .team-indicator {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .team-red {
+            background: linear-gradient(135deg, #ff4757, #c0392b);
+            color: #fff;
+        }
+        
+        .team-blue {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+        }
+        
+        /* 队友标识 */
+        .teammate-icon {
+            box-shadow: 0 0 0 2px #3498db, 0 0 10px rgba(52,152,219,0.5) !important;
+        }
         .player-info {
             display: flex;
             align-items: center;
@@ -362,6 +419,28 @@
             overflow-y: hidden;
             padding: 8px 4px;
             -webkit-overflow-scrolling: touch;
+            /* 自定义滚动条样式 */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,215,0,0.5) rgba(0,0,0,0.3);
+        }
+        
+        .hand-cards-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .hand-cards-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+        }
+        
+        .hand-cards-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, rgba(255,215,0,0.6), rgba(255,165,0,0.6));
+            border-radius: 4px;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+        
+        .hand-cards-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, rgba(255,215,0,0.8), rgba(255,165,0,0.8));
         }
         
         .hand-cards {
@@ -602,34 +681,33 @@
                 padding: 6px;
             }
             
-            /* 手牌区域改为4行13列网格布局 */
+            /* 手牌区域 - 横向滚动 */
             .hand-cards-container {
-                overflow-x: hidden;
-                overflow-y: auto;
-                padding: 4px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 8px 4px;
             }
             
             .hand-cards {
-                display: grid;
-                grid-template-columns: repeat(13, 1fr);
-                gap: 3px;
-                padding: 2px;
-                min-width: auto;
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 5px;
+                padding: 4px;
+                min-width: max-content;
             }
             
             .hand-card {
-                width: 100%;
-                min-width: 22px;
-                height: 32px;
-                border-radius: 4px;
+                width: 36px;
+                height: 50px;
+                flex-shrink: 0;
             }
             
             .hand-card .suit {
-                font-size: 12px;
+                font-size: 16px;
             }
             
             .hand-card .rank {
-                font-size: 8px;
+                font-size: 10px;
             }
             
             /* 玩家图标调整 */
@@ -720,16 +798,16 @@
         /* 超小屏幕适配 (如iPhone SE) */
         @media (max-width: 393px) {
             .hand-card {
-                height: 28px;
-                min-width: 20px;
+                width: 32px;
+                height: 44px;
             }
             
             .hand-card .suit {
-                font-size: 10px;
+                font-size: 14px;
             }
             
             .hand-card .rank {
-                font-size: 7px;
+                font-size: 9px;
             }
             
             .guard-card-display {
@@ -823,12 +901,19 @@
         <!-- 顶部 -->
         <div class="top-bar">
             <div class="player-info">
-                <div class="player-avatar-main" id="myAvatar">😺</div>
+                <div class="player-avatar-main" id="myAvatar">
+                    😺
+                    <div class="team-indicator team-red" id="myTeamIndicator" style="display:none">A</div>
+                </div>
                 <div class="player-details">
                     <div class="player-name">我 (黄金)</div>
                     <div class="player-level" id="myLevelDisplay">第 1 层</div>
                 </div>
             </div>
+            
+            <!-- 游戏模式显示 -->
+            <div class="game-mode-badge" id="gameModeBadge">👤 个人战</div>
+            
             <div style="font-size:11px;color:#FFD700">
                 💎 688 | 🪙 15K
             </div>
@@ -932,7 +1017,8 @@
         // 游戏状态
         let gameState = {
             round: 1,
-            myPlayer: { id: 'me', name: '我', avatar: '😺', level: 0, isAscender: false },
+            mode: 'solo', // 'solo', 'team', 'streak'
+            myPlayer: { id: 'me', name: '我', avatar: '😺', level: 0, isAscender: false, team: 'red' },
             players: [], // 10个玩家
             guards: [], // 13名守卫
             hand: [], // 玩家手牌52张
@@ -940,6 +1026,40 @@
             gameLog: [],
             currentTower: 0 // 当前塔索引
         };
+        
+        // 游戏模式配置
+        const GAME_MODES = {
+            solo: { name: '个人战', icon: '👤', class: '' },
+            team: { name: '团队战', icon: '👥', class: 'team' },
+            streak: { name: '连胜模式', icon: '🔥', class: 'streak' }
+        };
+        
+        // 设置游戏模式
+        function setGameMode(mode) {
+            gameState.mode = mode;
+            const config = GAME_MODES[mode];
+            const badge = document.getElementById('gameModeBadge');
+            badge.textContent = `${config.icon} ${config.name}`;
+            badge.className = `game-mode-badge ${config.class}`;
+            
+            // 团队战：分配队伍
+            if (mode === 'team') {
+                gameState.myPlayer.team = 'red';
+                document.getElementById('myTeamIndicator').style.display = 'flex';
+                document.getElementById('myTeamIndicator').textContent = '红';
+                document.getElementById('myTeamIndicator').className = 'team-indicator team-red';
+                
+                // 分配AI玩家队伍
+                gameState.players.forEach((p, i) => {
+                    p.team = i < 5 ? 'red' : 'blue';
+                });
+            } else {
+                document.getElementById('myTeamIndicator').style.display = 'none';
+                gameState.players.forEach(p => delete p.team);
+            }
+            
+            renderPlayerIcons();
+        }
         
         // ============ 初始化游戏 ============
         function initGame() {
@@ -1045,7 +1165,8 @@
             // 渲染AI玩家
             gameState.players.forEach((player, index) => {
                 const iconDiv = document.createElement('div');
-                iconDiv.className = `player-icon ${player.isAscender ? 'ascender' : ''}`;
+                const isTeammate = gameState.mode === 'team' && player.team === gameState.myPlayer.team;
+                iconDiv.className = `player-icon ${player.isAscender ? 'ascender' : ''} ${isTeammate ? 'teammate-icon' : ''}`;
                 iconDiv.textContent = player.avatar;
                 
                 // 计算位置 - 基于层级的垂直位置
@@ -1056,8 +1177,22 @@
                 const horizontalOffset = 15 + (index % 5) * 15 + (Math.floor(index / 5) * 7);
                 iconDiv.style.left = `${horizontalOffset}%`;
                 
+                // 团队战显示队伍标识
+                if (gameState.mode === 'team' && player.team) {
+                    const teamBadge = document.createElement('div');
+                    teamBadge.className = `team-indicator ${player.team === 'red' ? 'team-red' : 'team-blue'}`;
+                    teamBadge.textContent = player.team === 'red' ? '红' : '蓝';
+                    teamBadge.style.cssText = 'position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;font-size:7px;';
+                    iconDiv.appendChild(teamBadge);
+                }
+                
                 // 悬停提示
-                iconDiv.onmouseenter = (e) => showTooltip(e, `${player.name} - 第${player.level + 1}层`);
+                let tooltipText = `${player.name} - 第${player.level + 1}层`;
+                if (gameState.mode === 'team' && player.team) {
+                    const teamText = player.team === 'red' ? '红队' : '蓝队';
+                    tooltipText += ` [${teamText}]${isTeammate ? '(队友)' : ''}`;
+                }
+                iconDiv.onmouseenter = (e) => showTooltip(e, tooltipText);
                 iconDiv.onmouseleave = hideTooltip;
                 
                 container.appendChild(iconDiv);
@@ -1072,6 +1207,15 @@
             const selfLevelPosition = 7 + (12 - gameState.myPlayer.level) * (86 / 12);
             selfIcon.style.top = `${selfLevelPosition}%`;
             selfIcon.style.left = '75%';
+            
+            // 团队战显示自己的队伍标识
+            if (gameState.mode === 'team' && gameState.myPlayer.team) {
+                const teamBadge = document.createElement('div');
+                teamBadge.className = `team-indicator ${gameState.myPlayer.team === 'red' ? 'team-red' : 'team-blue'}`;
+                teamBadge.textContent = gameState.myPlayer.team === 'red' ? '红' : '蓝';
+                teamBadge.style.cssText = 'position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;font-size:7px;';
+                selfIcon.appendChild(teamBadge);
+            }
             
             container.appendChild(selfIcon);
         }
@@ -1113,7 +1257,7 @@
         }
         
         // ============ 更新守卫牌面板 ============
-        function updateGuardPanel() {
+        function updateGuardPanel(guardCard = null) {
             const guard = gameState.guards[gameState.myPlayer.level];
             if (!guard) return;
             
@@ -1124,15 +1268,39 @@
             document.getElementById('guardCardsLeft').textContent = guard.cardsLeft;
             
             // 守卫牌默认隐藏，显示"?"
-            if(guard.cardsLeft > 0) {
+            if (guardCard) {
+                // 玩家出牌后揭示守卫牌
+                display.className = `guard-card-display ${guardCard.isRed ? 'red' : 'black'}`;
+                display.innerHTML = `
+                    <span class="suit">${guardCard.suit}</span>
+                    <span class="rank">${guardCard.rank}</span>
+                `;
+                panel.classList.add('revealed');
+            } else if(guard.cardsLeft > 0) {
+                // 默认隐藏状态
                 display.className = 'guard-card-display';
                 display.innerHTML = '<span style="font-size:24px">?</span>';
                 panel.classList.remove('revealed');
             } else {
+                // 守卫被击败
                 display.className = 'guard-card-display';
                 display.innerHTML = '<span style="font-size:20px">✓</span>';
                 panel.classList.remove('revealed');
             }
+        }
+        
+        // ============ 揭示守卫牌（出牌后调用） ============
+        function revealGuardCard() {
+            const guard = gameState.guards[gameState.myPlayer.level];
+            if (!guard || guard.cardsLeft <= 0) return null;
+            
+            // 守卫亮出一张牌
+            const guardCard = guard.guardCards[13 - guard.cardsLeft];
+            
+            // 更新显示
+            updateGuardPanel(guardCard);
+            
+            return guardCard;
         }
         
         // ============ 更新塔显示 ============
@@ -1202,13 +1370,24 @@
                 gameState.hand[originalIndex].used = true;
             }
             
-            // 守卫亮出一张牌
+            // 守卫亮出一张牌（先揭示）
             let guardCard = null;
             if(guard.cardsLeft > 0) {
                 guardCard = guard.guardCards[13 - guard.cardsLeft];
                 guard.cardsLeft--;
             }
             
+            // 揭示守卫牌显示
+            revealGuardCard();
+            
+            // 延迟显示匹配结果
+            setTimeout(() => {
+                resolveCardBattle(playerCard, guardCard, me, guard);
+            }, 1500);
+        }
+        
+        // ============ 卡牌对决结算 ============
+        function resolveCardBattle(playerCard, guardCard, me, guard) {
             // 检查激怒牌（仅3/6/9层）
             let provokeTriggered = false;
             let fallBack = 0;
@@ -1247,16 +1426,20 @@
                 const suitMatch = playerCard.suit === guardCard.suit;
                 const rankMatch = playerCard.rank === guardCard.rank;
                 
-                if(suitMatch || rankMatch) {
+                if(suitMatch && rankMatch) {
                     const oldLevel = me.level;
-                    me.level = Math.min(me.level + 1, 12);
+                    me.level = Math.min(me.level + 2, 12);
                     
                     if(me.level === 12) {
                         me.isAscender = true;
                         addLog(`🎉 恭喜！你成为首登者守卫！`, 'success');
                     } else {
-                        addLog(`✅ 匹配成功！${playerCard.suit}${playerCard.rank} vs ${guardCard.suit}${guardCard.rank} 上一层`, 'success');
+                        addLog(`✅ 完全匹配！${playerCard.suit}${playerCard.rank} vs ${guardCard.suit}${guardCard.rank} 上升2层`, 'success');
                     }
+                } else if(suitMatch || rankMatch) {
+                    const oldLevel = me.level;
+                    me.level = Math.min(me.level + 1, 12);
+                    addLog(`✅ 部分匹配！${playerCard.suit}${playerCard.rank} vs ${guardCard.suit}${guardCard.rank} 上升1层`, 'success');
                 } else {
                     addLog(`❌ 不匹配 ${playerCard.suit}${playerCard.rank} vs ${guardCard.suit}${guardCard.rank}，停留本层`, 'normal');
                 }
@@ -1274,7 +1457,7 @@
             
             updatePlayerPosition();
             renderProvokeCards();
-            updateGuardPanel();
+            updateGuardPanel(); // 重置为隐藏状态
             renderHand();
             
             // 模拟其他玩家移动
