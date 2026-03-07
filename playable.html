@@ -408,8 +408,10 @@
         }
         
         .tower-image {
-            height: 85%;
-            max-width: 65%;
+            max-height: 95%;
+            max-width: 80%;
+            width: auto;
+            height: auto;
             object-fit: contain;
             filter: drop-shadow(0 4px 20px rgba(0,0,0,0.6));
             opacity: 0.6;
@@ -637,8 +639,8 @@
         
         /* ===== 底部 - 手牌区域 ===== */
         .bottom-area {
-            flex: 0 0 32%;
-            min-height: 160px;
+            flex: 0 0 38%;
+            min-height: 200px;
             background: linear-gradient(180deg, #1a1a3e 0%, #0f0f1e 100%);
             border-top: 2px solid #333;
             display: flex;
@@ -702,7 +704,8 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            min-height: 0;
+            min-height: 100px;
+            overflow: visible;
         }
         
         .hand-header {
@@ -730,7 +733,9 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: rgba(255,215,0,0.5) rgba(0,0,0,0.3);
-            min-height: 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
         }
         
         .hand-cards-container::-webkit-scrollbar {
@@ -749,16 +754,18 @@
         
         .hand-cards {
             display: flex;
-            gap: 3px;
-            padding: 3px;
+            gap: 4px;
+            padding: 4px;
             min-width: max-content;
+            min-height: 64px;
+            align-items: center;
         }
         
         .hand-card {
-            width: 34px;
-            height: 48px;
+            width: 40px;
+            height: 56px;
             background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-            border-radius: 5px;
+            border-radius: 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -766,7 +773,7 @@
             cursor: pointer;
             flex-shrink: 0;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             border: 2px solid transparent;
         }
         
@@ -780,8 +787,8 @@
         
         .hand-card.red { color: #d00; }
         .hand-card.black { color: #000; }
-        .hand-card .suit { font-size: 16px; }
-        .hand-card .rank { font-size: 10px; font-weight: bold; }
+        .hand-card .suit { font-size: 20px; }
+        .hand-card .rank { font-size: 12px; font-weight: bold; }
         
         /* 出牌按钮区域 */
         .play-section {
@@ -1001,21 +1008,21 @@
             .guard-icon { width: 18px; height: 18px; font-size: 10px; }
             .guard-card-hidden { width: 14px; height: 18px; font-size: 10px; }
             
-            .hand-card { width: 30px; height: 42px; }
-            .hand-card .suit { font-size: 14px; }
-            .hand-card .rank { font-size: 9px; }
+            .hand-card { width: 36px; height: 50px; }
+            .hand-card .suit { font-size: 18px; }
+            .hand-card .rank { font-size: 11px; }
             
             .current-guard-card { width: 38px; height: 52px; }
             .current-guard-card .suit { font-size: 20px; }
             
-            .bottom-area { flex: 0 0 30%; min-height: 140px; }
+            .bottom-area { flex: 0 0 35%; min-height: 160px; }
         }
         
         @media (max-width: 393px) {
             .layer-panel { width: 18%; min-width: 55px; }
             .provoke-panel { width: 22%; min-width: 70px; }
             .provoke-card { width: 16px; height: 22px; }
-            .hand-card { width: 26px; height: 36px; }
+            .hand-card { width: 32px; height: 44px; }
         }
         
         @media (min-width: 769px) {
