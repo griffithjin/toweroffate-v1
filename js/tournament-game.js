@@ -1,188 +1,265 @@
-/**
- * 命运塔锦标赛完整游戏逻辑
- * Tournament Game Logic for Tower of Fate
- * 
- * 功能包括：
- * 1. 10人锦标赛（真人+Bot）同时对战
- * 2. 30秒出牌倒计时，超时自动随机出牌
- * 3. 整局游戏时间限制（26-30分钟）
- * 4. 团队战赠牌逻辑
- * 5. 游戏结束逻辑与排名结算
- * 6. 明信片奖励系统
- * 7. 明信片收集册
- */
+// tournament-game.js - 命运塔锦标赛完整游戏逻辑（196国家完整版）
+// 这是自动生成的配置文件，包含全部196个国家
 
 // ============ 游戏配置 ============
 const TOURNAMENT_CONFIG = {
-    // 玩家配置
     MAX_PLAYERS: 10,
-    HUMAN_PLAYERS: 3,  // 初始真人玩家数
-    BOT_PLAYERS: 7,    // Bot玩家数
-    
-    // 时间配置
-    TURN_TIME_LIMIT: 30,        // 每回合30秒
-    MAX_GAME_TIME_SOLO: 1560,   // 单人模式：52张×30秒=1560秒（26分钟）
-    MAX_GAME_TIME_TEAM: 1800,   // 团队模式：60张×30秒=1800秒（30分钟）
-    
-    // 游戏配置
-    DECKS_COUNT: 4,             // 4副牌
-    TOTAL_CARDS: 208,           // 4×52=208张
-    HAND_SIZE: 52,              // 每人手牌数
-    TEAM_MODE: true,            // 默认团队模式
-    
-    // 激怒层配置
-    PROVOKE_LAYERS: [2, 5, 8],  // Q层, 9层, 6层（从0开始索引）
-    
-    // 赠牌配置
-    GIFT_CARD_RATIO: 1/3,       // 赠牌比例（1/3手牌）
-    GIFT_RANKS: [2, 3, 4],      // 第2-4名登顶后触发赠牌
+    HUMAN_PLAYERS: 3,
+    BOT_PLAYERS: 7,
+    TURN_TIME_LIMIT: 30,
+    MAX_GAME_TIME_SOLO: 1560,
+    MAX_GAME_TIME_TEAM: 1800,
+    DECKS_COUNT: 4,
+    TOTAL_CARDS: 208,
+    HAND_SIZE: 52,
+    TEAM_MODE: true,
+    PROVOKE_LAYERS: [2, 5, 8],
+    GIFT_CARD_RATIO: 1/3,
+    GIFT_RANKS: [2, 3, 4],
 };
 
-// ============ 国家塔楼数据 ============
+// ============ 196国家塔楼数据 ============
 const COUNTRY_TOWERS = {
-    // 亚洲
-    'china': {
-        name: '中国·东方明珠',
-        flag: '🇨🇳',
-        tower: 'oriental-pearl.png',
-        continent: 'asia',
-        difficulty: 'normal'
-    },
-    'japan': {
-        name: '日本·东京塔',
-        flag: '🇯🇵',
-        tower: 'tokyo-tower.png',
-        continent: 'asia',
-        difficulty: 'normal'
-    },
-    'south_korea': {
-        name: '韩国·N首尔塔',
-        flag: '🇰🇷',
-        tower: 'n-seoul-tower.png',
-        continent: 'asia',
-        difficulty: 'normal'
-    },
-    'india': {
-        name: '印度·印度门',
-        flag: '🇮🇳',
-        tower: 'india-gate.png',
-        continent: 'asia',
-        difficulty: 'hard'
-    },
-    'thailand': {
-        name: '泰国·郑王庙',
-        flag: '🇹🇭',
-        tower: 'wat-arun.png',
-        continent: 'asia',
-        difficulty: 'easy'
-    },
-    
-    // 欧洲
-    'france': {
-        name: '法国·埃菲尔铁塔',
-        flag: '🇫🇷',
-        tower: 'eiffel-tower.png',
-        continent: 'europe',
-        difficulty: 'normal'
-    },
-    'italy': {
-        name: '意大利·比萨斜塔',
-        flag: '🇮🇹',
-        tower: 'pisa-tower.png',
-        continent: 'europe',
-        difficulty: 'easy'
-    },
-    'uk': {
-        name: '英国·大本钟',
-        flag: '🇬🇧',
-        tower: 'big-ben.png',
-        continent: 'europe',
-        difficulty: 'normal'
-    },
-    'germany': {
-        name: '德国·科隆大教堂',
-        flag: '🇩🇪',
-        tower: 'cologne-cathedral.png',
-        continent: 'europe',
-        difficulty: 'hard'
-    },
-    'russia': {
-        name: '俄罗斯·克里姆林宫',
-        flag: '🇷🇺',
-        tower: 'kremlin.png',
-        continent: 'europe',
-        difficulty: 'hard'
-    },
-    
-    // 美洲
-    'usa': {
-        name: '美国·自由女神像',
-        flag: '🇺🇸',
-        tower: 'statue-of-liberty.png',
-        continent: 'america',
-        difficulty: 'normal'
-    },
-    'brazil': {
-        name: '巴西·基督像',
-        flag: '🇧🇷',
-        tower: 'christ-redeemer.png',
-        continent: 'america',
-        difficulty: 'normal'
-    },
-    'canada': {
-        name: '加拿大·CN塔',
-        flag: '🇨🇦',
-        tower: 'cn-tower.png',
-        continent: 'america',
-        difficulty: 'easy'
-    },
-    'mexico': {
-        name: '墨西哥·玛雅金字塔',
-        flag: '🇲🇽',
-        tower: 'chichen-itza.png',
-        continent: 'america',
-        difficulty: 'hard'
-    },
-    
-    // 非洲
-    'egypt': {
-        name: '埃及·金字塔',
-        flag: '🇪🇬',
-        tower: 'pyramid.png',
-        continent: 'africa',
-        difficulty: 'hard'
-    },
-    'south_africa': {
-        name: '南非·桌山',
-        flag: '🇿🇦',
-        tower: 'table-mountain.png',
-        continent: 'africa',
-        difficulty: 'normal'
-    },
-    'morocco': {
-        name: '摩洛哥·哈桑塔',
-        flag: '🇲🇦',
-        tower: 'hassan-tower.png',
-        continent: 'africa',
-        difficulty: 'easy'
-    },
-    
-    // 大洋洲
-    'australia': {
-        name: '澳大利亚·悉尼歌剧院',
-        flag: '🇦🇺',
-        tower: 'sydney-opera.png',
-        continent: 'oceania',
-        difficulty: 'normal'
-    },
-    'new_zealand': {
-        name: '新西兰·天空塔',
-        flag: '🇳🇿',
-        tower: 'sky-tower.png',
-        continent: 'oceania',
-        difficulty: 'easy'
-    }
+    // ============================================
+    // 亚洲 (49国)
+    // ============================================
+    'china': { name: '中国·东方明珠', flag: '🇨🇳', tower: 'oriental-pearl.png', continent: 'asia', difficulty: 'hard' },
+    'india': { name: '印度·泰姬陵', flag: '🇮🇳', tower: 'taj-mahal.png', continent: 'asia', difficulty: 'hard' },
+    'indonesia': { name: '印度尼西亚·婆罗浮屠', flag: '🇮🇩', tower: 'borobudur.png', continent: 'asia', difficulty: 'normal' },
+    'pakistan': { name: '巴基斯坦·伊斯兰堡', flag: '🇵🇰', tower: 'blue-mosque.png', continent: 'asia', difficulty: 'normal' },
+    'bangladesh': { name: '孟加拉国·达卡', flag: '🇧🇩', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'japan': { name: '日本·东京塔', flag: '🇯🇵', tower: 'tokyo-tower.png', continent: 'asia', difficulty: 'hard' },
+    'philippines': { name: '菲律宾·巧克力山', flag: '🇵🇭', tower: 'chocolate-hills.png', continent: 'asia', difficulty: 'easy' },
+    'vietnam': { name: '越南·下龙湾', flag: '🇻🇳', tower: 'ha-long-bay.png', continent: 'asia', difficulty: 'normal' },
+    'turkey': { name: '土耳其·蓝色清真寺', flag: '🇹🇷', tower: 'blue-mosque.png', continent: 'asia', difficulty: 'normal' },
+    'iran': { name: '伊朗·伊玛目广场', flag: '🇮🇷', tower: 'imam-square.png', continent: 'asia', difficulty: 'normal' },
+    'thailand': { name: '泰国·大皇宫', flag: '🇹🇭', tower: 'grand-palace.png', continent: 'asia', difficulty: 'easy' },
+    'myanmar': { name: '缅甸·仰光大金塔', flag: '🇲🇲', tower: 'shwedagon.png', continent: 'asia', difficulty: 'easy' },
+    'south_korea': { name: '韩国·N首尔塔', flag: '🇰🇷', tower: 'n-tower.png', continent: 'asia', difficulty: 'normal' },
+    'iraq': { name: '伊拉克·巴格达', flag: '🇮🇶', tower: 'steppe.png', continent: 'asia', difficulty: 'normal' },
+    'afghanistan': { name: '阿富汗·喀布尔', flag: '🇦🇫', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'saudi_arabia': { name: '沙特阿拉伯·麦加', flag: '🇸🇦', tower: 'steppe.png', continent: 'asia', difficulty: 'normal' },
+    'uzbekistan': { name: '乌兹别克斯坦·撒马尔罕', flag: '🇺🇿', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'malaysia': { name: '马来西亚·双子塔', flag: '🇲🇾', tower: 'petronas.png', continent: 'asia', difficulty: 'normal' },
+    'nepal': { name: '尼泊尔·喜马拉雅', flag: '🇳🇵', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'yemen': { name: '也门·萨那', flag: '🇾🇪', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'sri_lanka': { name: '斯里兰卡·狮子岩', flag: '🇱🇰', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'kazakhstan': { name: '哈萨克斯坦·草原', flag: '🇰🇿', tower: 'steppe.png', continent: 'asia', difficulty: 'normal' },
+    'cambodia': { name: '柬埔寨·吴哥窟', flag: '🇰🇭', tower: 'angkor-wat.png', continent: 'asia', difficulty: 'easy' },
+    'jordan': { name: '约旦·佩特拉', flag: '🇯🇴', tower: 'petra.png', continent: 'asia', difficulty: 'easy' },
+    'azerbaijan': { name: '阿塞拜疆·巴库', flag: '🇦🇿', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'uae': { name: '阿联酋·哈利法塔', flag: '🇦🇪', tower: 'burj-khalifa.png', continent: 'asia', difficulty: 'normal' },
+    'tajikistan': { name: '塔吉克斯坦·杜尚别', flag: '🇹🇯', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'israel': { name: '以色列·耶路撒冷', flag: '🇮🇱', tower: 'jerusalem.png', continent: 'asia', difficulty: 'normal' },
+    'laos': { name: '老挝·凯旋门', flag: '🇱🇦', tower: 'patuxai.png', continent: 'asia', difficulty: 'easy' },
+    'singapore': { name: '新加坡·滨海湾', flag: '🇸🇬', tower: 'marina-bay.png', continent: 'asia', difficulty: 'normal' },
+    'lebanon': { name: '黎巴嫩·贝鲁特', flag: '🇱🇧', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'oman': { name: '阿曼·马斯喀特', flag: '🇴🇲', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'kuwait': { name: '科威特·科威特塔', flag: '🇰🇼', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'georgia': { name: '格鲁吉亚·第比利斯', flag: '🇬🇪', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'mongolia': { name: '蒙古·乌兰巴托', flag: '🇲🇳', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'armenia': { name: '亚美尼亚·埃里温', flag: '🇦🇲', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'qatar': { name: '卡塔尔·多哈', flag: '🇶🇦', tower: 'doha-museum.png', continent: 'asia', difficulty: 'normal' },
+    'bahrain': { name: '巴林·麦纳麦', flag: '🇧🇭', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'turkmenistan': { name: '土库曼斯坦·阿什哈巴德', flag: '🇹🇲', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'kyrgyzstan': { name: '吉尔吉斯斯坦·比什凯克', flag: '🇰🇬', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'maldives': { name: '马尔代夫·马累', flag: '🇲🇻', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'brunei': { name: '文莱·斯里巴加湾', flag: '🇧🇳', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'bhutan': { name: '不丹·廷布', flag: '🇧🇹', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'north_korea': { name: '朝鲜·平壤', flag: '🇰🇵', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'east_timor': { name: '东帝汶·帝力', flag: '🇹🇱', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'syria': { name: '叙利亚·大马士革', flag: '🇸🇾', tower: 'steppe.png', continent: 'asia', difficulty: 'normal' },
+    'cyprus': { name: '塞浦路斯·尼科西亚', flag: '🇨🇾', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'palestine': { name: '巴勒斯坦', flag: '🇵🇸', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+    'kuwait': { name: '科威特·科威特塔', flag: '🇰🇼', tower: 'steppe.png', continent: 'asia', difficulty: 'easy' },
+
+    // ============================================
+    // 欧洲 (44国)
+    // ============================================
+    'russia': { name: '俄罗斯·圣瓦西里大教堂', flag: '🇷🇺', tower: 'st-basil.png', continent: 'europe', difficulty: 'hard' },
+    'germany': { name: '德国·勃兰登堡门', flag: '🇩🇪', tower: 'brandenburg-gate.png', continent: 'europe', difficulty: 'hard' },
+    'uk': { name: '英国·大本钟', flag: '🇬🇧', tower: 'big-ben.png', continent: 'europe', difficulty: 'hard' },
+    'france': { name: '法国·埃菲尔铁塔', flag: '🇫🇷', tower: 'eiffel-tower.png', continent: 'europe', difficulty: 'hard' },
+    'italy': { name: '意大利·比萨斜塔', flag: '🇮🇹', tower: 'pisa-tower.png', continent: 'europe', difficulty: 'normal' },
+    'spain': { name: '西班牙·圣家堂', flag: '🇪🇸', tower: 'sagrada-familia.png', continent: 'europe', difficulty: 'normal' },
+    'ukraine': { name: '乌克兰·基辅', flag: '🇺🇦', tower: 'kyiv.png', continent: 'europe', difficulty: 'normal' },
+    'poland': { name: '波兰·华沙', flag: '🇵🇱', tower: 'warsaw.png', continent: 'europe', difficulty: 'normal' },
+    'romania': { name: '罗马尼亚·布兰城堡', flag: '🇷🇴', tower: 'bran-castle.png', continent: 'europe', difficulty: 'easy' },
+    'netherlands': { name: '荷兰·风车', flag: '🇳🇱', tower: 'windmill.png', continent: 'europe', difficulty: 'normal' },
+    'belgium': { name: '比利时·布鲁塞尔', flag: '🇧🇪', tower: 'steppe.png', continent: 'europe', difficulty: 'normal' },
+    'czech_republic': { name: '捷克·布拉格', flag: '🇨🇿', tower: 'prague.png', continent: 'europe', difficulty: 'easy' },
+    'greece': { name: '希腊·帕特农神庙', flag: '🇬🇷', tower: 'parthenon.png', continent: 'europe', difficulty: 'normal' },
+    'portugal': { name: '葡萄牙·里斯本', flag: '🇵🇹', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'sweden': { name: '瑞典·斯德哥尔摩', flag: '🇸🇪', tower: 'stockholm.png', continent: 'europe', difficulty: 'normal' },
+    'hungary': { name: '匈牙利·布达佩斯', flag: '🇭🇺', tower: 'budapest.png', continent: 'europe', difficulty: 'easy' },
+    'belarus': { name: '白俄罗斯·明斯克', flag: '🇧🇾', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'austria': { name: '奥地利·维也纳', flag: '🇦🇹', tower: 'vienna-opera.png', continent: 'europe', difficulty: 'normal' },
+    'switzerland': { name: '瑞士·马特洪峰', flag: '🇨🇭', tower: 'matterhorn.png', continent: 'europe', difficulty: 'normal' },
+    'serbia': { name: '塞尔维亚·贝尔格莱德', flag: '🇷🇸', tower: 'sava-temple.png', continent: 'europe', difficulty: 'easy' },
+    'bulgaria': { name: '保加利亚·里拉修道院', flag: '🇧🇬', tower: 'rila.png', continent: 'europe', difficulty: 'easy' },
+    'denmark': { name: '丹麦·哥本哈根', flag: '🇩🇰', tower: 'copenhagen.png', continent: 'europe', difficulty: 'normal' },
+    'finland': { name: '芬兰·罗瓦涅米', flag: '🇫🇮', tower: 'rovaniemi.png', continent: 'europe', difficulty: 'normal' },
+    'slovakia': { name: '斯洛伐克·布拉迪斯拉发', flag: '🇸🇰', tower: 'bratislava.png', continent: 'europe', difficulty: 'easy' },
+    'norway': { name: '挪威·峡湾', flag: '🇳🇴', tower: 'fjord.png', continent: 'europe', difficulty: 'normal' },
+    'ireland': { name: '爱尔兰·莫赫悬崖', flag: '🇮🇪', tower: 'cliffs-of-moher.png', continent: 'europe', difficulty: 'easy' },
+    'croatia': { name: '克罗地亚·杜布罗夫尼克', flag: '🇭🇷', tower: 'dubrovnik.png', continent: 'europe', difficulty: 'easy' },
+    'bosnia': { name: '波黑·萨拉热窝', flag: '🇧🇦', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'albania': { name: '阿尔巴尼亚·地拉那', flag: '🇦🇱', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'lithuania': { name: '立陶宛·维尔纽斯', flag: '🇱🇹', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'slovenia': { name: '斯洛文尼亚·卢布尔雅那', flag: '🇸🇮', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'latvia': { name: '拉脱维亚·里加', flag: '🇱🇻', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'estonia': { name: '爱沙尼亚·塔林', flag: '🇪🇪', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'moldova': { name: '摩尔多瓦·基希讷乌', flag: '🇲🇩', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'luxembourg': { name: '卢森堡', flag: '🇱🇺', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'malta': { name: '马耳他', flag: '🇲🇹', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'iceland': { name: '冰岛·极光', flag: '🇮🇸', tower: 'aurora.png', continent: 'europe', difficulty: 'easy' },
+    'andorra': { name: '安道尔', flag: '🇦🇩', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'liechtenstein': { name: '列支敦士登', flag: '🇱🇮', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'monaco': { name: '摩纳哥', flag: '🇲🇨', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'san_marino': { name: '圣马力诺', flag: '🇸🇲', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'vatican': { name: '梵蒂冈', flag: '🇻🇦', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'montenegro': { name: '黑山', flag: '🇲🇪', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+    'north_macedonia': { name: '北马其顿', flag: '🇲🇰', tower: 'steppe.png', continent: 'europe', difficulty: 'easy' },
+
+    // ============================================
+    // 北美洲 (23国)
+    // ============================================
+    'usa': { name: '美国·自由女神像', flag: '🇺🇸', tower: 'statue-of-liberty.png', continent: 'america', difficulty: 'hard' },
+    'canada': { name: '加拿大·CN塔', flag: '🇨🇦', tower: 'cn-tower.png', continent: 'america', difficulty: 'hard' },
+    'mexico': { name: '墨西哥·奇琴伊察', flag: '🇲🇽', tower: 'steppe.png', continent: 'america', difficulty: 'normal' },
+    'guatemala': { name: '危地马拉·蒂卡尔', flag: '🇬🇹', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'cuba': { name: '古巴·哈瓦那', flag: '🇨🇺', tower: 'havana.png', continent: 'america', difficulty: 'easy' },
+    'haiti': { name: '海地·太子港', flag: '🇭🇹', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'dominican_republic': { name: '多米尼加·圣多明各', flag: '🇩🇴', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'honduras': { name: '洪都拉斯·科潘', flag: '🇭🇳', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'nicaragua': { name: '尼加拉瓜·马那瓜', flag: '🇳🇮', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'costa_rica': { name: '哥斯达黎加·阿雷纳尔', flag: '🇨🇷', tower: 'arenal.png', continent: 'america', difficulty: 'easy' },
+    'panama': { name: '巴拿马·巴拿马运河', flag: '🇵🇦', tower: 'panama-canal.png', continent: 'america', difficulty: 'easy' },
+    'el_salvador': { name: '萨尔瓦多·圣萨尔瓦多', flag: '🇸🇻', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'belize': { name: '伯利兹·贝尔莫潘', flag: '🇧🇿', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'jamaica': { name: '牙买加·金斯敦', flag: '🇯🇲', tower: 'dunn-river.png', continent: 'america', difficulty: 'easy' },
+    'trinidad': { name: '特立尼达和多巴哥', flag: '🇹🇹', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'bahamas': { name: '巴哈马·拿骚', flag: '🇧🇸', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'barbados': { name: '巴巴多斯', flag: '🇧🇧', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'grenada': { name: '格林纳达', flag: '🇬🇩', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'saint_lucia': { name: '圣卢西亚', flag: '🇱🇨', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'antigua': { name: '安提瓜和巴布达', flag: '🇦🇬', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'saint_vincent': { name: '圣文森特和格林纳丁斯', flag: '🇻🇨', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'saint_kitts': { name: '圣基茨和尼维斯', flag: '🇰🇳', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'dominica': { name: '多米尼克', flag: '🇩🇲', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+
+    // ============================================
+    // 南美洲 (12国)
+    // ============================================
+    'brazil': { name: '巴西·基督像', flag: '🇧🇷', tower: 'christ-redeemer.png', continent: 'america', difficulty: 'hard' },
+    'colombia': { name: '哥伦比亚·波哥大', flag: '🇨🇴', tower: 'steppe.png', continent: 'america', difficulty: 'normal' },
+    'argentina': { name: '阿根廷·方尖碑', flag: '🇦🇷', tower: 'obelisk.png', continent: 'america', difficulty: 'normal' },
+    'peru': { name: '秘鲁·马丘比丘', flag: '🇵🇪', tower: 'machu-picchu.png', continent: 'america', difficulty: 'normal' },
+    'venezuela': { name: '委内瑞拉·加拉加斯', flag: '🇻🇪', tower: 'steppe.png', continent: 'america', difficulty: 'normal' },
+    'chile': { name: '智利·复活节岛', flag: '🇨🇱', tower: 'easter-island.png', continent: 'america', difficulty: 'normal' },
+    'ecuador': { name: '厄瓜多尔·基多', flag: '🇪🇨', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'bolivia': { name: '玻利维亚·拉巴斯', flag: '🇧🇴', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'paraguay': { name: '巴拉圭·亚松森', flag: '🇵🇾', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'uruguay': { name: '乌拉圭·蒙得维的亚', flag: '🇺🇾', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'guyana': { name: '圭亚那', flag: '🇬🇾', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+    'suriname': { name: '苏里南', flag: '🇸🇷', tower: 'steppe.png', continent: 'america', difficulty: 'easy' },
+
+    // ============================================
+    // 非洲 (54国)
+    // ============================================
+    'nigeria': { name: '尼日利亚·拉各斯', flag: '🇳🇬', tower: 'steppe.png', continent: 'africa', difficulty: 'normal' },
+    'ethiopia': { name: '埃塞俄比亚·拉利贝拉', flag: '🇪🇹', tower: 'lalibela.png', continent: 'africa', difficulty: 'easy' },
+    'egypt': { name: '埃及·金字塔', flag: '🇪🇬', tower: 'pyramids.png', continent: 'africa', difficulty: 'normal' },
+    'dr_congo': { name: '刚果民主共和国', flag: '🇨🇩', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'tanzania': { name: '坦桑尼亚·塞伦盖蒂', flag: '🇹🇿', tower: 'serengeti.png', continent: 'africa', difficulty: 'easy' },
+    'south_africa': { name: '南非·桌山', flag: '🇿🇦', tower: 'table-mountain.png', continent: 'africa', difficulty: 'normal' },
+    'kenya': { name: '肯尼亚·内罗毕', flag: '🇰🇪', tower: 'steppe.png', continent: 'africa', difficulty: 'normal' },
+    'uganda': { name: '乌干达·坎帕拉', flag: '🇺🇬', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'sudan': { name: '苏丹·喀土穆', flag: '🇸🇩', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'algeria': { name: '阿尔及利亚·阿尔及尔', flag: '🇩🇿', tower: 'steppe.png', continent: 'africa', difficulty: 'normal' },
+    'morocco': { name: '摩洛哥·舍夫沙万', flag: '🇲🇦', tower: 'chefchaouen.png', continent: 'africa', difficulty: 'easy' },
+    'angola': { name: '安哥拉·罗安达', flag: '🇦🇴', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'ghana': { name: '加纳·阿克拉', flag: '🇬🇭', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'mozambique': { name: '莫桑比克·马普托', flag: '🇲🇿', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'madagascar': { name: '马达加斯加·猴面包树', flag: '🇲🇬', tower: 'baobab.png', continent: 'africa', difficulty: 'easy' },
+    'cameroon': { name: '喀麦隆·雅温得', flag: '🇨🇲', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'ivory_coast': { name: '科特迪瓦·阿比让', flag: '🇨🇮', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'niger': { name: '尼日尔·尼亚美', flag: '🇳🇪', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'burkina_faso': { name: '布基纳法索·瓦加杜古', flag: '🇧🇫', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'mali': { name: '马里·巴马科', flag: '🇲🇱', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'malawi': { name: '马拉维·利隆圭', flag: '🇲🇼', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'zambia': { name: '赞比亚·维多利亚瀑布', flag: '🇿🇲', tower: 'victoria-falls.png', continent: 'africa', difficulty: 'easy' },
+    'senegal': { name: '塞内加尔·达喀尔', flag: '🇸🇳', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'somalia': { name: '索马里·摩加迪沙', flag: '🇸🇴', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'chad': { name: '乍得·恩贾梅纳', flag: '🇹🇩', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'zimbabwe': { name: '津巴布韦·哈拉雷', flag: '🇿🇼', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'guinea': { name: '几内亚·科纳克里', flag: '🇬🇳', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'rwanda': { name: '卢旺达·基加利', flag: '🇷🇼', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'benin': { name: '贝宁·波多诺伏', flag: '🇧🇯', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'burundi': { name: '布隆迪·布琼布拉', flag: '🇧🇮', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'tunisia': { name: '突尼斯·突尼斯', flag: '🇹🇳', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'south_sudan': { name: '南苏丹·朱巴', flag: '🇸🇸', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'togo': { name: '多哥·洛美', flag: '🇹🇬', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'sierra_leone': { name: '塞拉利昂·弗里敦', flag: '🇸🇱', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'libya': { name: '利比亚·的黎波里', flag: '🇱🇾', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'liberia': { name: '利比里亚·蒙罗维亚', flag: '🇱🇷', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'central_african_republic': { name: '中非共和国', flag: '🇨🇫', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'mauritania': { name: '毛里塔尼亚·努瓦克肖特', flag: '🇲🇷', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'eritrea': { name: '厄立特里亚·阿斯马拉', flag: '🇪🇷', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'gambia': { name: '冈比亚·班珠尔', flag: '🇬🇲', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'botswana': { name: '博茨瓦纳·哈博罗内', flag: '🇧🇼', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'gabon': { name: '加蓬·利伯维尔', flag: '🇬🇦', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'lesotho': { name: '莱索托·马塞卢', flag: '🇱🇸', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'guinea_bissau': { name: '几内亚比绍·比绍', flag: '🇬🇼', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'equatorial_guinea': { name: '赤道几内亚', flag: '🇬🇶', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'mauritius': { name: '毛里求斯·莫卡', flag: '🇲🇺', tower: 'le-morne.png', continent: 'africa', difficulty: 'easy' },
+    'eswatini': { name: '斯威士兰·姆巴巴内', flag: '🇸🇿', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'djibouti': { name: '吉布提', flag: '🇩🇯', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'comoros': { name: '科摩罗·莫罗尼', flag: '🇰🇲', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'cape_verde': { name: '佛得角·普拉亚', flag: '🇨🇻', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'sao_tome': { name: '圣多美和普林西比', flag: '🇸🇹', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'seychelles': { name: '塞舌尔·维多利亚', flag: '🇸🇨', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'namibia': { name: '纳米比亚·温得和克', flag: '🇳🇦', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+    'reunion': { name: '留尼汪', flag: '🇷🇪', tower: 'steppe.png', continent: 'africa', difficulty: 'easy' },
+
+    // ============================================
+    // 大洋洲 (14国)
+    // ============================================
+    'australia': { name: '澳大利亚·悉尼歌剧院', flag: '🇦🇺', tower: 'sydney-opera.png', continent: 'oceania', difficulty: 'hard' },
+    'papua_new_guinea': { name: '巴布亚新几内亚', flag: '🇵🇬', tower: 'png.png', continent: 'oceania', difficulty: 'easy' },
+    'new_zealand': { name: '新西兰·天空塔', flag: '🇳🇿', tower: 'sky-tower.png', continent: 'oceania', difficulty: 'normal' },
+    'fiji': { name: '斐济·苏瓦', flag: '🇫🇯', tower: 'fiji.png', continent: 'oceania', difficulty: 'easy' },
+    'solomon_islands': { name: '所罗门群岛', flag: '🇸🇧', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'vanuatu': { name: '瓦努阿图·维拉港', flag: '🇻🇺', tower: 'vanuatu.png', continent: 'oceania', difficulty: 'easy' },
+    'samoa': { name: '萨摩亚·阿皮亚', flag: '🇼🇸', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'micronesia': { name: '密克罗尼西亚', flag: '🇫🇲', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'tonga': { name: '汤加·努库阿洛法', flag: '🇹🇴', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'kiribati': { name: '基里巴斯', flag: '🇰🇮', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'palau': { name: '帕劳', flag: '🇵🇼', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'marshall_islands': { name: '马绍尔群岛', flag: '🇲🇭', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'tuvalu': { name: '图瓦卢', flag: '🇹🇻', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
+    'nauru': { name: '瑙鲁', flag: '🇳🇷', tower: 'steppe.png', continent: 'oceania', difficulty: 'easy' },
 };
+
+// 按大洲分组统计
+const COUNTRIES_BY_CONTINENT = {
+    asia: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].continent === 'asia'),
+    europe: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].continent === 'europe'),
+    america: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].continent === 'america'),
+    africa: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].continent === 'africa'),
+    oceania: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].continent === 'oceania')
+};
+
+// 难度统计
+const DIFFICULTY_STATS = {
+    easy: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].difficulty === 'easy').length,
+    normal: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].difficulty === 'normal').length,
+    hard: Object.keys(COUNTRY_TOWERS).filter(k => COUNTRY_TOWERS[k].difficulty === 'hard').length
+};
+
+console.log('🏆 命运塔锦标赛 - 196国家配置加载完成！');
+console.log(`📊 统计: 亚洲${COUNTRIES_BY_CONTINENT.asia.length}国, 欧洲${COUNTRIES_BY_CONTINENT.europe.length}国, 美洲${COUNTRIES_BY_CONTINENT.america.length}国, 非洲${COUNTRIES_BY_CONTINENT.africa.length}国, 大洋洲${COUNTRIES_BY_CONTINENT.oceania.length}国`);
+console.log(`🎮 难度分布: 简单${DIFFICULTY_STATS.easy}国, 普通${DIFFICULTY_STATS.normal}国, 困难${DIFFICULTY_STATS.hard}国`);
 
 // ============ 明信片配置 ============
 const POSTCARD_CONFIG = {
@@ -198,1694 +275,325 @@ const POSTCARD_CONFIG = {
     }
 };
 
-// ============ 游戏状态管理 ============
+// ============ 游戏状态管理类 ============
 class TournamentGame {
     constructor() {
         this.state = {
-            // 游戏基本信息
-            gameId: null,
-            country: null,
-            towerData: null,
-            startTime: null,
-            gameTimeRemaining: 0,
-            
-            // 玩家信息
-            players: [],
-            humanPlayers: [],
-            botPlayers: [],
-            myPlayerId: null,
-            currentTurn: 0,
-            
-            // 团队信息
-            teams: {
-                panda: { members: [], finished: [], gifted: false },
-                wolf: { members: [], finished: [], gifted: false }
-            },
-            
-            // 游戏状态
-            isRunning: false,
-            isPaused: false,
-            round: 1,
-            phase: 'waiting', // waiting, playing, finished
-            
-            // 时间控制
-            turnTimeRemaining: 0,
-            turnTimer: null,
-            gameTimer: null,
-            countdownInterval: null,
-            
-            // 卡牌系统
-            guards: [],
-            provokeCards: [],
-            deck: [],
-            
-            // 排行榜
-            leaderboard: [],
-            finishedPlayers: [],
-            
-            // 我的状态
-            myHand: [],
-            mySelectedCard: null,
-            myLevel: 12, // 从第2层开始（索引12）
-            myPreviousLevel: 12,
-            myTeam: null,
-            
-            // 日志
-            logs: [],
-            records: []
+            gameId: null, country: null, towerData: null, startTime: null, gameTimeRemaining: 0,
+            players: [], humanPlayers: [], botPlayers: [], myPlayerId: null, currentTurn: 0,
+            teams: { panda: { members: [], finished: [], gifted: false }, wolf: { members: [], finished: [], gifted: false } },
+            isRunning: false, isPaused: false, round: 1, phase: 'waiting',
+            turnTimeRemaining: 0, turnTimer: null, gameTimer: null, countdownInterval: null,
+            guards: [], provokeCards: [], deck: [], leaderboard: [], finishedPlayers: [],
+            myHand: [], mySelectedCard: null, myLevel: 12, myPreviousLevel: 12, myTeam: null,
+            logs: [], records: []
         };
-        
         this.callbacks = {};
         this.ui = null;
     }
-    
-    // ============ 初始化游戏 ============
+
     init(countryCode, isTeamMode = true) {
-        console.log(`🎮 初始化锦标赛: ${countryCode}, 团队模式: ${isTeamMode}`);
-        
-        // 设置国家和塔楼
+        console.log(`🎮 初始化锦标赛: ${countryCode}`);
         this.state.country = countryCode;
         this.state.towerData = COUNTRY_TOWERS[countryCode] || COUNTRY_TOWERS['china'];
-        this.state.gameId = this.generateGameId();
-        
-        // 设置游戏模式
+        this.state.gameId = 'TG_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         TOURNAMENT_CONFIG.TEAM_MODE = isTeamMode;
-        this.state.gameTimeRemaining = isTeamMode ? 
-            TOURNAMENT_CONFIG.MAX_GAME_TIME_TEAM : 
-            TOURNAMENT_CONFIG.MAX_GAME_TIME_SOLO;
-        
-        // 初始化玩家
+        this.state.gameTimeRemaining = isTeamMode ? TOURNAMENT_CONFIG.MAX_GAME_TIME_TEAM : TOURNAMENT_CONFIG.MAX_GAME_TIME_SOLO;
         this.initPlayers();
-        
-        // 初始化卡牌系统
         this.initCardSystem();
-        
-        // 初始化UI
-        this.initUI();
-        
-        // 保存到本地存储
         this.saveGameState();
-        
-        console.log('✅ 游戏初始化完成');
         return this.state;
     }
-    
-    // 生成游戏ID
-    generateGameId() {
-        return 'TG_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-    
-    // ============ 初始化玩家 ============
+
     initPlayers() {
         const avatars = ['😺', '🦁', '🐯', '🦊', '🐺', '🐻', '🐼', '🐨', '🐸', '🦉'];
-        const botNames = [
-            '龙霸天下', '巴黎绅士', '德州牛仔', '樱花忍者', '北极熊',
-            '沙漠之狐', '草原雄狮', '深海巨鲸', '飞天神鹰', '闪电侠'
-        ];
-        
-        this.state.players = [];
-        this.state.humanPlayers = [];
-        this.state.botPlayers = [];
-        
-        // 创建玩家自己
-        const myPlayer = {
-            id: 'player_me',
-            name: '我',
-            avatar: '😎',
-            isHuman: true,
-            isBot: false,
-            level: 12,
-            previousLevel: 12,
-            team: 'panda',
-            hand: [],
-            cardsUsed: 0,
-            cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE,
-            finished: false,
-            finishRank: null,
-            finishTime: null,
-            isActive: true
-        };
-        
-        this.state.players.push(myPlayer);
-        this.state.humanPlayers.push(myPlayer);
-        this.state.myPlayerId = myPlayer.id;
-        this.state.myTeam = myPlayer.team;
-        this.state.myHand = myPlayer.hand;
-        this.state.myLevel = myPlayer.level;
-        
-        // 分配团队
+        const botNames = ['龙霸天下', '巴黎绅士', '德州牛仔', '樱花忍者', '北极熊', '沙漠之狐', '草原雄狮', '深海巨鲸', '飞天神鹰', '闪电侠'];
+        this.state.players = []; this.state.humanPlayers = []; this.state.botPlayers = [];
+        const myPlayer = { id: 'player_me', name: '我', avatar: '😎', isHuman: true, isBot: false, level: 12, previousLevel: 12, team: 'panda', hand: [], cardsUsed: 0, cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE, finished: false, finishRank: null, finishTime: null, isActive: true };
+        this.state.players.push(myPlayer); this.state.humanPlayers.push(myPlayer); this.state.myPlayerId = myPlayer.id; this.state.myTeam = myPlayer.team; this.state.myHand = myPlayer.hand;
         this.state.teams.panda.members.push(myPlayer.id);
-        
-        // 创建其他人类玩家（模拟）
-        const humanCount = TOURNAMENT_CONFIG.HUMAN_PLAYERS - 1;
-        for (let i = 0; i < humanCount; i++) {
+        for (let i = 0; i < TOURNAMENT_CONFIG.HUMAN_PLAYERS - 1; i++) {
             const team = i % 2 === 0 ? 'panda' : 'wolf';
-            const player = {
-                id: `human_${i}`,
-                name: `玩家${i + 2}`,
-                avatar: avatars[i + 1],
-                isHuman: true,
-                isBot: false,
-                level: 12,
-                previousLevel: 12,
-                team: team,
-                hand: this.generateHand(),
-                cardsUsed: 0,
-                cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE,
-                finished: false,
-                finishRank: null,
-                finishTime: null,
-                isActive: true
-            };
-            
-            this.state.players.push(player);
-            this.state.humanPlayers.push(player);
-            this.state.teams[team].members.push(player.id);
+            const player = { id: `human_${i}`, name: `玩家${i + 2}`, avatar: avatars[i + 1], isHuman: true, isBot: false, level: 12, previousLevel: 12, team: team, hand: this.generateHand(), cardsUsed: 0, cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE, finished: false, finishRank: null, finishTime: null, isActive: true };
+            this.state.players.push(player); this.state.humanPlayers.push(player); this.state.teams[team].members.push(player.id);
         }
-        
-        // 创建Bot玩家
-        const botCount = TOURNAMENT_CONFIG.BOT_PLAYERS;
-        for (let i = 0; i < botCount; i++) {
-            const team = (i + humanCount) % 2 === 0 ? 'panda' : 'wolf';
-            const player = {
-                id: `bot_${i}`,
-                name: botNames[i] || `Bot${i + 1}`,
-                avatar: '🤖',
-                isHuman: false,
-                isBot: true,
-                level: 12,
-                previousLevel: 12,
-                team: team,
-                hand: this.generateHand(),
-                cardsUsed: 0,
-                cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE,
-                finished: false,
-                finishRank: null,
-                finishTime: null,
-                isActive: true,
-                aiDifficulty: Math.random() > 0.7 ? 'hard' : (Math.random() > 0.4 ? 'normal' : 'easy')
-            };
-            
-            this.state.players.push(player);
-            this.state.botPlayers.push(player);
-            this.state.teams[team].members.push(player.id);
+        for (let i = 0; i < TOURNAMENT_CONFIG.BOT_PLAYERS; i++) {
+            const team = (i + TOURNAMENT_CONFIG.HUMAN_PLAYERS - 1) % 2 === 0 ? 'panda' : 'wolf';
+            const player = { id: `bot_${i}`, name: botNames[i] || `Bot${i + 1}`, avatar: '🤖', isHuman: false, isBot: true, level: 12, previousLevel: 12, team: team, hand: this.generateHand(), cardsUsed: 0, cardsRemaining: TOURNAMENT_CONFIG.HAND_SIZE, finished: false, finishRank: null, finishTime: null, isActive: true, aiDifficulty: Math.random() > 0.7 ? 'hard' : (Math.random() > 0.4 ? 'normal' : 'easy') };
+            this.state.players.push(player); this.state.botPlayers.push(player); this.state.teams[team].members.push(player.id);
         }
-        
-        console.log(`👥 玩家初始化完成: ${this.state.players.length}人`);
-        console.log(`  - 真人: ${this.state.humanPlayers.length}`);
-        console.log(`  - Bot: ${this.state.botPlayers.length}`);
-        console.log(`  - 熊猫队: ${this.state.teams.panda.members.length}人`);
-        console.log(`  - 战狼队: ${this.state.teams.wolf.members.length}人`);
     }
-    
-    // 生成手牌
+
     generateHand() {
-        const suits = ['♥', '♦', '♣', '♠'];
-        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const suits = ['♥', '♦', '♣', '♠']; const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
         const hand = [];
-        
-        for (let s of suits) {
-            for (let r of ranks) {
-                hand.push({
-                    suit: s,
-                    rank: r,
-                    isRed: s === '♥' || s === '♦',
-                    used: false
-                });
-            }
-        }
-        
+        for (let s of suits) for (let r of ranks) hand.push({ suit: s, rank: r, isRed: s === '♥' || s === '♦', used: false });
         return hand;
     }
-    
-    // ============ 初始化卡牌系统 ============
+
     initCardSystem() {
-        // 生成完整的208张牌（4副）
-        const allCards = [];
-        const suits = ['♥', '♦', '♣', '♠'];
-        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        
-        for (let deck = 0; deck < 4; deck++) {
-            for (let s of suits) {
-                for (let r of ranks) {
-                    allCards.push({
-                        suit: s,
-                        rank: r,
-                        deck: deck,
-                        isRed: s === '♥' || s === '♦',
-                        used: false
-                    });
-                }
-            }
-        }
-        
-        // 洗牌
-        allCards.sort(() => Math.random() - 0.5);
-        this.state.deck = allCards;
-        
-        // 生成13层守卫
-        this.state.guards = [];
-        let cardIndex = 0;
-        const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-        
+        const allCards = []; const suits = ['♥', '♦', '♣', '♠']; const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        for (let deck = 0; deck < 4; deck++) for (let s of suits) for (let r of ranks) allCards.push({ suit: s, rank: r, deck: deck, isRed: s === '♥' || s === '♦', used: false });
+        allCards.sort(() => Math.random() - 0.5); this.state.deck = allCards;
+        this.state.guards = []; let cardIndex = 0; const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
         for (let i = 0; i < 13; i++) {
-            // 守卫抽13张牌（隐藏）
-            const guardCards = [];
-            for (let j = 0; j < 13; j++) {
-                guardCards.push({ ...allCards[cardIndex++], used: false });
-            }
-            
-            // 守卫的3张激怒牌（明牌）
-            const provokeCards = [];
-            for (let j = 0; j < 3; j++) {
-                provokeCards.push({ ...allCards[cardIndex++] });
-            }
-            
-            this.state.guards.push({
-                level: i,
-                levelName: levels[i],
-                guardCards: guardCards,
-                provokeCards: provokeCards,
-                cardsLeft: 13,
-                isDefeated: false
-            });
+            const guardCards = []; for (let j = 0; j < 13; j++) guardCards.push({ ...allCards[cardIndex++], used: false });
+            const provokeCards = []; for (let j = 0; j < 3; j++) provokeCards.push({ ...allCards[cardIndex++] });
+            this.state.guards.push({ level: i, levelName: levels[i], guardCards: guardCards, provokeCards: provokeCards, cardsLeft: 13, isDefeated: false });
         }
-        
-        // 给玩家自己发牌
         const myPlayer = this.state.players.find(p => p.id === this.state.myPlayerId);
-        if (myPlayer) {
-            myPlayer.hand = this.generateHand();
-            this.state.myHand = myPlayer.hand;
-        }
-        
-        console.log('🃏 卡牌系统初始化完成');
+        if (myPlayer) { myPlayer.hand = this.generateHand(); this.state.myHand = myPlayer.hand; }
     }
-    
-    // ============ 初始化UI ============
-    initUI() {
-        // UI初始化将由外部调用
-        console.log('🎨 UI初始化准备就绪');
-    }
-    
-    // ============ 游戏开始 ============
+
     start() {
-        if (this.state.isRunning) {
-            console.warn('游戏已经在运行中');
-            return;
-        }
-        
-        console.log('🚀 游戏开始！');
-        this.state.isRunning = true;
-        this.state.phase = 'playing';
-        this.state.startTime = Date.now();
-        this.state.round = 1;
-        this.state.currentTurn = 0;
-        
-        // 启动游戏计时器
-        this.startGameTimer();
-        
-        // 开始第一回合
-        this.startTurn();
-        
-        // 触发回调
+        if (this.state.isRunning) return;
+        this.state.isRunning = true; this.state.phase = 'playing'; this.state.startTime = Date.now(); this.state.round = 1; this.state.currentTurn = 0;
+        this.startGameTimer(); this.startTurn();
         this.trigger('gameStarted', { gameId: this.state.gameId });
-        
-        // 添加日志
         this.addLog('🎮 锦标赛开始！命运塔之战！');
         this.addLog(`🏰 战场: ${this.state.towerData.name}`);
         this.addLog(`👥 参战人数: ${this.state.players.length}人`);
-        this.addLog('💡 提示: 匹配守卫牌上升，避开激怒牌！');
     }
-    
-    // ============ 游戏计时器 ============
+
     startGameTimer() {
-        // 整局游戏倒计时
         this.state.gameTimer = setInterval(() => {
             if (this.state.isPaused) return;
-            
             this.state.gameTimeRemaining--;
-            
-            // 触发时间更新回调
-            this.trigger('gameTimeUpdate', {
-                remaining: this.state.gameTimeRemaining,
-                total: TOURNAMENT_CONFIG.TEAM_MODE ? 
-                    TOURNAMENT_CONFIG.MAX_GAME_TIME_TEAM : 
-                    TOURNAMENT_CONFIG.MAX_GAME_TIME_SOLO
-            });
-            
-            // 检查游戏超时
-            if (this.state.gameTimeRemaining <= 0) {
-                this.forceEndGame('timeout');
-            }
+            this.trigger('gameTimeUpdate', { remaining: this.state.gameTimeRemaining, total: TOURNAMENT_CONFIG.TEAM_MODE ? TOURNAMENT_CONFIG.MAX_GAME_TIME_TEAM : TOURNAMENT_CONFIG.MAX_GAME_TIME_SOLO });
+            if (this.state.gameTimeRemaining <= 0) this.forceEndGame('timeout');
         }, 1000);
     }
-    
-    // ============ 回合系统 ============
+
     startTurn() {
         const player = this.state.players[this.state.currentTurn];
-        if (!player || player.finished) {
-            this.nextTurn();
-            return;
-        }
-        
-        console.log(`🎯 回合开始: ${player.name}`);
-        
-        // 重置回合时间
+        if (!player || player.finished) { this.nextTurn(); return; }
         this.state.turnTimeRemaining = TOURNAMENT_CONFIG.TURN_TIME_LIMIT;
-        
-        // 更新UI
-        this.trigger('turnStarted', {
-            player: player,
-            timeLimit: TOURNAMENT_CONFIG.TURN_TIME_LIMIT
-        });
-        
-        // 如果是玩家自己
-        if (player.id === this.state.myPlayerId) {
-            this.addLog('🎯 你的回合！请选择手牌');
-            this.trigger('myTurn', { timeLimit: TOURNAMENT_CONFIG.TURN_TIME_LIMIT });
-        } else {
-            this.addLog(`⏳ ${player.name}的回合...`);
-        }
-        
-        // 启动回合倒计时
+        this.trigger('turnStarted', { player: player, timeLimit: TOURNAMENT_CONFIG.TURN_TIME_LIMIT });
+        if (player.id === this.state.myPlayerId) { this.addLog('🎯 你的回合！请选择手牌'); this.trigger('myTurn', { timeLimit: TOURNAMENT_CONFIG.TURN_TIME_LIMIT }); }
+        else this.addLog(`⏳ ${player.name}的回合...`);
         this.startTurnTimer();
     }
-    
+
     startTurnTimer() {
-        // 清除之前的计时器
-        if (this.state.turnTimer) {
-            clearInterval(this.state.turnTimer);
-        }
-        
+        if (this.state.turnTimer) clearInterval(this.state.turnTimer);
         this.state.turnTimer = setInterval(() => {
             if (this.state.isPaused) return;
-            
             this.state.turnTimeRemaining--;
-            
-            // 触发倒计时回调
-            this.trigger('turnTimeUpdate', {
-                remaining: this.state.turnTimeRemaining,
-                total: TOURNAMENT_CONFIG.TURN_TIME_LIMIT
-            });
-            
-            // 时间警告
-            if (this.state.turnTimeRemaining === 10) {
-                this.trigger('timeWarning', { remaining: 10 });
-                this.addLog('⚠️ 最后10秒！');
-            }
-            
-            // 超时处理
-            if (this.state.turnTimeRemaining <= 0) {
-                this.handleTurnTimeout();
-            }
+            this.trigger('turnTimeUpdate', { remaining: this.state.turnTimeRemaining, total: TOURNAMENT_CONFIG.TURN_TIME_LIMIT });
+            if (this.state.turnTimeRemaining === 10) { this.trigger('timeWarning', { remaining: 10 }); this.addLog('⚠️ 最后10秒！'); }
+            if (this.state.turnTimeRemaining <= 0) this.handleTurnTimeout();
         }, 1000);
     }
-    
-    // 回合超时处理
+
     handleTurnTimeout() {
         const player = this.state.players[this.state.currentTurn];
-        console.log(`⏰ ${player.name} 回合超时`);
-        
-        // 停止回合计时器
         clearInterval(this.state.turnTimer);
-        
-        // 自动随机出牌
         const randomCard = this.getRandomAvailableCard(player);
-        
         this.addLog(`⏰ ${player.name} 超时，系统自动出牌`);
-        
-        // 执行出牌
         this.playCard(player.id, randomCard);
     }
-    
-    // 获取随机可用卡牌
+
     getRandomAvailableCard(player) {
         const availableCards = player.hand.filter(c => !c.used);
         if (availableCards.length === 0) return null;
-        
-        const randomIndex = Math.floor(Math.random() * availableCards.length);
-        return availableCards[randomIndex];
+        return availableCards[Math.floor(Math.random() * availableCards.length)];
     }
-    
-    // 下一回合
+
     nextTurn() {
         clearInterval(this.state.turnTimer);
-        
-        // 找到下一个未完成的玩家
         let attempts = 0;
-        do {
-            this.state.currentTurn = (this.state.currentTurn + 1) % this.state.players.length;
-            attempts++;
-        } while (
-            attempts < this.state.players.length && 
-            this.state.players[this.state.currentTurn].finished
-        );
-        
-        // 检查是否所有玩家都完成
+        do { this.state.currentTurn = (this.state.currentTurn + 1) % this.state.players.length; attempts++; }
+        while (attempts < this.state.players.length && this.state.players[this.state.currentTurn].finished);
         const activePlayers = this.state.players.filter(p => !p.finished);
-        if (activePlayers.length === 0) {
-            this.endGame();
-            return;
-        }
-        
-        // 增加回合数（每轮10个有效回合）
-        if (this.state.currentTurn === 0) {
-            this.state.round++;
-            this.trigger('roundChanged', { round: this.state.round });
-        }
-        
-        // 延迟后开始下一回合
-        setTimeout(() => {
-            this.startTurn();
-        }, 1000);
+        if (activePlayers.length === 0) { this.endGame(); return; }
+        if (this.state.currentTurn === 0) { this.state.round++; this.trigger('roundChanged', { round: this.state.round }); }
+        setTimeout(() => this.startTurn(), 1000);
     }
-    
-    // ============ 出牌逻辑 ============
+
     playCard(playerId, card) {
         const player = this.state.players.find(p => p.id === playerId);
         if (!player || player.finished || !card) return false;
-        
-        console.log(`🃏 ${player.name} 出牌: ${card.suit}${card.rank}`);
-        
-        // 保存之前的层数
         player.previousLevel = player.level;
-        
-        // 标记手牌已使用
-        const handIndex = player.hand.findIndex(
-            c => c.suit === card.suit && c.rank === card.rank && !c.used
-        );
-        if (handIndex >= 0) {
-            player.hand[handIndex].used = true;
-            player.cardsUsed++;
-            player.cardsRemaining--;
-        }
-        
-        // 如果是玩家自己，更新手牌显示
-        if (player.id === this.state.myPlayerId) {
-            this.state.mySelectedCard = null;
-        }
-        
-        // 执行战斗结算
+        const handIndex = player.hand.findIndex(c => c.suit === card.suit && c.rank === card.rank && !c.used);
+        if (handIndex >= 0) { player.hand[handIndex].used = true; player.cardsUsed++; player.cardsRemaining--; }
+        if (player.id === this.state.myPlayerId) this.state.mySelectedCard = null;
         const result = this.resolveBattle(player, card);
-        
-        // 触发回调
-        this.trigger('cardPlayed', {
-            player: player,
-            card: card,
-            result: result
-        });
-        
-        // 检查是否登顶
-        if (player.level === 0 && !player.finished) {
-            this.playerReachedTop(player);
-        }
-        
-        // 进入下一回合
+        this.trigger('cardPlayed', { player: player, card: card, result: result });
+        if (player.level === 0 && !player.finished) this.playerReachedTop(player);
         this.nextTurn();
-        
         return true;
     }
-    
-    // 玩家选择卡牌
+
     selectCard(cardIndex) {
-        if (this.state.players[this.state.currentTurn].id !== this.state.myPlayerId) {
-            return false;
-        }
-        
+        if (this.state.players[this.state.currentTurn].id !== this.state.myPlayerId) return false;
         const availableCards = this.state.myHand.filter(c => !c.used);
-        if (cardIndex < 0 || cardIndex >= availableCards.length) {
-            return false;
-        }
-        
+        if (cardIndex < 0 || cardIndex >= availableCards.length) return false;
         this.state.mySelectedCard = cardIndex;
-        this.trigger('cardSelected', { 
-            card: availableCards[cardIndex],
-            index: cardIndex 
-        });
-        
+        this.trigger('cardSelected', { card: availableCards[cardIndex], index: cardIndex });
         return true;
     }
-    
-    // 确认出牌
+
     confirmPlay() {
-        if (this.state.mySelectedCard === null) {
-            return false;
-        }
-        
+        if (this.state.mySelectedCard === null) return false;
         const availableCards = this.state.myHand.filter(c => !c.used);
-        const selectedCard = availableCards[this.state.mySelectedCard];
-        
-        return this.playCard(this.state.myPlayerId, selectedCard);
+        return this.playCard(this.state.myPlayerId, availableCards[this.state.mySelectedCard]);
     }
-    
-    // ============ 战斗结算 ============
+
     resolveBattle(player, playerCard) {
         const guard = this.state.guards[player.level];
         if (!guard) return { type: 'error' };
-        
-        let result = {
-            type: 'normal',
-            levelChange: 0,
-            guardCard: null,
-            provokeTriggered: false,
-            message: ''
-        };
-        
-        // 守卫亮出一张牌
+        let result = { type: 'normal', levelChange: 0, guardCard: null, provokeTriggered: false, message: '' };
         let guardCard = null;
-        if (guard.cardsLeft > 0) {
-            guardCard = guard.guardCards[13 - guard.cardsLeft];
-            guard.cardsLeft--;
-            result.guardCard = guardCard;
-        }
-        
-        // 检查激怒牌
+        if (guard.cardsLeft > 0) { guardCard = guard.guardCards[13 - guard.cardsLeft]; guard.cardsLeft--; result.guardCard = guardCard; }
         const provokeLayers = TOURNAMENT_CONFIG.PROVOKE_LAYERS;
-        let provokeTriggered = false;
-        let fallBack = 0;
-        
+        let provokeTriggered = false, fallBack = 0;
         if (provokeLayers.includes(player.level)) {
             for (let pc of guard.provokeCards) {
-                const suitMatch = playerCard.suit === pc.suit;
-                const rankMatch = playerCard.rank === pc.rank;
-                
-                if (suitMatch && rankMatch) {
-                    provokeTriggered = true;
-                    fallBack = 2;
-                    result.type = 'provoke_full';
-                    result.provokeTriggered = true;
-                    result.message = '💥 激怒牌完全匹配！退回2层！';
-                    break;
-                } else if (suitMatch || rankMatch) {
-                    provokeTriggered = true;
-                    fallBack = 1;
-                    result.type = 'provoke_partial';
-                    result.provokeTriggered = true;
-                    result.message = '⚠️ 激怒牌触发！退回1层！';
-                    break;
-                }
+                const suitMatch = playerCard.suit === pc.suit; const rankMatch = playerCard.rank === pc.rank;
+                if (suitMatch && rankMatch) { provokeTriggered = true; fallBack = 2; result.type = 'provoke_full'; result.provokeTriggered = true; result.message = '💥 激怒牌完全匹配！退回2层！'; break; }
+                else if (suitMatch || rankMatch) { provokeTriggered = true; fallBack = 1; result.type = 'provoke_partial'; result.provokeTriggered = true; result.message = '⚠️ 激怒牌触发！退回1层！'; break; }
             }
         }
-        
-        // 计算层数变化
-        if (provokeTriggered) {
-            player.level = Math.min(12, player.level + fallBack);
-            result.levelChange = -fallBack;
-        } else if (guardCard) {
-            const suitMatch = playerCard.suit === guardCard.suit;
-            const rankMatch = playerCard.rank === guardCard.rank;
-            
-            if (suitMatch && rankMatch) {
-                player.level = Math.max(0, player.level - 2);
-                result.levelChange = 2;
-                result.type = 'full_match';
-                result.message = '✅ 完全匹配！上升2层！';
-            } else if (suitMatch || rankMatch) {
-                player.level = Math.max(0, player.level - 1);
-                result.levelChange = 1;
-                result.type = 'partial_match';
-                result.message = '✅ 部分匹配！上升1层！';
-            } else {
-                result.type = 'no_match';
-                result.message = '❌ 不匹配，停留本层';
-            }
+        if (provokeTriggered) { player.level = Math.min(12, player.level + fallBack); result.levelChange = -fallBack; }
+        else if (guardCard) {
+            const suitMatch = playerCard.suit === guardCard.suit; const rankMatch = playerCard.rank === guardCard.rank;
+            if (suitMatch && rankMatch) { player.level = Math.max(0, player.level - 2); result.levelChange = 2; result.type = 'full_match'; result.message = '✅ 完全匹配！上升2层！'; }
+            else if (suitMatch || rankMatch) { player.level = Math.max(0, player.level - 1); result.levelChange = 1; result.type = 'partial_match'; result.message = '✅ 部分匹配！上升1层！'; }
+            else { result.type = 'no_match'; result.message = '❌ 不匹配，停留本层'; }
         }
-        
-        // 检查守卫是否被击败
-        if (guard.cardsLeft === 0 && !guard.isDefeated) {
-            guard.isDefeated = true;
-            result.guardDefeated = true;
-        }
-        
-        // 添加日志
-        if (result.message) {
-            this.addLog(`${player.name}: ${result.message}`);
-        }
-        
-        // 添加游戏记录
-        this.addRecord({
-            player: player,
-            action: result.type,
-            card: playerCard,
-            result: result.levelChange > 0 ? 'win' : result.levelChange < 0 ? 'lose' : 'neutral',
-            change: result.levelChange
-        });
-        
+        if (guard.cardsLeft === 0 && !guard.isDefeated) { guard.isDefeated = true; result.guardDefeated = true; }
+        if (result.message) this.addLog(`${player.name}: ${result.message}`);
+        this.addRecord({ player: player, action: result.type, card: playerCard, result: result.levelChange > 0 ? 'win' : result.levelChange < 0 ? 'lose' : 'neutral', change: result.levelChange });
         return result;
     }
-    
-    // ============ 登顶处理 ============
+
     playerReachedTop(player) {
-        player.finished = true;
-        player.finishRank = this.state.finishedPlayers.length + 1;
-        player.finishTime = Date.now();
-        
+        player.finished = true; player.finishRank = this.state.finishedPlayers.length + 1; player.finishTime = Date.now();
         this.state.finishedPlayers.push(player);
-        
-        console.log(`🏆 ${player.name} 登顶！排名第${player.finishRank}`);
-        
         this.addLog(`🏆 ${player.name} 成功登顶！排名第${player.finishRank}`);
-        
-        // 触发回调
-        this.trigger('playerFinished', {
-            player: player,
-            rank: player.finishRank
-        });
-        
-        // 检查团队战赠牌逻辑
-        if (TOURNAMENT_CONFIG.TEAM_MODE) {
-            this.checkTeamGiftLogic(player);
-        }
-        
-        // 检查游戏是否结束（前3名都产生）
-        if (this.state.finishedPlayers.length >= 3) {
-            // 可以继续游戏，但主要奖励已确定
-            this.addLog('🎉 前三名已产生！');
-        }
-        
-        // 检查是否所有玩家都完成
+        this.trigger('playerFinished', { player: player, rank: player.finishRank });
+        if (TOURNAMENT_CONFIG.TEAM_MODE) this.checkTeamGiftLogic(player);
         const unfinishedCount = this.state.players.filter(p => !p.finished).length;
-        if (unfinishedCount === 0) {
-            setTimeout(() => this.endGame(), 2000);
-        }
+        if (unfinishedCount === 0) setTimeout(() => this.endGame(), 2000);
     }
-    
-    // ============ 团队战赠牌逻辑 ============
+
     checkTeamGiftLogic(finishedPlayer) {
         const rank = finishedPlayer.finishRank;
-        
-        // 第2-4名登顶后触发赠牌
         if (rank >= 2 && rank <= 4) {
             const team = this.state.teams[finishedPlayer.team];
-            
-            // 检查是否已经赠牌过
             if (team.gifted) return;
-            
-            // 获取未登顶的队友
-            const unfinishedTeammates = team.members
-                .map(id => this.state.players.find(p => p.id === id))
-                .filter(p => p && !p.finished);
-            
+            const unfinishedTeammates = team.members.map(id => this.state.players.find(p => p.id === id)).filter(p => p && !p.finished);
             if (unfinishedTeammates.length > 0) {
-                console.log(`🎁 ${finishedPlayer.team}队赠牌触发！`);
-                
-                // 计算赠牌数量（手牌的1/3）
                 const giftCount = Math.floor(finishedPlayer.hand.filter(c => !c.used).length * TOURNAMENT_CONFIG.GIFT_CARD_RATIO);
-                
                 if (giftCount > 0) {
-                    // 获取可用卡牌
                     const availableCards = finishedPlayer.hand.filter(c => !c.used);
                     const giftCards = availableCards.slice(0, giftCount);
-                    
-                    // 平均分配给队友
                     const cardsPerTeammate = Math.floor(giftCards.length / unfinishedTeammates.length);
-                    
                     unfinishedTeammates.forEach((teammate, index) => {
                         const startIdx = index * cardsPerTeammate;
-                        const endIdx = startIdx + cardsPerTeammate;
-                        const cardsToGive = giftCards.slice(startIdx, endIdx);
-                        
-                        // 将卡牌添加到队友手牌（标记为额外获得）
-                        cardsToGive.forEach(card => {
-                            teammate.hand.push({
-                                ...card,
-                                isGift: true,
-                                from: finishedPlayer.name
-                            });
-                        });
-                        
+                        const cardsToGive = giftCards.slice(startIdx, startIdx + cardsPerTeammate);
+                        cardsToGive.forEach(card => teammate.hand.push({ ...card, isGift: true, from: finishedPlayer.name }));
                         teammate.cardsRemaining += cardsToGive.length;
-                        
-                        console.log(`  → ${teammate.name} 获得 ${cardsToGive.length} 张赠牌`);
                         this.addLog(`🎁 ${finishedPlayer.name} 赠送 ${cardsToGive.length} 张牌给 ${teammate.name}`);
                     });
-                    
                     team.gifted = true;
-                    
-                    // 触发回调
-                    this.trigger('teamGift', {
-                        from: finishedPlayer,
-                        to: unfinishedTeammates,
-                        cards: giftCards
-                    });
+                    this.trigger('teamGift', { from: finishedPlayer, to: unfinishedTeammates, cards: giftCards });
                 }
             }
         }
     }
-    
-    // ============ 游戏结束 ============
+
     endGame() {
         if (this.state.phase === 'finished') return;
-        
-        console.log('🏁 游戏结束');
-        this.state.phase = 'finished';
-        this.state.isRunning = false;
-        
-        // 停止计时器
-        clearInterval(this.state.gameTimer);
-        clearInterval(this.state.turnTimer);
-        
-        // 完成所有未完成的玩家排名
+        this.state.phase = 'finished'; this.state.isRunning = false;
+        clearInterval(this.state.gameTimer); clearInterval(this.state.turnTimer);
         const unfinishedPlayers = this.state.players.filter(p => !p.finished);
-        unfinishedPlayers.sort((a, b) => a.level - b.level); // 按层数排序（越低排名越高）
-        
-        unfinishedPlayers.forEach((player, index) => {
-            player.finished = true;
-            player.finishRank = this.state.finishedPlayers.length + 1;
-            player.finishTime = Date.now();
-            this.state.finishedPlayers.push(player);
-        });
-        
-        // 生成最终排行榜
+        unfinishedPlayers.sort((a, b) => a.level - b.level);
+        unfinishedPlayers.forEach((player, index) => { player.finished = true; player.finishRank = this.state.finishedPlayers.length + 1; player.finishTime = Date.now(); this.state.finishedPlayers.push(player); });
         this.state.leaderboard = [...this.state.finishedPlayers];
-        
-        // 计算奖励
         const rewards = this.calculateRewards();
-        
-        // 保存明信片到收集册
         this.savePostcards();
-        
-        // 触发回调
-        this.trigger('gameEnded', {
-            leaderboard: this.state.leaderboard,
-            rewards: rewards,
-            myRank: this.getMyRank()
-        });
-        
-        // 显示结算界面
-        this.showResultScreen();
-        
-        // 保存游戏结果
+        this.trigger('gameEnded', { leaderboard: this.state.leaderboard, rewards: rewards, myRank: this.getMyRank() });
         this.saveGameResult();
     }
-    
-    // 强制结束游戏（超时）
-    forceEndGame(reason) {
-        console.log(`⏰ 游戏强制结束: ${reason}`);
-        this.addLog('⏰ 游戏时间到！强制结束');
-        this.endGame();
-    }
-    
-    // 计算奖励
+
+    forceEndGame(reason) { this.addLog('⏰ 游戏时间到！强制结束'); this.endGame(); }
+
     calculateRewards() {
         const myRank = this.getMyRank();
-        const rewards = {
-            rank: myRank,
-            diamonds: 0,
-            coins: 0,
-            title: null,
-            postcard: null
-        };
-        
-        if (myRank === 1) {
-            rewards.diamonds = POSTCARD_CONFIG.rewards.gold.diamonds;
-            rewards.coins = POSTCARD_CONFIG.rewards.gold.coins;
-            rewards.title = POSTCARD_CONFIG.rewards.gold.title;
-            rewards.postcard = {
-                type: 'gold',
-                country: this.state.country,
-                tower: this.state.towerData
-            };
-        } else if (myRank === 2) {
-            rewards.diamonds = POSTCARD_CONFIG.rewards.silver.diamonds;
-            rewards.coins = POSTCARD_CONFIG.rewards.silver.coins;
-            rewards.title = POSTCARD_CONFIG.rewards.silver.title;
-            rewards.postcard = {
-                type: 'silver',
-                country: this.state.country,
-                tower: this.state.towerData
-            };
-        } else if (myRank === 3) {
-            rewards.diamonds = POSTCARD_CONFIG.rewards.bronze.diamonds;
-            rewards.coins = POSTCARD_CONFIG.rewards.bronze.coins;
-            rewards.title = POSTCARD_CONFIG.rewards.bronze.title;
-            rewards.postcard = {
-                type: 'bronze',
-                country: this.state.country,
-                tower: this.state.towerData
-            };
-        } else {
-            // 参与奖
-            rewards.diamonds = 100;
-            rewards.coins = 10000;
-        }
-        
+        const rewards = { rank: myRank, diamonds: 0, coins: 0, title: null, postcard: null };
+        if (myRank === 1) { rewards.diamonds = POSTCARD_CONFIG.rewards.gold.diamonds; rewards.coins = POSTCARD_CONFIG.rewards.gold.coins; rewards.title = POSTCARD_CONFIG.rewards.gold.title; rewards.postcard = { type: 'gold', country: this.state.country, tower: this.state.towerData }; }
+        else if (myRank === 2) { rewards.diamonds = POSTCARD_CONFIG.rewards.silver.diamonds; rewards.coins = POSTCARD_CONFIG.rewards.silver.coins; rewards.title = POSTCARD_CONFIG.rewards.silver.title; rewards.postcard = { type: 'silver', country: this.state.country, tower: this.state.towerData }; }
+        else if (myRank === 3) { rewards.diamonds = POSTCARD_CONFIG.rewards.bronze.diamonds; rewards.coins = POSTCARD_CONFIG.rewards.bronze.coins; rewards.title = POSTCARD_CONFIG.rewards.bronze.title; rewards.postcard = { type: 'bronze', country: this.state.country, tower: this.state.towerData }; }
+        else { rewards.diamonds = 100; rewards.coins = 10000; }
         return rewards;
     }
-    
-    // 获取我的排名
-    getMyRank() {
-        const myPlayer = this.state.players.find(p => p.id === this.state.myPlayerId);
-        return myPlayer ? myPlayer.finishRank : null;
-    }
-    
-    // ============ 明信片系统 ============
+
+    getMyRank() { const myPlayer = this.state.players.find(p => p.id === this.state.myPlayerId); return myPlayer ? myPlayer.finishRank : null; }
+
     savePostcards() {
         const rewards = this.calculateRewards();
-        
         if (!rewards.postcard) return;
-        
-        // 获取现有的明信片收集
         let collection = this.loadPostcardCollection();
-        
-        // 创建新的明信片
-        const postcard = {
-            id: `pc_${Date.now()}`,
-            type: rewards.postcard.type,
-            country: rewards.postcard.country,
-            countryName: rewards.postcard.tower.name,
-            flag: rewards.postcard.tower.flag,
-            tower: rewards.postcard.tower.tower,
-            obtainedAt: new Date().toISOString(),
-            rank: rewards.rank,
-            gameId: this.state.gameId
-        };
-        
-        // 添加到收集册
+        const postcard = { id: `pc_${Date.now()}`, type: rewards.postcard.type, country: rewards.postcard.country, countryName: rewards.postcard.tower.name, flag: rewards.postcard.tower.flag, tower: rewards.postcard.tower.tower, obtainedAt: new Date().toISOString(), rank: rewards.rank, gameId: this.state.gameId };
         collection.postcards.push(postcard);
-        
-        // 更新国家收集状态
-        if (!collection.countries[rewards.postcard.country]) {
-            collection.countries[rewards.postcard.country] = {
-                obtained: true,
-                types: []
-            };
-        }
+        if (!collection.countries[rewards.postcard.country]) collection.countries[rewards.postcard.country] = { obtained: true, types: [] };
         collection.countries[rewards.postcard.country].types.push(rewards.postcard.type);
-        
-        // 保存到本地存储
         localStorage.setItem('towerOfFate_postcards', JSON.stringify(collection));
-        
-        console.log('📮 明信片已保存:', postcard);
     }
-    
-    // 加载明信片收集
+
     loadPostcardCollection() {
-        const defaultCollection = {
-            postcards: [],
-            countries: {},
-            stats: {
-                totalGames: 0,
-                goldCount: 0,
-                silverCount: 0,
-                bronzeCount: 0,
-                uniqueCountries: 0
-            }
-        };
-        
-        try {
-            const saved = localStorage.getItem('towerOfFate_postcards');
-            if (saved) {
-                return JSON.parse(saved);
-            }
-        } catch (e) {
-            console.error('加载明信片收集失败:', e);
-        }
-        
+        const defaultCollection = { postcards: [], countries: {}, stats: { totalGames: 0, goldCount: 0, silverCount: 0, bronzeCount: 0, uniqueCountries: 0 } };
+        try { const saved = localStorage.getItem('towerOfFate_postcards'); if (saved) return JSON.parse(saved); } catch (e) {}
         return defaultCollection;
     }
-    
-    // 获取收集进度
+
     getCollectionProgress() {
         const collection = this.loadPostcardCollection();
         const totalCountries = Object.keys(COUNTRY_TOWERS).length;
         const collectedCountries = Object.keys(collection.countries).length;
-        
-        return {
-            totalCountries,
-            collectedCountries,
-            progress: Math.round((collectedCountries / totalCountries) * 100),
-            goldCount: collection.postcards.filter(p => p.type === 'gold').length,
-            silverCount: collection.postcards.filter(p => p.type === 'silver').length,
-            bronzeCount: collection.postcards.filter(p => p.type === 'bronze').length,
-            totalPostcards: collection.postcards.length
-        };
+        return { totalCountries, collectedCountries, progress: Math.round((collectedCountries / totalCountries) * 100), goldCount: collection.postcards.filter(p => p.type === 'gold').length, silverCount: collection.postcards.filter(p => p.type === 'silver').length, bronzeCount: collection.postcards.filter(p => p.type === 'bronze').length, totalPostcards: collection.postcards.length };
     }
-    
-    // ============ 日志系统 ============
+
     addLog(message) {
-        const time = new Date().toLocaleTimeString('zh-CN', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit' 
-        });
-        
-        const logEntry = {
-            time: time,
-            message: message,
-            timestamp: Date.now()
-        };
-        
+        const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const logEntry = { time: time, message: message, timestamp: Date.now() };
         this.state.logs.push(logEntry);
-        
-        // 限制日志数量
-        if (this.state.logs.length > 50) {
-            this.state.logs.shift();
-        }
-        
-        // 触发回调
+        if (this.state.logs.length > 50) this.state.logs.shift();
         this.trigger('logAdded', logEntry);
     }
-    
-    // 添加游戏记录
+
     addRecord(record) {
         this.state.records.unshift(record);
-        
-        // 限制记录数量
-        if (this.state.records.length > 20) {
-            this.state.records.pop();
-        }
-        
+        if (this.state.records.length > 20) this.state.records.pop();
         this.trigger('recordAdded', record);
     }
-    
-    // ============ 事件系统 ============
-    on(event, callback) {
-        if (!this.callbacks[event]) {
-            this.callbacks[event] = [];
-        }
-        this.callbacks[event].push(callback);
-    }
-    
-    off(event, callback) {
-        if (this.callbacks[event]) {
-            this.callbacks[event] = this.callbacks[event].filter(cb => cb !== callback);
-        }
-    }
-    
-    trigger(event, data) {
-        if (this.callbacks[event]) {
-            this.callbacks[event].forEach(callback => {
-                try {
-                    callback(data);
-                } catch (e) {
-                    console.error(`事件回调错误 (${event}):`, e);
-                }
-            });
-        }
-    }
-    
-    // ============ 持久化 ============
-    saveGameState() {
-        try {
-            localStorage.setItem('towerOfFate_currentGame', JSON.stringify({
-                gameId: this.state.gameId,
-                country: this.state.country,
-                phase: this.state.phase,
-                startTime: this.state.startTime
-            }));
-        } catch (e) {
-            console.error('保存游戏状态失败:', e);
-        }
-    }
-    
-    saveGameResult() {
-        try {
-            const history = JSON.parse(localStorage.getItem('towerOfFate_gameHistory') || '[]');
-            
-            history.push({
-                gameId: this.state.gameId,
-                country: this.state.country,
-                towerName: this.state.towerData.name,
-                rank: this.getMyRank(),
-                timestamp: new Date().toISOString(),
-                playerCount: this.state.players.length
-            });
-            
-            // 限制历史记录数量
-            if (history.length > 50) {
-                history.shift();
-            }
-            
-            localStorage.setItem('towerOfFate_gameHistory', JSON.stringify(history));
-        } catch (e) {
-            console.error('保存游戏历史失败:', e);
-        }
-    }
-    
-    // ============ 工具方法 ============
-    formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    
-    getMyPlayer() {
-        return this.state.players.find(p => p.id === this.state.myPlayerId);
-    }
-    
-    getPlayerById(id) {
-        return this.state.players.find(p => p.id === id);
-    }
-    
-    // ============ UI相关 ============
-    showResultScreen() {
-        // 这将在外部实现
-        this.trigger('showResultScreen', {
-            leaderboard: this.state.leaderboard,
-            rewards: this.calculateRewards()
-        });
-    }
-    
-    // 暂停/继续游戏
-    pause() {
-        this.state.isPaused = true;
-        this.addLog('⏸️ 游戏已暂停');
-    }
-    
-    resume() {
-        this.state.isPaused = false;
-        this.addLog('▶️ 游戏继续');
-    }
-    
-    // 放弃游戏
-    surrender() {
-        const myPlayer = this.getMyPlayer();
-        if (myPlayer) {
-            myPlayer.finished = true;
-            myPlayer.finishRank = this.state.players.length;
-            this.state.finishedPlayers.push(myPlayer);
-            this.addLog('🏳️ 你已放弃游戏');
-        }
-        
-        this.endGame();
-    }
-    
-    // 获取游戏统计
-    getStats() {
-        const myPlayer = this.getMyPlayer();
-        
-        return {
-            totalPlayers: this.state.players.length,
-            finishedPlayers: this.state.finishedPlayers.length,
-            myRank: myPlayer ? myPlayer.finishRank : null,
-            myLevel: this.state.myLevel,
-            round: this.state.round,
-            gameTimeRemaining: this.state.gameTimeRemaining,
-            turnTimeRemaining: this.state.turnTimeRemaining,
-            cardsRemaining: myPlayer ? myPlayer.cardsRemaining : 0
-        };
-    }
-}
 
-// ============ 游戏界面管理器 ============
-class TournamentUI {
-    constructor(game) {
-        this.game = game;
-        this.elements = {};
-        this.init();
-    }
-    
-    init() {
-        // 绑定游戏事件
-        this.game.on('gameStarted', (data) => this.onGameStarted(data));
-        this.game.on('turnStarted', (data) => this.onTurnStarted(data));
-        this.game.on('turnTimeUpdate', (data) => this.onTurnTimeUpdate(data));
-        this.game.on('gameTimeUpdate', (data) => this.onGameTimeUpdate(data));
-        this.game.on('myTurn', (data) => this.onMyTurn(data));
-        this.game.on('cardPlayed', (data) => this.onCardPlayed(data));
-        this.game.on('playerFinished', (data) => this.onPlayerFinished(data));
-        this.game.on('gameEnded', (data) => this.onGameEnded(data));
-        this.game.on('logAdded', (data) => this.onLogAdded(data));
-        this.game.on('showResultScreen', (data) => this.showResultScreen(data));
-        this.game.on('teamGift', (data) => this.onTeamGift(data));
-        
-        // 缓存DOM元素
-        this.cacheElements();
-    }
-    
-    cacheElements() {
-        this.elements = {
-            // 游戏主容器
-            gameContainer: document.getElementById('tournamentGameContainer'),
-            
-            // 塔楼相关
-            towerImage: document.getElementById('towerImage'),
-            towerName: document.getElementById('towerName'),
-            towerFlag: document.getElementById('towerFlag'),
-            
-            // 计时器
-            turnTimer: document.getElementById('turnTimer'),
-            turnTimerText: document.getElementById('turnTimerText'),
-            gameTimer: document.getElementById('gameTimer'),
-            gameTimerText: document.getElementById('gameTimerText'),
-            
-            // 玩家信息
-            playerList: document.getElementById('playerList'),
-            myAvatar: document.getElementById('myAvatar'),
-            myName: document.getElementById('myName'),
-            myLevel: document.getElementById('myLevel'),
-            myCards: document.getElementById('myCards'),
-            
-            // 手牌区域
-            handContainer: document.getElementById('handContainer'),
-            playButton: document.getElementById('playButton'),
-            
-            // 层叠区
-            layerList: document.getElementById('layerList'),
-            
-            // 守卫区
-            guardDisplay: document.getElementById('guardDisplay'),
-            provokeList: document.getElementById('provokeList'),
-            
-            // 日志
-            logContainer: document.getElementById('logContainer'),
-            
-            // 结果界面
-            resultScreen: document.getElementById('resultScreen'),
-            resultLeaderboard: document.getElementById('resultLeaderboard'),
-            resultRewards: document.getElementById('resultRewards')
-        };
-    }
-    
-    // 渲染塔楼背景
-    renderTower() {
-        const towerData = this.game.state.towerData;
-        if (!towerData) return;
-        
-        if (this.elements.towerName) {
-            this.elements.towerName.textContent = towerData.name;
-        }
-        
-        if (this.elements.towerFlag) {
-            this.elements.towerFlag.textContent = towerData.flag;
-        }
-        
-        if (this.elements.towerImage) {
-            this.elements.towerImage.src = `assets/towers/${towerData.tower}`;
-            this.elements.towerImage.onerror = () => {
-                // 使用emoji备用
-                this.elements.towerImage.style.display = 'none';
-                const emojiContainer = document.getElementById('towerEmoji');
-                if (emojiContainer) {
-                    emojiContainer.textContent = this.getTowerEmoji(towerData.continent);
-                }
-            };
-        }
-    }
-    
-    getTowerEmoji(continent) {
-        const emojis = {
-            asia: '🏯',
-            europe: '🏰',
-            america: '🗽',
-            africa: '🦁',
-            oceania: '🦘'
-        };
-        return emojis[continent] || '🗼';
-    }
-    
-    // 渲染玩家列表
-    renderPlayerList() {
-        if (!this.elements.playerList) return;
-        
-        const players = this.game.state.players;
-        let html = '';
-        
-        players.forEach((player, index) => {
-            const isMe = player.id === this.game.state.myPlayerId;
-            const isCurrentTurn = index === this.game.state.currentTurn;
-            const teamClass = player.team === 'panda' ? 'team-panda' : 'team-wolf';
-            const statusIcon = player.finished ? '🏆' : (isCurrentTurn ? '▶️' : '');
-            
-            html += `
-                <div class="player-item ${teamClass} ${isMe ? 'is-me' : ''} ${isCurrentTurn ? 'current-turn' : ''} ${player.finished ? 'finished' : ''}">
-                    <span class="player-avatar">${player.avatar}</span>
-                    <span class="player-name">${player.name}${isMe ? ' (我)' : ''}</span>
-                    <span class="player-level">第${this.getLevelName(player.level)}层</span>
-                    <span class="player-status">${statusIcon}</span>
-                </div>
-            `;
-        });
-        
-        this.elements.playerList.innerHTML = html;
-    }
-    
-    getLevelName(levelIndex) {
-        const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-        return levels[levelIndex] || '?';
-    }
-    
-    // 渲染手牌
-    renderHand() {
-        if (!this.elements.handContainer) return;
-        
-        const myHand = this.game.state.myHand.filter(c => !c.used);
-        let html = '';
-        
-        myHand.forEach((card, index) => {
-            const isSelected = this.game.state.mySelectedCard === index;
-            const colorClass = card.isRed ? 'red' : 'black';
-            
-            html += `
-                <div class="hand-card ${colorClass} ${isSelected ? 'selected' : ''}" 
-                     onclick="window.tournamentGame.selectCard(${index})"
-                     data-index="${index}">
-                    <span class="suit">${card.suit}</span>
-                    <span class="rank">${card.rank}</span>
-                    ${card.isGift ? '<span class="gift-badge">🎁</span>' : ''}
-                </div>
-            `;
-        });
-        
-        this.elements.handContainer.innerHTML = html;
-        
-        // 更新出牌按钮状态
-        this.updatePlayButton();
-    }
-    
-    updatePlayButton() {
-        if (!this.elements.playButton) return;
-        
-        const isMyTurn = this.game.state.players[this.game.state.currentTurn]?.id === this.game.state.myPlayerId;
-        const hasSelected = this.game.state.mySelectedCard !== null;
-        
-        this.elements.playButton.disabled = !isMyTurn || !hasSelected;
-        this.elements.playButton.textContent = isMyTurn ? 
-            (hasSelected ? '⚔️ 出牌攻击' : '请选择手牌') : 
-            '等待其他玩家...';
-    }
-    
-    // 渲染层叠区
-    renderLayers() {
-        if (!this.elements.layerList) return;
-        
-        const levels = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-        const myLevel = this.game.state.myLevel;
-        
-        let html = '';
-        
-        levels.forEach((level, index) => {
-            const isCurrent = myLevel === index;
-            const isStartLayer = index === 12;
-            
-            // 获取该层的所有玩家
-            const playersHere = this.game.state.players.filter(p => p.level === index);
-            
-            let playersHtml = '';
-            if (playersHere.length > 0) {
-                playersHtml = '<div class="layer-players">' +
-                    playersHere.map(p => {
-                        const isSelf = p.id === this.game.state.myPlayerId;
-                        const teamClass = p.team === 'panda' ? 'panda-team' : 'wolf-team';
-                        return `<span class="layer-player ${teamClass} ${isSelf ? 'self' : ''}">${p.avatar}</span>`;
-                    }).join('') +
-                    '</div>';
-            }
-            
-            html += `
-                <div class="layer-item ${isCurrent ? 'current' : ''} ${isStartLayer ? 'start-layer' : ''}">
-                    <span class="layer-rank">${level}</span>
-                    ${playersHtml}
-                </div>
-            `;
-        });
-        
-        this.elements.layerList.innerHTML = html;
-    }
-    
-    // 渲染守卫和激怒牌
-    renderGuardAndProvoke() {
-        const myLevel = this.game.state.myLevel;
-        const guard = this.game.state.guards[myLevel];
-        
-        if (!guard) return;
-        
-        // 渲染当前守卫显示
-        if (this.elements.guardDisplay) {
-            this.elements.guardDisplay.innerHTML = `
-                <div class="guard-info">
-                    <span class="guard-level">${guard.levelName}层守卫</span>
-                    <span class="guard-cards">剩余: ${guard.cardsLeft}/13</span>
-                </div>
-            `;
-        }
-        
-        // 渲染激怒牌
-        if (this.elements.provokeList) {
-            let html = '<div class="provoke-title">⚠️ 激怒牌</div>';
-            
-            guard.provokeCards.forEach(card => {
-                const colorClass = card.isRed ? 'red' : 'black';
-                html += `
-                    <div class="provoke-card ${colorClass}">
-                        <span class="suit">${card.suit}</span>
-                        <span class="rank">${card.rank}</span>
-                    </div>
-                `;
-            });
-            
-            this.elements.provokeList.innerHTML = html;
-        }
-    }
-    
-    // ============ 事件处理器 ============
-    onGameStarted(data) {
-        console.log('🎮 游戏开始事件:', data);
-        this.renderTower();
-        this.renderPlayerList();
-        this.renderHand();
-        this.renderLayers();
-        this.renderGuardAndProvoke();
-    }
-    
-    onTurnStarted(data) {
-        console.log('🎯 回合开始事件:', data);
-        this.renderPlayerList();
-        
-        // 高亮当前玩家
-        const playerItems = document.querySelectorAll('.player-item');
-        playerItems.forEach((item, index) => {
-            item.classList.toggle('current-turn', index === this.game.state.currentTurn);
-        });
-    }
-    
-    onTurnTimeUpdate(data) {
-        if (this.elements.turnTimerText) {
-            this.elements.turnTimerText.textContent = `剩余 ${data.remaining}秒`;
-        }
-        
-        if (this.elements.turnTimer) {
-            const progress = (data.remaining / data.total) * 100;
-            this.elements.turnTimer.style.width = `${progress}%`;
-            
-            // 警告颜色
-            if (data.remaining <= 10) {
-                this.elements.turnTimer.classList.add('warning');
-            } else {
-                this.elements.turnTimer.classList.remove('warning');
-            }
-        }
-    }
-    
-    onGameTimeUpdate(data) {
-        if (this.elements.gameTimerText) {
-            this.elements.gameTimerText.textContent = this.game.formatTime(data.remaining);
-        }
-        
-        if (this.elements.gameTimer) {
-            const progress = (data.remaining / data.total) * 100;
-            this.elements.gameTimer.style.width = `${progress}%`;
-        }
-    }
-    
-    onMyTurn(data) {
-        console.log('🎯 我的回合事件:', data);
-        this.renderHand();
-        
-        // 播放提示音（如果启用）
-        this.playSound('turn');
-        
-        // 显示提示
-        this.showToast('🎯 你的回合！请选择手牌');
-    }
-    
-    onCardPlayed(data) {
-        console.log('🃏 卡牌打出事件:', data);
-        
-        // 更新界面
-        this.renderHand();
-        this.renderLayers();
-        this.renderGuardAndProvoke();
-        
-        // 显示结果动画
-        if (data.player.id === this.game.state.myPlayerId) {
-            this.showBattleResult(data.result);
-        }
-    }
-    
-    onPlayerFinished(data) {
-        console.log('🏆 玩家登顶事件:', data);
-        
-        this.renderPlayerList();
-        this.renderLayers();
-        
-        // 显示登顶提示
-        this.showToast(`🏆 ${data.player.name} 成功登顶！排名第${data.rank}`);
-    }
-    
-    onTeamGift(data) {
-        console.log('🎁 团队赠牌事件:', data);
-        
-        // 如果我是受赠者，显示提示
-        const isRecipient = data.to.some(p => p.id === this.game.state.myPlayerId);
-        if (isRecipient) {
-            this.showToast('🎁 队友赠送了卡牌给你！');
-            this.renderHand();
-        }
-    }
-    
-    onGameEnded(data) {
-        console.log('🏁 游戏结束事件:', data);
-    }
-    
-    onLogAdded(data) {
-        if (!this.elements.logContainer) return;
-        
-        const logEntry = document.createElement('div');
-        logEntry.className = 'log-entry';
-        logEntry.innerHTML = `<span class="log-time">${data.time}</span> ${data.message}`;
-        
-        this.elements.logContainer.insertBefore(logEntry, this.elements.logContainer.firstChild);
-        
-        // 限制日志数量
-        while (this.elements.logContainer.children.length > 20) {
-            this.elements.logContainer.removeChild(this.elements.logContainer.lastChild);
-        }
-    }
-    
-    // ============ 结果界面 ============
-    showResultScreen(data) {
-        if (!this.elements.resultScreen) {
-            // 如果没有结果界面元素，创建一个
-            this.createResultScreen();
-        }
-        
-        const { leaderboard, rewards } = data;
-        
-        // 渲染排行榜
-        if (this.elements.resultLeaderboard) {
-            let html = '<h3>🏆 最终排名</h3>';
-            
-            leaderboard.forEach((player, index) => {
-                const rankClass = index < 3 ? `rank-${index + 1}` : '';
-                const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
-                const isMe = player.id === this.game.state.myPlayerId;
-                
-                html += `
-                    <div class="leaderboard-item ${rankClass} ${isMe ? 'is-me' : ''}">
-                        <span class="rank">${rankIcon}</span>
-                        <span class="avatar">${player.avatar}</span>
-                        <span class="name">${player.name}${isMe ? ' (我)' : ''}</span>
-                        <span class="team">${player.team === 'panda' ? '🐼' : '🐺'}</span>
-                    </div>
-                `;
-            });
-            
-            this.elements.resultLeaderboard.innerHTML = html;
-        }
-        
-        // 渲染奖励
-        if (this.elements.resultRewards) {
-            const myRank = rewards.rank;
-            const rankText = myRank === 1 ? '冠军' : myRank === 2 ? '亚军' : myRank === 3 ? '季军' : `第${myRank}名`;
-            
-            let html = `
-                <div class="my-rank">你的排名: <span class="rank-${myRank}">${rankText}</span></div>
-                <div class="rewards-list">
-            `;
-            
-            if (rewards.postcard) {
-                const postcardType = POSTCARD_CONFIG.types[rewards.postcard.type];
-                html += `
-                    <div class="reward-item postcard ${rewards.postcard.type}">
-                        <span class="icon">${postcardType.icon}</span>
-                        <span class="name">${this.game.state.towerData.name} ${postcardType.name}</span>
-                    </div>
-                `;
-            }
-            
-            html += `
-                    <div class="reward-item diamonds">
-                        <span class="icon">💎</span>
-                        <span class="amount">${rewards.diamonds}</span>
-                    </div>
-                    <div class="reward-item coins">
-                        <span class="icon">🪙</span>
-                        <span class="amount">${rewards.coins.toLocaleString()}</span>
-                    </div>
-            `;
-            
-            if (rewards.title) {
-                html += `
-                    <div class="reward-item title">
-                        <span class="icon">✨</span>
-                        <span class="name">称号: ${rewards.title}</span>
-                    </div>
-                `;
-            }
-            
-            html += '</div>';
-            
-            // 添加分享按钮
-            html += `
-                <div class="result-actions">
-                    <button class="btn-share" onclick="window.tournamentUI.shareResult()">
-                        📤 分享战绩
-                    </button>
-                    <button class="btn-collection" onclick="window.tournamentUI.viewCollection()">
-                        📔 查看明信片
-                    </button>
-                    <button class="btn-again" onclick="location.reload()">
-                        🎮 再来一局
-                    </button>
-                </div>
-            `;
-            
-            this.elements.resultRewards.innerHTML = html;
-        }
-        
-        // 显示结果界面
-        this.elements.resultScreen.style.display = 'flex';
-    }
-    
-    createResultScreen() {
-        const resultScreen = document.createElement('div');
-        resultScreen.id = 'resultScreen';
-        resultScreen.className = 'result-screen';
-        resultScreen.innerHTML = `
-            <div class="result-container">
-                <h2>🎉 游戏结束</h2>
-                <div id="resultLeaderboard"></div>
-                <div id="resultRewards"></div>
-            </div>
-        `;
-        
-        document.body.appendChild(resultScreen);
-        this.elements.resultScreen = resultScreen;
-        this.elements.resultLeaderboard = document.getElementById('resultLeaderboard');
-        this.elements.resultRewards = document.getElementById('resultRewards');
-    }
-    
-    // ============ 工具方法 ============
-    showToast(message) {
-        // 创建toast元素
-        const toast = document.createElement('div');
-        toast.className = 'game-toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
-        // 动画显示
-        setTimeout(() => toast.classList.add('show'), 10);
-        
-        // 自动消失
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-    
-    showBattleResult(result) {
-        let message = '';
-        let type = '';
-        
-        switch (result.type) {
-            case 'full_match':
-                message = '🎉 完美匹配！上升2层！';
-                type = 'success';
-                break;
-            case 'partial_match':
-                message = '✨ 匹配成功！上升1层！';
-                type = 'success';
-                break;
-            case 'provoke_full':
-                message = '💥 激怒！退回2层！';
-                type = 'danger';
-                break;
-            case 'provoke_partial':
-                message = '⚠️ 激怒！退回1层！';
-                type = 'warning';
-                break;
-            case 'no_match':
-                message = '❌ 未匹配';
-                type = 'neutral';
-                break;
-        }
-        
-        if (message) {
-            this.showToast(message);
-        }
-    }
-    
-    playSound(type) {
-        // 音频播放实现
-        // 可以在这里集成音频系统
-    }
-    
-    // 分享结果
-    shareResult() {
-        const rewards = this.game.calculateRewards();
-        const myRank = rewards.rank;
-        const rankText = myRank === 1 ? '🥇 冠军' : myRank === 2 ? '🥈 亚军' : myRank === 3 ? '🥉 季军' : `第${myRank}名`;
-        
-        const shareText = `🏆 命运塔锦标赛\n` +
-            `🗼 ${this.game.state.towerData.name}\n` +
-            `🎯 我的排名: ${rankText}\n` +
-            `💎 获得钻石: ${rewards.diamonds}\n` +
-            `🪙 获得金币: ${rewards.coins.toLocaleString()}\n` +
-            `快来挑战我吧！`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: '命运塔锦标赛战绩',
-                text: shareText
-            });
-        } else {
-            // 复制到剪贴板
-            navigator.clipboard.writeText(shareText).then(() => {
-                this.showToast('✅ 战绩已复制到剪贴板');
-            });
-        }
-    }
-    
-    // 查看明信片收集
-    viewCollection() {
-        window.location.href = 'collection.html';
-    }
-}
+    on(event, callback) { if (!this.callbacks[event]) this.callbacks[event] = []; this.callbacks[event].push(callback); }
+    off(event, callback) { if (this.callbacks[event]) this.callbacks[event] = this.callbacks[event].filter(cb => cb !== callback); }
+    trigger(event, data) { if (this.callbacks[event]) this.callbacks[event].forEach(callback => { try { callback(data); } catch (e) {} }); }
 
-// ============ 全局实例 ============
-let tournamentGame = null;
-let tournamentUI = null;
-
-// ============ 初始化函数 ============
-function initTournamentGame(countryCode, isTeamMode = true) {
-    console.log(`🎮 初始化锦标赛游戏: ${countryCode}`);
-    
-    // 创建游戏实例
-    tournamentGame = new TournamentGame();
-    tournamentGame.init(countryCode, isTeamMode);
-    
-    // 创建UI实例
-    tournamentUI = new TournamentUI(tournamentGame);
-    
-    // 保存到全局
-    window.tournamentGame = tournamentGame;
-    window.tournamentUI = tournamentUI;
-    
-    // 启动游戏
-    tournamentGame.start();
-    
-    return { game: tournamentGame, ui: tournamentUI };
+    saveGameState() { try { localStorage.setItem('towerOfFate_currentGame', JSON.stringify({ gameId: this.state.gameId, country: this.state.country, phase: this.state.phase, startTime: this.state.startTime })); } catch (e) {} }
+    saveGameResult() { try { const history = JSON.parse(localStorage.getItem('towerOfFate_gameHistory') || '[]'); history.push({ gameId: this.state.gameId, country: this.state.country, towerName: this.state.towerData.name, rank: this.getMyRank(), timestamp: new Date().toISOString(), playerCount: this.state.players.length }); if (history.length > 50) history.shift(); localStorage.setItem('towerOfFate_gameHistory', JSON.stringify(history)); } catch (e) {} }
+    formatTime(seconds) { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`; }
+    getMyPlayer() { return this.state.players.find(p => p.id === this.state.myPlayerId); }
+    getPlayerById(id) { return this.state.players.find(p => p.id === id); }
+    pause() { this.state.isPaused = true; this.addLog('⏸️ 游戏已暂停'); }
+    resume() { this.state.isPaused = false; this.addLog('▶️ 游戏继续'); }
+    surrender() { const myPlayer = this.getMyPlayer(); if (myPlayer) { myPlayer.finished = true; myPlayer.finishRank = this.state.players.length; this.state.finishedPlayers.push(myPlayer); this.addLog('🏳️ 你已放弃游戏'); } this.endGame(); }
+    getStats() { const myPlayer = this.getMyPlayer(); return { totalPlayers: this.state.players.length, finishedPlayers: this.state.finishedPlayers.length, myRank: myPlayer ? myPlayer.finishRank : null, myLevel: this.state.myLevel, round: this.state.round, gameTimeRemaining: this.state.gameTimeRemaining, turnTimeRemaining: this.state.turnTimeRemaining, cardsRemaining: myPlayer ? myPlayer.cardsRemaining : 0 }; }
 }
 
 // ============ 导出 ============
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { TournamentGame, TournamentUI, initTournamentGame };
+    module.exports = { COUNTRY_TOWERS, COUNTRIES_BY_CONTINENT, DIFFICULTY_STATS, TOURNAMENT_CONFIG, TournamentGame, POSTCARD_CONFIG };
 } else {
+    window.COUNTRY_TOWERS = COUNTRY_TOWERS;
+    window.COUNTRIES_BY_CONTINENT = COUNTRIES_BY_CONTINENT;
+    window.DIFFICULTY_STATS = DIFFICULTY_STATS;
+    window.TOURNAMENT_CONFIG = TOURNAMENT_CONFIG;
     window.TournamentGame = TournamentGame;
-    window.TournamentUI = TournamentUI;
-    window.initTournamentGame = initTournamentGame;
+    window.POSTCARD_CONFIG = POSTCARD_CONFIG;
 }
 
-console.log('✅ tournament-game.js 加载完成');
+console.log('✅ tournament-game.js 完整版加载成功！支持196国家锦标赛！');
